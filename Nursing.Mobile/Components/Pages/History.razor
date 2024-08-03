@@ -1,0 +1,57 @@
+@page "/history"
+@using BlazorDateRangePicker
+@inject Nursing.Mobile.Services.IDatabase Database
+
+<h1>History</h1>
+
+<div>
+    <DateRangePicker OnRangeSelect="OnDateRangeChanged" class="form-control"></DateRangePicker>
+</div>
+
+<table class="table table-responsive table-striped">
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Total</th>
+            <th>Left</th>
+            <th>Right</th>
+            <th>Finished</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var feeding in Feedings)
+        {
+            <tr>
+                <td>@feeding.FirstFinish.ToString("h:mm tt")</td>
+                <td><DurationCount Duration="feeding.TotalTime" /></td>
+                <td><DurationCount Duration="feeding.LeftBreastTotal" /></td>
+                <td><DurationCount Duration="feeding.RightBreastTotal" /></td>
+                <td>@(feeding.IsFinished ? "Yes" : "No")</td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    private DateTime StartDate { get; set; } = DateTime.Now.AddMonths(-1);
+    private DateTime EndDate { get; set; } = DateTime.Now;
+
+    private List<Feeding> Feedings { get; set; } = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        Feedings = await GetHistory(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow);
+    }
+
+    private async Task<List<Feeding>> GetHistory(DateTime startDate, DateTime endDate)
+    {
+        var data = await Database.GetFeedings(startDate, endDate);
+        return data;
+    }
+
+    private async Task OnDateRangeChanged(DateRange dateRange)
+    {
+        Feedings = await GetHistory(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
+    }
+}
