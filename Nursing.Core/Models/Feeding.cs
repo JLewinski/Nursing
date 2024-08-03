@@ -2,8 +2,9 @@ namespace Nursing.Models;
 
 public class Feeding
 {
+    public Guid Id { get; set; }
     private List<FeedingTime> _leftBreast = [];
-    public IReadOnlyCollection<FeedingTime> LeftBreast
+    public List<FeedingTime> LeftBreast
     {
         get => _leftBreast;
         init => _leftBreast = value.ToList();
@@ -23,7 +24,7 @@ public class Feeding
     }
 
     private List<FeedingTime> _rightBreast = [];
-    public IReadOnlyCollection<FeedingTime> RightBreast
+    public List<FeedingTime> RightBreast
     {
         get => _rightBreast;
         init => _rightBreast = value.ToList();
@@ -42,6 +43,8 @@ public class Feeding
         }
     }
 
+    public TimeSpan TotalTime => LeftBreastTotal + RightBreastTotal;
+
     public void StartLeftBreast()
     {
         _leftBreast.Add(new FeedingTime { StartTime = DateTime.UtcNow });
@@ -49,7 +52,9 @@ public class Feeding
 
     public void EndLeftBreast()
     {
-        _leftBreast.Last().EndTime = DateTime.UtcNow;
+        LastFinish = DateTime.UtcNow;
+        _leftBreast.Last().EndTime = LastFinish;
+        _leftBreastTotal = GetTotalTime(LeftBreast);
     }
 
     public void StartRightBreast()
@@ -59,9 +64,10 @@ public class Feeding
 
     public void EndRightBreast()
     {
-        _rightBreast.Last().EndTime = DateTime.UtcNow;
+        LastFinish = DateTime.UtcNow;
+        _rightBreast.Last().EndTime = LastFinish;
+        _rightBreastTotal = GetTotalTime(RightBreast);
     }
-
 
     public TimeSpan GetTotalTime(IEnumerable<FeedingTime> breast)
     {
@@ -70,7 +76,7 @@ public class Feeding
 
     public bool IsFinished { get; set; }
 
-
+    public DateTime LastFinish { get; set; }
 }
 
 public class FeedingTime
