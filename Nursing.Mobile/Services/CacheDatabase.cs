@@ -13,7 +13,7 @@ internal class CacheDatabase : IDatabase
 
     public CacheDatabase()
     {
-        File.Delete(DatabasePath);
+        //File.Delete(DatabasePath);
     }
 
     private async Task Init()
