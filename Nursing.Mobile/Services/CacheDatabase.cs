@@ -8,9 +8,12 @@ internal class CacheDatabase : IDatabase
     private const string DatabaseFilename = "Nursing.json";
     private static string DatabasePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DatabaseFilename);
 
+    private const string SettingsFilename = "Settings.json";
+    private static string SettingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SettingsFilename);
+
     public CacheDatabase()
     {
-        //File.Delete(DatabasePath);
+        File.Delete(DatabasePath);
     }
 
     private async Task Init()
@@ -93,5 +96,22 @@ internal class CacheDatabase : IDatabase
         await Save(all);
 
         return true;
+    }
+
+    public async Task<TimeSpan> GetInBetween()
+    {
+        Settings settings;
+
+        if (!File.Exists(SettingsPath))
+        {
+            settings = new();
+        }
+        else
+        {
+            var data = await File.ReadAllTextAsync(SettingsPath);
+            settings = JsonSerializer.Deserialize<Settings>(data) ?? new();
+        }
+
+        return settings.Duration;
     }
 }
