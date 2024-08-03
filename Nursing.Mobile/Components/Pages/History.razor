@@ -1,0 +1,27 @@
+@page "/history"
+@using BlazorDateRangePicker
+@inject Nursing.Mobile.Services.IDatabase Database
+
+<h1>History</h1>
+
+<div>
+    <DateRangePicker OnRangeSelect="OnDateRangeChanged"></DateRangePicker>
+</div>
+
+@code {
+    private DateTime StartDate { get; set; } = DateTime.Now.AddMonths(-1);
+    private DateTime EndDate { get; set; } = DateTime.Now;
+
+    private List<Feeding> Feedings { get; set; } = new();
+
+    private async Task<List<Feeding>> GetHistory(DateTime startDate, DateTime endDate)
+    {
+        var data = await Database.GetFeedings(startDate, endDate);
+        return data;
+    }
+
+    private async Task OnDateRangeChanged(DateRange dateRange)
+    {
+        Feedings = await GetHistory(dateRange.Start, dateRange.End);
+    }
+}
