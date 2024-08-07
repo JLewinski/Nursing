@@ -10,4 +10,6 @@ internal interface IDatabase
     Task<List<Feeding>> GetLast();
     Task<bool> SaveFeeding(Feeding feeding);
     Task<TimeSpan> GetInBetween();
+
+    Task DeleteAll();
 }

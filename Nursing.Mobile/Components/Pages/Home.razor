@@ -30,7 +30,7 @@
         <div class="col-6">
             @if (leftRightNeither == LeftRightNeither.Left)
             {
-                //TODO: Make this a badge (bootstrap)
+            //TODO: Make this a badge (bootstrap)
                 <p class="badge rounded-pill text-bg-info">Last Used</p>
             }
             else
@@ -57,7 +57,7 @@
             <BoobTimer Feedings="feeding.RightBreast" OnToggle="Save" />
         </div>
     </div>
-    
+
     @if (startTime.HasValue)
     {
         <div class="row">
@@ -68,41 +68,51 @@
                 <button class="btn btn-primary" @onclick=Finish>Finish</button>
             </div>
         </div>
-        <table class="table table-borderless table-striped table-responsive align-middle mt-5 d-none d-md-block">
-            <tbody>
-                @{
-                    var leftIndex = feeding.LeftBreast.Count;
-                    var rightIndex = feeding.RightBreast.Count;
-                }
-                @while (leftIndex > 0 || rightIndex > 0)
-                {
+        <div class="mt-5 row">
+            <table class="table table-borderless table-striped table-responsive align-middle d-none d-md-table">
+                <thead>
                     <tr>
-                        @if (--leftIndex >= 0)
-                        {
-                            var startFinish = feeding.LeftBreast[leftIndex];
-                            <td class="col-3">@startFinish.StartTime.ToLocalTime().ToString("'Start: 'h:mm:ss tt")</td>
-                            <td class="col-3">@(startFinish.EndTime?.ToLocalTime().ToString("'End: 'h:mm:ss tt"))</td>
-                        }
-                        else
-                        {
-                            <td class="col-3"></td>
-                            <td class="col-3"></td>
-                        }
-                        @if (--rightIndex >= 0)
-                        {
-                            var startFinish = feeding.RightBreast[rightIndex];
-                            <td class="col-3">@startFinish.StartTime.ToLocalTime().ToString("'Start: 'h:mm:ss tt")</td>
-                            <td class="col-3">@(startFinish.EndTime?.ToLocalTime().ToString("'End: 'h:mm:ss tt"))</td>
-                        }
-                        else
-                        {
-                            <td class="col-3"></td>
-                            <td class="col-3"></td>
-                        }
+                        <th>Left Start</th>
+                        <th>Left End</th>
+                        <th>Right Start</th>
+                        <th>Right End</th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @{
+                        var leftIndex = feeding.LeftBreast.Count;
+                        var rightIndex = feeding.RightBreast.Count;
+                    }
+                    @while (leftIndex > 0 || rightIndex > 0)
+                    {
+                        <tr>
+                            @if (--leftIndex >= 0)
+                            {
+                                var startFinish = feeding.LeftBreast[leftIndex];
+                                <td>@LocalTimeString(startFinish.StartTime)</td>
+                                <td>@LocalTimeString(startFinish.EndTime)</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                                <td></td>
+                            }
+                            @if (--rightIndex >= 0)
+                            {
+                                var startFinish = feeding.RightBreast[rightIndex];
+                                <td>@LocalTimeString(startFinish.StartTime)</td>
+                                <td>@LocalTimeString(startFinish.EndTime)</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                                <td></td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
     }
 </div>
 @code {
@@ -111,6 +121,16 @@
         Left,
         Right,
         Neither
+    }
+
+    private string LocalTimeString(DateTime? time, string? prefix = null)
+    {
+        if (time == null)
+        {
+            return string.Empty;
+        }
+
+        return $"{prefix}{time.Value.ToLocalTime().ToString("h:mm:ss tt")}";
     }
 
     private Feeding feeding = new Feeding();
@@ -231,7 +251,7 @@
             feeding.Started = startTime.Value;
             await InvokeAsync(StateHasChanged);
         }
-        
+
         await Database.SaveFeeding(feeding);
     }
 

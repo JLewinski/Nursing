@@ -5,6 +5,7 @@ namespace Nursing.Mobile.Services;
 
 internal class CacheDatabase : IDatabase
 {
+    private static string DatabaseFolderPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing");
     private static string DatabasePath => CreateDatabasePath(DateTime.UtcNow);
 
     private const string SettingsFilename = "Settings.json";
@@ -12,22 +13,19 @@ internal class CacheDatabase : IDatabase
 
     private static string CreateDatabasePath(DateTime date)
     {
-        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing", $"Data.{date:yyyy.MM.dd}.json");
+        return Path.Combine(DatabaseFolderPath, $"Data.{date:yyyy.MM.dd}.json");
     }
 
     public CacheDatabase()
     {
-        //var files = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing"));
-        //foreach (var file in files)
-        //{
-        //    File.Delete(file);
-        //}
+        
     }
 
     private static bool IsInit(string? dbPath = null)
     {
-        if (File.Exists(dbPath ?? DatabasePath))
+        if (!File.Exists(dbPath ?? DatabasePath))
         {
+            Directory.CreateDirectory(DatabaseFolderPath);
             return false;
         }
 
@@ -53,6 +51,7 @@ internal class CacheDatabase : IDatabase
     private static async Task Save(IEnumerable<Feeding> feedings, string path)
     {
         var json = JsonSerializer.Serialize(feedings);
+
         await File.WriteAllTextAsync(path, json);
     }
 
@@ -112,6 +111,7 @@ internal class CacheDatabase : IDatabase
         if (start is null)
         {
             feedings = await GetFeedings(DatabasePath);
+            feedings.AddRange(await GetFeedings(CreateDatabasePath(DateTime.UtcNow.AddDays(-1))));
         }
         else
         {
@@ -127,8 +127,8 @@ internal class CacheDatabase : IDatabase
 
 
         return feedings?
-            .Where(x => x.Finished >= (start ?? DateTime.MinValue) && x.Finished <= (end ?? DateTime.UtcNow))
-            .OrderByDescending(x => x.Finished)
+            .Where(x => x.Started >= (start ?? DateTime.MinValue) && x.Started <= (end ?? DateTime.UtcNow))
+            .OrderByDescending(x => x.Started)
             .ToList() ?? [];
     }
 
@@ -175,5 +175,11 @@ internal class CacheDatabase : IDatabase
         }
 
         return settings.Duration;
+    }
+
+    public Task DeleteAll()
+    {
+        Directory.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing"), true);
+        return Task.FromResult(true);
     }
 }
