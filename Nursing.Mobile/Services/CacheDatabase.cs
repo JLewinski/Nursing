@@ -1,4 +1,4 @@
-﻿using Nursing.Models;
+using Nursing.Models;
 using System.Text.Json;
 
 namespace Nursing.Mobile.Services;
@@ -67,8 +67,8 @@ internal class CacheDatabase : IDatabase
 
         var feedings = JsonSerializer.Deserialize<List<Feeding>>(jsonData);
         return feedings?
-            .Where(x => x.LastFinish >= (start ?? DateTime.MinValue) && x.LastFinish <= (end ?? DateTime.UtcNow))
-            .OrderByDescending(x => x.LastFinish)
+            .Where(x => x.Finished >= (start ?? DateTime.MinValue) && x.Finished <= (end ?? DateTime.UtcNow))
+            .OrderByDescending(x => x.Finished)
             .ToList() ?? [];
     }
 
