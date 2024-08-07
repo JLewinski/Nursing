@@ -61,7 +61,6 @@ public class Feeding
         {
             return;
         }
-        Finished = DateTime.UtcNow;
         _leftBreast.Last().EndTime = Finished;
         _leftBreastTotal = GetTotalTime(LeftBreast);
     }
@@ -82,7 +81,6 @@ public class Feeding
         {
             return;
         }
-        Finished = DateTime.UtcNow;
         _rightBreast.Last().EndTime = Finished;
         _rightBreastTotal = GetTotalTime(RightBreast);
     }
