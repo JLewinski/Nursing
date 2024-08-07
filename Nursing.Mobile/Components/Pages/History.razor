@@ -4,54 +4,101 @@
 
 <h1>History</h1>
 
-<div>
-    <DateRangePicker OnRangeSelect="OnDateRangeChanged" class="form-control"></DateRangePicker>
+<div class="container">
+    <div class="row">
+        <DateRangePicker OnRangeSelect="OnDateRangeChanged"
+            StartDate="DateTime.Now.AddDays(-7)"
+            EndDate="DateTime.Now"
+            MaxDate="DateTime.Now"
+            class="form-control"></DateRangePicker>
+    </div>
+    <div class="row mt-2 mb-2">
+        <table class="table table-responsive table-striped table-bordered mb-3">
+            <tr>
+                <th>Average Time Fed</th>
+                <td><DurationCount Duration="AverageFed" /></td>
+            </tr>
+            <tr>
+                <th>Average Time Took</th>
+                <td><DurationCount Duration="AverageTook" /></td>
+            </tr>
+            <tr>
+                <th>Average Time Between</th>
+                <td><DurationCount Duration="AverageTimeBetween" /></td>
+            </tr>
+        </table>
+    </div>
+    <div class="row">
+        <table class="table table-responsive table-striped">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Total</th>
+                    <th>Left</th>
+                    <th>Right</th>
+                    <th>Finished</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var feeding in Feedings)
+                {
+                    <tr>
+                        <td class="d-none d-lg-block">@feeding.Started.ToLocalTime().ToShortDateString()</td>
+                        <td>@feeding.Started.ToLocalTime().ToShortTimeString()</td>
+                        <td><DurationCount Duration="feeding.TotalTime" /></td>
+                        <td><DurationCount Duration="feeding.LeftBreastTotal" /></td>
+                        <td><DurationCount Duration="feeding.RightBreastTotal" /></td>
+                        <td>@(feeding.IsFinished ? "Yes" : "No")</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
 </div>
 
-<table class="table table-responsive table-striped">
-    <thead>
-        <tr>
-            <th>Date</th>
-            <th>Total</th>
-            <th>Left</th>
-            <th>Right</th>
-            <th>Finished</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var feeding in Feedings)
-        {
-            <tr>
-                <td>@feeding.FirstFinish.ToString("h:mm tt")</td>
-                <td><DurationCount Duration="feeding.TotalTime" /></td>
-                <td><DurationCount Duration="feeding.LeftBreastTotal" /></td>
-                <td><DurationCount Duration="feeding.RightBreastTotal" /></td>
-                <td>@(feeding.IsFinished ? "Yes" : "No")</td>
-            </tr>
-        }
-    </tbody>
-</table>
-
 @code {
-    private DateTime StartDate { get; set; } = DateTime.Now.AddMonths(-1);
-    private DateTime EndDate { get; set; } = DateTime.Now;
+    private List<Feeding> Feedings = new();
 
-    private List<Feeding> Feedings { get; set; } = new();
+    private DateTime MinTime;
+
+    private TimeSpan AverageFed => Average(Feedings.Select(x => x.TotalTime));
+    private TimeSpan AverageTook => Average(Feedings.Select(x => x.Finished - x.Started));
+    private TimeSpan AverageTimeBetween
+    {
+        get
+        {
+            if (Feedings.Count < 2)
+            {
+                return TimeSpan.Zero;
+            }
+
+            List<TimeSpan> timesBetween = new();
+            for (int i = 1; i < Feedings.Count; i++)
+            {
+                timesBetween.Add(Feedings[i].Started - Feedings[i - 1].Started);
+            }
+            return Average(timesBetween);
+        }
+    }
+
+    private TimeSpan Average(IEnumerable<TimeSpan> list)
+    {
+        if (!list.Any())
+        {
+            return TimeSpan.Zero;
+        }
+        var averageTicks = list.Average(x => x.Ticks);
+        return TimeSpan.FromTicks((long)averageTicks);
+    }
 
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        Feedings = await GetHistory(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow);
-    }
-
-    private async Task<List<Feeding>> GetHistory(DateTime startDate, DateTime endDate)
-    {
-        var data = await Database.GetFeedings(startDate, endDate);
-        return data;
+        Feedings = await Database.GetFeedings(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow);
     }
 
     private async Task OnDateRangeChanged(DateRange dateRange)
     {
-        Feedings = await GetHistory(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
+        Feedings = await Database.GetFeedings(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
     }
 }

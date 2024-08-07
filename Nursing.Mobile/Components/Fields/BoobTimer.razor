@@ -1,0 +1,93 @@
+﻿<button class="btn btn-primary p-5 rounded-circle" @onclick=Toggle>
+    <div>@buttonText</div>
+    <div><DurationCount Duration="timeSpan" /></div>
+</button>
+
+
+@code {
+    [Parameter]
+    public List<FeedingTime> Feedings { get; init; } = default!;
+
+    [Parameter]
+    public EventCallback OnToggle { get; init; }
+
+    private TimeSpan timeSpan = TimeSpan.Zero;
+
+    public FeedingTime? CurrentFeeding => Feedings.LastOrDefault();
+
+    private bool isOff => CurrentFeeding?.StartTime == null || CurrentFeeding.EndTime != null;
+
+    private string buttonText => isOff ? "Start" : "Stop";
+
+    private Timer? timer;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        if (Feedings.Count > 0)
+        {
+            timeSpan = Feeding.GetTotalTime(Feedings);
+            StartTimer();
+        }
+    }
+
+    private async Task Toggle()
+    {
+        if (isOff)
+        {
+            if (CurrentFeeding != null && CurrentFeeding.EndTime == null)
+            {
+                CurrentFeeding.EndTime = DateTime.UtcNow;
+            }
+            Feedings.Add(new FeedingTime { StartTime = DateTime.UtcNow });
+            StartTimer();
+        }
+        else
+        {
+            if (CurrentFeeding != null && CurrentFeeding.EndTime == null)
+            {
+                CurrentFeeding.EndTime = DateTime.UtcNow;
+            }
+            EndTimer();
+        }
+
+        await OnToggle.InvokeAsync();
+    }
+
+    public void EndTimer()
+    {
+        if (timer == null)
+        {
+            return;
+        }
+
+        timer.Dispose();
+        timer = null;
+    }
+
+    public void StartTimer()
+    {
+        if (timer != null)
+        {
+            return;
+        }
+
+        timer = new Timer(async _ =>
+            {
+                var previous = timeSpan;
+
+                timeSpan = Feeding.GetTotalTime(Feedings);
+
+                if ((int)previous.TotalSeconds != (int)timeSpan.TotalSeconds)
+                {
+                    await InvokeAsync(StateHasChanged);
+                }
+                else if (isOff)
+                {
+                    EndTimer();
+                    await InvokeAsync(StateHasChanged);
+                }
+            }, null, 0, 500);
+    }
+}

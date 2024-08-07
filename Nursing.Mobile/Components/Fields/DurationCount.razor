@@ -3,10 +3,70 @@
 @code {
 
     [Parameter]
+    public DateTime? StartTime { get; set; }
+
+    [Parameter]
+    public DateTime? EndTime { get; set; }
+
+    [Parameter]
     public TimeSpan Duration { get; set; }
+
+    private TimeSpan previousDuration;
+
+    [Parameter]
+    public bool ShowHours { get; set; } = false;
+
+    [Parameter]
+    public bool IsTimer { get; set; } = false;
+
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        if (IsTimer)
+        {
+            previousDuration = Duration;
+            new Timer(async _ =>
+            {
+                if(StartTime.HasValue && EndTime.HasValue)
+                {
+                    Duration = EndTime.Value - StartTime.Value;
+                }
+                else if (StartTime.HasValue)
+                {
+                    Duration = DateTime.UtcNow - StartTime.Value;
+                }
+                else if (EndTime.HasValue)
+                {
+                    Duration = EndTime.Value - DateTime.UtcNow;
+                }
+
+                if ((int)previousDuration.TotalSeconds != (int)Duration.TotalSeconds)
+                {
+                    previousDuration = Duration;
+                    await InvokeAsync(StateHasChanged);
+                }
+            }, null, 0, 100);
+        }
+    }
 
     private string DurationToString(TimeSpan duration)
     {
-        return $"{duration.TotalMinutes.ToString("00")}:{duration.Seconds.ToString("00")}";
+        var minutesText = ShowHours ? duration.Minutes.ToString("00") : ((int)duration.TotalMinutes).ToString("00");
+        var secondsText = duration.Seconds.ToString("00");
+
+        var text = $"{minutesText}:{secondsText}";
+
+        if (ShowHours)
+        {
+            var hoursText = ShowHours ? ((int)duration.TotalHours).ToString("00") : "";
+            text = hoursText + ":" + text;
+        }
+        if (duration < TimeSpan.Zero)
+        {
+            text = "-" + text;
+        }
+
+        return text;
     }
 }

@@ -60,8 +60,8 @@ internal class LocalDatabase// : IDatabase
     {
         await Init();
         return await Database.Table<Feeding>()
-            .Where(x => x.LastFinish >= (start ?? DateTime.MinValue) && x.LastFinish <= (end ?? DateTime.UtcNow))
-            .OrderByDescending(x => x.LastFinish)
+            .Where(x => x.Finished >= (start ?? DateTime.MinValue) && x.Finished <= (end ?? DateTime.UtcNow))
+            .OrderByDescending(x => x.Finished)
             .ToListAsync();
     }
 
@@ -69,7 +69,7 @@ internal class LocalDatabase// : IDatabase
     {
         await Init();
         var data = await Database.Table<Feeding>()
-            .Where(x => x.LastFinish >= (start ?? DateTime.MinValue) && x.LastFinish <= (end ?? DateTime.UtcNow))
+            .Where(x => x.Finished >= (start ?? DateTime.MinValue) && x.Finished <= (end ?? DateTime.UtcNow))
             .ToListAsync();
 
         var (total, right, left) = data.Aggregate((total: TimeSpan.Zero, right: TimeSpan.Zero, left: TimeSpan.Zero), (acc, x) =>
@@ -92,7 +92,7 @@ internal class LocalDatabase// : IDatabase
         {
             await Init();
             return await Database.Table<Feeding>()
-            .OrderByDescending(x => x.LastFinish)
+            .OrderByDescending(x => x.Finished)
             .Take(2)
             .ToListAsync();
         }
