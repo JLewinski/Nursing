@@ -237,7 +237,7 @@
 
     private async Task Reset()
     {
-        await Database.Delete(feeding.Id);
+        await Database.Delete(feeding);
         Navigation.Refresh();
     }
 
