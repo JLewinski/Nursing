@@ -19,6 +19,10 @@
     [Parameter]
     public bool IsTimer { get; set; } = false;
 
+    public async Task ManualUpdate()
+    {
+        await InvokeAsync(StateHasChanged);
+    }
 
     protected override async Task OnParametersSetAsync()
     {

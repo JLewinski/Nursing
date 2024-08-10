@@ -8,6 +8,7 @@
         {
             <div class="col-12">
                 <p>Started: @startTime.Value.ToLocalTime().ToShortTimeString()</p>
+                <p><DurationCount @ref="totalDuration" Duration="feeding.TotalTime" /></p>
             </div>
         }
         else if (lastTime.HasValue)
@@ -51,15 +52,17 @@
     </div>
     <div class="row mb-3">
         <div class="col-6">
-            <BoobTimer Feedings="feeding.LeftBreast" OnToggle="Save" />
+            <BoobTimer ViewModel="feeding" IsLeft="true" OnToggle="Save" OnUpdate="ManualUpdate" />
         </div>
         <div class="col-6">
-            <BoobTimer Feedings="feeding.RightBreast" OnToggle="Save" />
+            <BoobTimer ViewModel="feeding" IsLeft="false" OnToggle="Save" OnUpdate="ManualUpdate" />
         </div>
     </div>
+</div>
 
-    @if (startTime.HasValue)
-    {
+@if (startTime.HasValue)
+{
+    <div class="container">
         <div class="row">
             <div class="d-grid gap-2 col-6 mx-auto">
                 <button class="btn btn-primary" @onclick=Reset>Reset</button>
@@ -113,9 +116,16 @@
                 </tbody>
             </table>
         </div>
-    }
-</div>
+    </div>
+}
+
 @code {
+    private DurationCount totalDuration;
+    private async Task ManualUpdate()
+    {
+        
+    }
+
     enum LeftRightNeither
     {
         Left,
@@ -235,6 +245,22 @@
         {
             leftRightNeither = LeftRightNeither.Right;
         }
+    }
+
+    private Task Toggle(bool? leftRightStart)
+    {
+        if (leftRightStart is bool left)
+        {
+            if (left)
+            {
+                feeding.EndRightBreast();
+            }
+            else
+            {
+                feeding.EndLeftBreast();
+            }
+        }
+        return Save();
     }
 
     private async Task Save()
