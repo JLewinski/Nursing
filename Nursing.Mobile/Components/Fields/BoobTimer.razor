@@ -1,19 +1,27 @@
 ﻿<button class="btn btn-primary p-5 rounded-circle" @onclick=Toggle>
     <div>@buttonText</div>
-    <div><DurationCount Duration="timeSpan" /></div>
+    <div><DurationCount Duration="Duration" /></div>
 </button>
 
 
 @code {
     [Parameter]
-    public List<FeedingTime> Feedings { get; init; } = default!;
+    public Feeding ViewModel { get; init; } = new();
+
+    private List<FeedingTime> feedings => IsLeft ? ViewModel.LeftBreast : ViewModel.RightBreast;
 
     [Parameter]
     public EventCallback OnToggle { get; init; }
 
-    private TimeSpan timeSpan = TimeSpan.Zero;
+    [Parameter]
+    public EventCallback OnUpdate { get; init; }
 
-    public FeedingTime? CurrentFeeding => Feedings.LastOrDefault();
+    private TimeSpan Duration => IsLeft ? ViewModel.LeftBreastTotal : ViewModel.RightBreastTotal;
+
+    [Parameter]
+    public bool IsLeft { get; init; }
+
+    public FeedingTime? CurrentFeeding => feedings.LastOrDefault();
 
     private bool isOff => CurrentFeeding?.StartTime == null || CurrentFeeding.EndTime != null;
 
@@ -25,9 +33,8 @@
     {
         await base.OnParametersSetAsync();
 
-        if (Feedings.Count > 0)
+        if (feedings.Count > 0)
         {
-            timeSpan = Feeding.GetTotalTime(Feedings);
             StartTimer();
         }
     }
@@ -36,22 +43,29 @@
     {
         if (isOff)
         {
-            if (CurrentFeeding != null && CurrentFeeding.EndTime == null)
+            if (IsLeft)
             {
-                CurrentFeeding.EndTime = DateTime.UtcNow;
+                ViewModel.StartLeftBreast();
             }
-            Feedings.Add(new FeedingTime { StartTime = DateTime.UtcNow });
+            else
+            {
+                ViewModel.StartRightBreast();
+            }
+
             StartTimer();
         }
         else
         {
-            if (CurrentFeeding != null && CurrentFeeding.EndTime == null)
+            if (IsLeft)
             {
-                CurrentFeeding.EndTime = DateTime.UtcNow;
+                ViewModel.EndLeftBreast();
+            }
+            else
+            {
+                ViewModel.EndRightBreast();
             }
             EndTimer();
         }
-
         await OnToggle.InvokeAsync();
     }
 
@@ -75,19 +89,21 @@
 
         timer = new Timer(async _ =>
             {
-                var previous = timeSpan;
-
-                timeSpan = Feeding.GetTotalTime(Feedings);
-
-                if ((int)previous.TotalSeconds != (int)timeSpan.TotalSeconds)
-                {
-                    await InvokeAsync(StateHasChanged);
-                }
-                else if (isOff)
+                if(isOff)
                 {
                     EndTimer();
+                    return;
+                }
+
+                var previous = Duration;
+                ViewModel.Calculate();
+
+                if (previous.TotalSeconds != Duration.TotalSeconds)
+                {
+                    await InvokeAsync(OnUpdate.InvokeAsync);
                     await InvokeAsync(StateHasChanged);
                 }
-            }, null, 0, 500);
+
+            }, null, 0, 100);
     }
 }

@@ -8,6 +8,7 @@
         {
             <div class="col-12">
                 <p>Started: @startTime.Value.ToLocalTime().ToShortTimeString()</p>
+                <p><DurationCount @ref="totalDuration" Duration="feeding.TotalTime" /></p>
             </div>
         }
         else if (lastTime.HasValue)
@@ -30,7 +31,7 @@
         <div class="col-6">
             @if (leftRightNeither == LeftRightNeither.Left)
             {
-                //TODO: Make this a badge (bootstrap)
+            //TODO: Make this a badge (bootstrap)
                 <p class="badge rounded-pill text-bg-info">Last Used</p>
             }
             else
@@ -51,15 +52,17 @@
     </div>
     <div class="row mb-3">
         <div class="col-6">
-            <BoobTimer Feedings="feeding.LeftBreast" OnToggle="Save" />
+            <BoobTimer ViewModel="feeding" IsLeft="true" OnToggle="Save" OnUpdate="ManualUpdate" />
         </div>
         <div class="col-6">
-            <BoobTimer Feedings="feeding.RightBreast" OnToggle="Save" />
+            <BoobTimer ViewModel="feeding" IsLeft="false" OnToggle="Save" OnUpdate="ManualUpdate" />
         </div>
     </div>
-    
-    @if (startTime.HasValue)
-    {
+</div>
+
+@if (startTime.HasValue)
+{
+    <div class="container">
         <div class="row">
             <div class="d-grid gap-2 col-6 mx-auto">
                 <button class="btn btn-primary" @onclick=Reset>Reset</button>
@@ -68,49 +71,76 @@
                 <button class="btn btn-primary" @onclick=Finish>Finish</button>
             </div>
         </div>
-        <table class="table table-borderless table-striped table-responsive align-middle mt-5 d-none d-md-block">
-            <tbody>
-                @{
-                    var leftIndex = feeding.LeftBreast.Count;
-                    var rightIndex = feeding.RightBreast.Count;
-                }
-                @while (leftIndex > 0 || rightIndex > 0)
-                {
+        <div class="mt-5 row">
+            <table class="table table-borderless table-striped table-responsive align-middle d-none d-md-table">
+                <thead>
                     <tr>
-                        @if (--leftIndex >= 0)
-                        {
-                            var startFinish = feeding.LeftBreast[leftIndex];
-                            <td class="col-3">@startFinish.StartTime.ToLocalTime().ToString("'Start: 'h:mm:ss tt")</td>
-                            <td class="col-3">@(startFinish.EndTime?.ToLocalTime().ToString("'End: 'h:mm:ss tt"))</td>
-                        }
-                        else
-                        {
-                            <td class="col-3"></td>
-                            <td class="col-3"></td>
-                        }
-                        @if (--rightIndex >= 0)
-                        {
-                            var startFinish = feeding.RightBreast[rightIndex];
-                            <td class="col-3">@startFinish.StartTime.ToLocalTime().ToString("'Start: 'h:mm:ss tt")</td>
-                            <td class="col-3">@(startFinish.EndTime?.ToLocalTime().ToString("'End: 'h:mm:ss tt"))</td>
-                        }
-                        else
-                        {
-                            <td class="col-3"></td>
-                            <td class="col-3"></td>
-                        }
+                        <th>Left Start</th>
+                        <th>Left End</th>
+                        <th>Right Start</th>
+                        <th>Right End</th>
                     </tr>
-                }
-            </tbody>
-        </table>
-    }
-</div>
+                </thead>
+                <tbody>
+                    @{
+                        var leftIndex = feeding.LeftBreast.Count;
+                        var rightIndex = feeding.RightBreast.Count;
+                    }
+                    @while (leftIndex > 0 || rightIndex > 0)
+                    {
+                        <tr>
+                            @if (--leftIndex >= 0)
+                            {
+                                var startFinish = feeding.LeftBreast[leftIndex];
+                                <td>@LocalTimeString(startFinish.StartTime)</td>
+                                <td>@LocalTimeString(startFinish.EndTime)</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                                <td></td>
+                            }
+                            @if (--rightIndex >= 0)
+                            {
+                                var startFinish = feeding.RightBreast[rightIndex];
+                                <td>@LocalTimeString(startFinish.StartTime)</td>
+                                <td>@LocalTimeString(startFinish.EndTime)</td>
+                            }
+                            else
+                            {
+                                <td></td>
+                                <td></td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}
+
 @code {
+    private DurationCount totalDuration;
+    private async Task ManualUpdate()
+    {
+        
+    }
+
     enum LeftRightNeither
     {
         Left,
         Right,
         Neither
+    }
+
+    private string LocalTimeString(DateTime? time, string? prefix = null)
+    {
+        if (time == null)
+        {
+            return string.Empty;
+        }
+
+        return $"{prefix}{time.Value.ToLocalTime().ToString("h:mm:ss tt")}";
     }
 
     private Feeding feeding = new Feeding();
@@ -217,6 +247,22 @@
         }
     }
 
+    private Task Toggle(bool? leftRightStart)
+    {
+        if (leftRightStart is bool left)
+        {
+            if (left)
+            {
+                feeding.EndRightBreast();
+            }
+            else
+            {
+                feeding.EndLeftBreast();
+            }
+        }
+        return Save();
+    }
+
     private async Task Save()
     {
         if (startTime is null)
@@ -231,13 +277,13 @@
             feeding.Started = startTime.Value;
             await InvokeAsync(StateHasChanged);
         }
-        
+
         await Database.SaveFeeding(feeding);
     }
 
     private async Task Reset()
     {
-        await Database.Delete(feeding.Id);
+        await Database.Delete(feeding);
         Navigation.Refresh();
     }
 

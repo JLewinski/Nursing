@@ -1,0 +1,58 @@
+@page "/settings"
+@inject NavigationManager Navigation
+@inject Services.IDatabase Database
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Settings</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button class="btn btn-danger" @onclick="Delete">Delete Data</button>
+        </div>
+    </div>
+    <div class="row mt-3 mb-3">
+        <div class="col-6">
+            <InputSelect @bind-Value="settings.Theme" class="form-control">
+                @foreach (var theme in Enum.GetValues<Nursing.Models.ThemeSetting>())
+                {
+                    <option value="@theme">@theme</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="col-6">
+            <input @bind-value="hoursBetweenFeedings" type="number" step="0.5" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button class="btn btn-primary" @onclick="Save">Save</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private Nursing.Models.Settings settings = new();
+    private double hoursBetweenFeedings = 3.5;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+        settings = await Database.GetSettings();
+        hoursBetweenFeedings = settings.Duration.TotalHours;
+    }
+
+    private async Task Delete()
+    {
+        await Database.DeleteAll();
+    }
+
+    private async Task Save()
+    {
+        settings.Duration = TimeSpan.FromHours(hoursBetweenFeedings);
+        await Database.SaveSettings(settings);
+        Navigation.Refresh();
+    }
+}
