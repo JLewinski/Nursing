@@ -8,22 +8,22 @@
         {
             <div class="col-12">
                 <p>Started: @startTime.Value.ToLocalTime().ToShortTimeString()</p>
-                <p><DurationCount @ref="totalDuration" Duration="feeding.TotalTime" /></p>
+                <p class="h3"><DurationCount @ref="totalDuration" Duration="feeding.TotalTime" /></p>
             </div>
         }
         else if (lastTime.HasValue)
         {
             var lastTimeValue = lastTime.Value;
             <div class="col-6">
-                <p class="p-0 m-0">Last Fed</p>
-                <p class="p-0 m-0">@lastTimeValue.ToLocalTime().ToShortTimeString()</p>
-                <p><DurationCount StartTime="lastTimeValue" ShowHours="true" IsTimer="true" /></p>
+                <p class="p-0 m-0 h3">Last Fed</p>
+                <p class="p-0 m-0 h4">@lastTimeValue.ToLocalTime().ToShortTimeString()</p>
+                <p class="h4"><DurationCount StartTime="lastTimeValue" ShowHours="true" IsTimer="true" /></p>
             </div>
             var nextFeeding = lastTimeValue + TimeBetweenFeedings;
             <div class="col-6">
-                <p class="p-0 m-0">Next Feeding</p>
-                <p class="p-0 m-0">@nextFeeding.ToLocalTime().ToShortTimeString()</p>
-                <p><DurationCount EndTime="nextFeeding" ShowHours="true" IsTimer="true" /></p>
+                <p class="p-0 m-0 h3">Next Feeding</p>
+                <p class="p-0 m-0 h4">@nextFeeding.ToLocalTime().ToShortTimeString()</p>
+                <p class="h4"><DurationCount EndTime="nextFeeding" ShowHours="true" IsTimer="true" /></p>
             </div>
         }
     </div>
@@ -32,7 +32,7 @@
             @if (leftRightNeither == LeftRightNeither.Left)
             {
             //TODO: Make this a badge (bootstrap)
-                <p class="badge rounded-pill text-bg-info">Last Used</p>
+                <p class="badge rounded-pill text-bg-info px-3">Last Used</p>
             }
             else
             {
@@ -42,7 +42,7 @@
         <div class="col-6">
             @if (leftRightNeither == LeftRightNeither.Right)
             {
-                <p>Last Used</p>
+                <p class="badge rounded-pill text-bg-info px-3">Last Used</p>
             }
             else
             {

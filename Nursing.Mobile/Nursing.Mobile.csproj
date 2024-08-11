@@ -44,42 +44,58 @@
       <AndroidKeyStore>False</AndroidKeyStore>
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-android|AnyCPU'">
       <AndroidKeyStore>False</AndroidKeyStore>
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-ios|AnyCPU'">
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-maccatalyst|AnyCPU'">
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net8.0-windows10.0.19041.0|AnyCPU'">
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-ios|AnyCPU'">
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-maccatalyst|AnyCPU'">
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net8.0-windows10.0.19041.0|AnyCPU'">
       <ApplicationTitle>Nursing</ApplicationTitle>
       <ApplicationId>com.lewinski.nursing</ApplicationId>
+      <ApplicationDisplayVersion>1.0.2</ApplicationDisplayVersion>
+      <ApplicationVersion>3</ApplicationVersion>
     </PropertyGroup>
 
     <ItemGroup>
