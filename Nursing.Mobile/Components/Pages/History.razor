@@ -65,7 +65,7 @@
     private DateTime MinTime;
 
     private TimeSpan AverageFed => Average(Feedings.Select(x => x.TotalTime));
-    private TimeSpan AverageTook => Average(Feedings.Select(x => x.Finished - x.Started));
+    private TimeSpan AverageTook => Average(Feedings.Where(x => x.Finished != null).Select(x => x.Finished.Value - x.Started));
     private TimeSpan AverageTimeBetween
     {
         get
