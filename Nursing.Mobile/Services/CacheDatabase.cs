@@ -18,7 +18,7 @@ internal class CacheDatabase : IDatabase
 
     public CacheDatabase()
     {
-        
+
     }
 
     private static bool IsInit(string? dbPath = null)
@@ -101,28 +101,20 @@ internal class CacheDatabase : IDatabase
 
     public async Task<List<Feeding>> GetFeedings(DateTime? start = null, DateTime? end = null)
     {
-        if (start is null && end is null && !IsInit())
-        {
-            return [];
-        }
-
         List<Feeding> feedings = [];
 
         if (start is null)
         {
-            feedings = await GetFeedings(DatabasePath);
-            feedings.AddRange(await GetFeedings(CreateDatabasePath(DateTime.UtcNow.AddDays(-1))));
+            start = DateTime.UtcNow.AddDays(-1);
         }
-        else
+
+        var dateIterator = start.Value.Date;
+
+        while (dateIterator <= (end ?? DateTime.UtcNow).Date)
         {
-            var dateIterator = start.Value.Date;
+            feedings.AddRange(await GetFeedings(CreateDatabasePath(dateIterator)));
 
-            while (dateIterator <= (end ?? DateTime.UtcNow).Date)
-            {
-                feedings.AddRange(await GetFeedings(CreateDatabasePath(dateIterator)));
-
-                dateIterator = dateIterator.AddDays(1);
-            }
+            dateIterator = dateIterator.AddDays(1);
         }
 
 
