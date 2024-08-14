@@ -1,6 +1,7 @@
 @page "/history"
 @using BlazorDateRangePicker
-@inject Nursing.Mobile.Services.IDatabase Database
+@using Nursing.Core.Models.DTO
+@inject Nursing.Core.Services.IDatabase Database
 
 <h1>History</h1>
 
@@ -51,7 +52,7 @@
                         <td><DurationCount Duration="feeding.TotalTime" /></td>
                         <td><DurationCount Duration="feeding.LeftBreastTotal" /></td>
                         <td><DurationCount Duration="feeding.RightBreastTotal" /></td>
-                        <td>@(feeding.IsFinished ? "Yes" : "No")</td>
+                        <td>@(feeding.Finished != null ? "Yes" : "No")</td>
                     </tr>
                 }
             </tbody>
@@ -60,7 +61,7 @@
 </div>
 
 @code {
-    private List<Feeding> Feedings = new();
+    private List<FeedingDto> Feedings = new();
 
     private DateTime MinTime;
 

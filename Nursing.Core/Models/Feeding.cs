@@ -9,23 +9,6 @@ public class Feeding : FeedingDto
 
     }
 
-    public Feeding(OldFeeding feeding)
-    {
-        Id = feeding.Id;
-        LeftBreastTotal = feeding.LeftBreastTotal;
-        RightBreastTotal = feeding.RightBreastTotal;
-        TotalTime = feeding.TotalTime;
-        Started = feeding.Started;
-        Finished = feeding.Finished;
-        
-        var maxLeft = feeding.LeftBreast.Count > 0 ? feeding.LeftBreast.Max(x => x.StartTime) : DateTime.MinValue;
-        var maxRight = feeding.RightBreast.Count > 0 ? feeding.RightBreast.Max(x => x.StartTime) : DateTime.MinValue;
-
-        LastIsLeft = maxLeft > maxRight;
-
-        LastUpdated = DateTime.UtcNow;
-    }
-
     public Feeding(FeedingDto feeding)
     {
         Id = feeding.Id;
