@@ -1,6 +1,7 @@
 ﻿@page "/"
+@using Nursing.Mobile.Services
 @inject NavigationManager Navigation
-@inject Services.IDatabase Database
+@inject Nursing.Core.Services.IDatabase Database
 
 <div class="container text-center">
     <div class="row">
@@ -123,7 +124,7 @@
     private DurationCount totalDuration;
     private async Task ManualUpdate()
     {
-        
+
     }
 
     enum LeftRightNeither
@@ -163,88 +164,22 @@
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
-        TimeBetweenFeedings = await Database.GetInBetween();
+        var settings = await Cache.GetSettings();
+        TimeBetweenFeedings = settings.Duration;
         await Load();
     }
 
     private async Task Load()
     {
-        var last2 = await Database.GetLast();
-        var last = last2.FirstOrDefault();
-        if (last != null && !last.IsFinished)
+        var cache = await Cache.Get();
+        feeding = cache.CurrentFeeding;
+        lastTime = cache.LastStart;
+        leftRightNeither = cache.LastWasLeft switch
         {
-            Load(last);
-            if (last2.Count == 2)
-            {
-                var previous = last2.Last();
-                if (previous != null)
-                {
-                    LoadPrevious(previous);
-                }
-            }
-        }
-        else if (last != null)
-        {
-            LoadPrevious(last);
-        }
-    }
-
-    private void Load(Feeding loadedFeeding)
-    {
-        feeding = loadedFeeding;
-        if (feeding.LeftBreast.Count > 0)
-        {
-            leftInProgress = feeding.LeftBreast.Last().EndTime == null;
-            startTime = feeding.LeftBreast.First().StartTime;
-        }
-
-        if (feeding.RightBreast.Count > 0)
-        {
-            rightInProgress = feeding.RightBreast.Last().EndTime == null;
-            if (startTime == null || feeding.RightBreast.First().StartTime < startTime)
-            {
-                startTime = feeding.RightBreast.First().StartTime;
-            }
-        }
-    }
-
-    public async Task<Feeding?> Load(string path)
-    {
-        if (!File.Exists(path))
-        {
-            return null;
-        }
-
-        var data = await File.ReadAllTextAsync(path);
-        var cachedFeeding = System.Text.Json.JsonSerializer.Deserialize<Feeding>(data);
-        return cachedFeeding;
-    }
-
-    private void LoadPrevious(Feeding previousFeeding)
-    {
-        lastTime = previousFeeding.Started;
-        var maxLeft = previousFeeding.LeftBreast.Count > 0 ? previousFeeding.LeftBreast.Max(x => x.EndTime) : null;
-        var maxRight = previousFeeding.RightBreast.Count > 0 ? previousFeeding.RightBreast.Max(x => x.EndTime) : null;
-
-        if (maxLeft.HasValue && maxRight.HasValue)
-        {
-            if (maxLeft > maxRight)
-            {
-                leftRightNeither = LeftRightNeither.Left;
-            }
-            else
-            {
-                leftRightNeither = LeftRightNeither.Right;
-            }
-        }
-        else if (maxLeft.HasValue)
-        {
-            leftRightNeither = LeftRightNeither.Left;
-        }
-        else if (maxRight.HasValue)
-        {
-            leftRightNeither = LeftRightNeither.Right;
-        }
+            true => LeftRightNeither.Left,
+            false => LeftRightNeither.Right,
+            _ => LeftRightNeither.Neither
+        };
     }
 
     private Task Toggle(bool? leftRightStart)
@@ -277,6 +212,8 @@
             feeding.Started = startTime.Value;
             await InvokeAsync(StateHasChanged);
         }
+
+        await CacheService.Cache(feeding);
 
         await Database.SaveFeeding(feeding);
     }

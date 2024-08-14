@@ -4,6 +4,40 @@ namespace Nursing.Models;
 
 public class Feeding : FeedingDto
 {
+    public Feeding()
+    {
+
+    }
+
+    public Feeding(OldFeeding feeding)
+    {
+        Id = feeding.Id;
+        LeftBreastTotal = feeding.LeftBreastTotal;
+        RightBreastTotal = feeding.RightBreastTotal;
+        TotalTime = feeding.TotalTime;
+        Started = feeding.Started;
+        Finished = feeding.Finished;
+        
+        var maxLeft = feeding.LeftBreast.Count > 0 ? feeding.LeftBreast.Max(x => x.StartTime) : DateTime.MinValue;
+        var maxRight = feeding.RightBreast.Count > 0 ? feeding.RightBreast.Max(x => x.StartTime) : DateTime.MinValue;
+
+        LastIsLeft = maxLeft > maxRight;
+
+        LastUpdated = DateTime.UtcNow;
+    }
+
+    public Feeding(FeedingDto feeding)
+    {
+        Id = feeding.Id;
+        LeftBreastTotal = feeding.LeftBreastTotal;
+        RightBreastTotal = feeding.RightBreastTotal;
+        TotalTime = feeding.TotalTime;
+        Started = feeding.Started;
+        Finished = feeding.Finished;
+        LastIsLeft = feeding.LastIsLeft;
+        LastUpdated = feeding.LastUpdated;
+    }
+
     public List<FeedingTime> LeftBreast { get; init; } = [];
 
     public List<FeedingTime> RightBreast { get; init; } = [];
@@ -86,4 +120,30 @@ public class FeedingTime
 {
     public DateTime StartTime { get; set; }
     public DateTime? EndTime { get; set; }
+}
+
+public class OldFeeding
+{
+    public Guid Id { get; set; }
+    public List<FeedingTime> LeftBreast { get; set; } = [];
+    public TimeSpan LeftBreastTotal { get; set; }
+    public List<FeedingTime> RightBreast { get; set; } = [];
+    public TimeSpan RightBreastTotal { get; set; }
+    public TimeSpan TotalTime => LeftBreastTotal + RightBreastTotal;
+
+    public void Calculate()
+    {
+        LeftBreastTotal = GetTotalTime(LeftBreast);
+        RightBreastTotal = GetTotalTime(RightBreast);
+    }
+
+    public static TimeSpan GetTotalTime(IEnumerable<FeedingTime> breast)
+    {
+        return breast.Aggregate(TimeSpan.Zero, (acc, x) => acc + ((x.EndTime ?? DateTime.UtcNow) - x.StartTime));
+    }
+
+    public bool IsFinished { get; set; }
+
+    public DateTime Started { get; set; }
+    public DateTime Finished { get; set; }
 }
