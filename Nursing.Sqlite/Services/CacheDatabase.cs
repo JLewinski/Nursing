@@ -1,7 +1,7 @@
 using Nursing.Models;
 using System.Text.Json;
 
-namespace Nursing.Mobile.Services;
+namespace Nursing.Sqlite.Services;
 
 internal class CacheDatabase
 {

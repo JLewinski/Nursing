@@ -14,6 +14,18 @@ namespace Nursing.Core.Models.DTO
         {
         }
 
+        public FeedingDto(FeedingDto feeding)
+        {
+            Id = feeding.Id;
+            LeftBreastTotal = feeding.LeftBreastTotal;
+            RightBreastTotal = feeding.RightBreastTotal;
+            TotalTime = feeding.TotalTime;
+            Started = feeding.Started;
+            Finished = feeding.Finished;
+            LastIsLeft = feeding.LastIsLeft;
+            LastUpdated = feeding.LastUpdated;
+        }
+
         public FeedingDto(OldFeeding feeding)
         {
             Id = feeding.Id;
@@ -40,5 +52,10 @@ namespace Nursing.Core.Models.DTO
         public DateTime? Finished { get; set; }
         public bool LastIsLeft { get; set; }
         public DateTime LastUpdated { get; set; }
+
+        public FeedingDto ToDto()
+        {
+            return new(this);
+        }
     }
 }

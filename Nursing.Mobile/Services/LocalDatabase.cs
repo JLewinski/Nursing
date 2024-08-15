@@ -67,11 +67,11 @@ internal class LocalDatabase : Nursing.Core.Services.IDatabase
         if (feeding.Id == Guid.Empty)
         {
             feeding.Id = Guid.NewGuid();
-            result = await Database.InsertAsync(feeding);
+            result = await Database.InsertAsync(feeding.ToDto());
         }
         else
         {
-            result = await Database.UpdateAsync(feeding);
+            result = await Database.UpdateAsync(feeding.ToDto());
         }
 
         return result == 1;
@@ -135,17 +135,5 @@ internal class LocalDatabase : Nursing.Core.Services.IDatabase
     {
         await Init();
         await Database.Table<FeedingDto>().DeleteAsync();
-    }
-
-    public async Task<Settings> GetSettings()
-    {
-        var settings = await Database.Table<Settings>().FirstOrDefaultAsync();
-        return settings ?? new();
-    }
-
-    public async Task SaveSettings(Settings settings)
-    {
-        await Init();
-        await Database.InsertOrReplaceAsync(settings);
     }
 }
