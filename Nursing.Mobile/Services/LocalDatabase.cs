@@ -86,8 +86,10 @@ internal class LocalDatabase : Nursing.Core.Services.IDatabase
     public async Task<List<FeedingDto>> GetFeedings(DateTime? start, DateTime? end)
     {
         await Init();
+        start ??= DateTime.MinValue;
+        end ??= DateTime.UtcNow;
         return await Database.Table<FeedingDto>()
-            .Where(x => x.Started >= (start ?? DateTime.MinValue) && x.Started <= (end ?? DateTime.UtcNow))
+            .Where(x => x.Started >= start && x.Started <= end)
             .OrderByDescending(x => x.Started)
             .ToListAsync();
     }
