@@ -5,6 +5,11 @@ namespace Nursing.Models;
 
 public class NursingContext : DbContext, Nursing.Core.Services.IDatabase
 {
+
+    public NursingContext(DbContextOptions options) : base(options)
+    {
+    }
+
     public DbSet<FeedingDto> Feedings { get; set; }
 
     public Task Delete(FeedingDto feeding)

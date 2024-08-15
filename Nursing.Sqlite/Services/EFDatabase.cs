@@ -9,6 +9,10 @@ namespace Nursing.Services;
 
 public class EFDatabase : Models.NursingContext
 {
+    public EFDatabase(DbContextOptions<EFDatabase> options) : base(options)
+    {
+    }
+
     public void Migrate()
     {
         Database.Migrate();

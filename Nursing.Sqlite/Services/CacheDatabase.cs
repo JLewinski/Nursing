@@ -31,7 +31,7 @@ internal class CacheDatabase
     {
         var path = CreateDatabasePath(feeding.Started);
 
-        var all = await GetFeedings(path);
+        var all = await GetFeedingsAsync(path);
 
         var temp = all.FirstOrDefault(x => x.Id == feeding.Id);
         if (temp is null)
@@ -77,7 +77,24 @@ internal class CacheDatabase
         return (total / data.Count, right / data.Count, left / data.Count);
     }
 
-    public async Task<List<OldFeeding>> GetFeedings(string fileName)
+    public List<OldFeeding> GetFeedings(string fileName)
+    {
+        if (!IsInit(fileName))
+        {
+            return [];
+        }
+
+        var jsonData = File.ReadAllText(fileName);
+
+        if (jsonData == string.Empty)
+        {
+            return [];
+        }
+
+        return JsonSerializer.Deserialize<List<OldFeeding>>(jsonData) ?? [];
+    }
+
+    public async Task<List<OldFeeding>> GetFeedingsAsync(string fileName)
     {
         if (!IsInit(fileName))
         {
@@ -92,6 +109,22 @@ internal class CacheDatabase
         }
 
         return JsonSerializer.Deserialize<List<OldFeeding>>(jsonData) ?? [];
+    }
+
+    public List<OldFeeding> GetAllFeedings()
+    {
+        List<OldFeeding> feedings = [];
+
+            if (!Directory.Exists(DatabaseFolderPath))
+            {
+                return [];
+            }
+            var files = Directory.GetFiles(DatabaseFolderPath);
+            foreach (var file in files)
+            {
+                feedings.AddRange(GetFeedings(file));
+            }
+        return feedings;
     }
 
     public async Task<List<OldFeeding>> GetFeedings(DateTime? start = null, DateTime? end = null)
@@ -112,7 +145,7 @@ internal class CacheDatabase
             var files = Directory.GetFiles(DatabaseFolderPath);
             foreach(var file in files)
             {
-                feedings.AddRange(await GetFeedings(file));
+                feedings.AddRange(await GetFeedingsAsync(file));
             }
         }
         else
@@ -121,7 +154,7 @@ internal class CacheDatabase
 
             while (dateIterator <= (end ?? DateTime.UtcNow).Date)
             {
-                feedings.AddRange(await GetFeedings(CreateDatabasePath(dateIterator)));
+                feedings.AddRange(await GetFeedingsAsync(CreateDatabasePath(dateIterator)));
 
                 dateIterator = dateIterator.AddDays(1);
             }
@@ -142,7 +175,7 @@ internal class CacheDatabase
     public async Task<bool> SaveFeeding(OldFeeding feeding)
     {
         var path = CreateDatabasePath(feeding.Started);
-        var all = await GetFeedings(path);
+        var all = await GetFeedingsAsync(path);
         var existing = all.FirstOrDefault(x => x.Id == feeding.Id);
 
         if (existing is not null)
@@ -178,7 +211,12 @@ internal class CacheDatabase
         return settings.Duration;
     }
 
-    public Task DeleteAll()
+    public void DeleteAll()
+    {
+        Directory.Delete(DatabaseFolderPath, true);
+    }
+
+    public Task DeleteAllAsync()
     {
         Directory.Delete(DatabaseFolderPath, true);
         return Task.FromResult(true);

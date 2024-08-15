@@ -27,28 +27,10 @@ internal class LocalDatabase : Nursing.Core.Services.IDatabase
             return;
         }
 
-        CacheDatabase cacheDatabase = new();
 
         Database = new SQLiteAsyncConnection(DatabasePath, Flags);
 
         await Database.CreateTableAsync<FeedingDto>();
-
-        try
-        {
-
-            var feedings = await cacheDatabase.GetFeedings(DateTime.MinValue, DateTime.MaxValue);
-            var dtos = feedings.Select(x => new FeedingDto(x)).ToList();
-            if (feedings.Count > 0)
-            {
-                await Database.InsertAllAsync(dtos);
-                var all = await Database.Table<FeedingDto>().ToListAsync();
-                await cacheDatabase.DeleteAll();
-            }
-        }
-        catch (Exception ex)
-        {
-            throw;
-        }
 
         CacheService cacheService = new();
         await cacheService.Cache(new(await GetLast()));
