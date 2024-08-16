@@ -41,7 +41,6 @@
         <div class="col-6">
             @if (leftRightNeither == LeftRightNeither.Left)
             {
-            //TODO: Make this a badge (bootstrap)
                 <p class="badge rounded-pill text-bg-info px-3">Last Used</p>
             }
             else
@@ -130,10 +129,10 @@
 }
 
 @code {
-    private DurationCount totalDuration;
-    private async Task ManualUpdate()
+    private DurationCount totalDuration = null!;
+    private Task ManualUpdate()
     {
-
+        return totalDuration?.ManualUpdate(feeding.TotalTime) ?? Task.FromResult<object?>(null);
     }
 
     enum LeftRightNeither
@@ -183,7 +182,7 @@
         var cache = await Cache.Get();
         feeding = cache.CurrentFeeding;
         lastTime = cache.LastStart;
-        startTime = feeding.Finish != null ? feeding.Started : null;
+        startTime = !feeding.IsFinished && feeding.Started > DateTime.MinValue ? feeding.Started : null;
         leftRightNeither = cache.LastWasLeft switch
         {
             true => LeftRightNeither.Left,

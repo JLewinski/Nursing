@@ -19,7 +19,7 @@
     public EventCallback OnToggle { get; init; }
 
     [Parameter]
-    public EventCallback OnUpdate { get; init; }
+    public EventCallback<TimeSpan> OnUpdate { get; init; }
 
     private TimeSpan Duration => IsLeft ? ViewModel.LeftBreastTotal : ViewModel.RightBreastTotal;
 
@@ -105,7 +105,7 @@
 
                 if (previous.TotalSeconds != Duration.TotalSeconds)
                 {
-                    await InvokeAsync(OnUpdate.InvokeAsync);
+                    await InvokeAsync(() => OnUpdate.InvokeAsync(ViewModel.TotalTime));
                     await InvokeAsync(StateHasChanged);
                 }
 
