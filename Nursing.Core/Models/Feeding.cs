@@ -1,101 +1,118 @@
+using Nursing.Core.Models.DTO;
+
 namespace Nursing.Models;
 
-public class Feeding
+public class Feeding : FeedingDto
 {
-    public Guid Id { get; set; }
-    private List<FeedingTime> _leftBreast = [];
-    public List<FeedingTime> LeftBreast
+    public Feeding()
     {
-        get => _leftBreast;
-        init => _leftBreast = value.ToList();
-    }
-    private TimeSpan? _leftBreastTotal;
-    public TimeSpan LeftBreastTotal
-    {
-        get
-        {
-            _leftBreastTotal ??= GetTotalTime(LeftBreast);
-            return _leftBreastTotal.Value;
-        }
-        set
-        {
-            _leftBreastTotal = value;
-        }
+
     }
 
-    private List<FeedingTime> _rightBreast = [];
-    public List<FeedingTime> RightBreast
+    public Feeding(FeedingDto feeding)
     {
-        get => _rightBreast;
-        init => _rightBreast = value.ToList();
-    }
-    private TimeSpan? _rightBreastTotal;
-    public TimeSpan RightBreastTotal
-    {
-        get
-        {
-            _rightBreastTotal ??= GetTotalTime(RightBreast);
-            return _rightBreastTotal.Value;
-        }
-        set
-        {
-            _rightBreastTotal = value;
-        }
+        Id = feeding.Id;
+        LeftBreastTotal = feeding.LeftBreastTotal;
+        RightBreastTotal = feeding.RightBreastTotal;
+        TotalTime = feeding.TotalTime;
+        Started = feeding.Started;
+        Finished = feeding.Finished;
+        LastIsLeft = feeding.LastIsLeft;
+        LastUpdated = feeding.LastUpdated;
     }
 
-    public TimeSpan TotalTime => LeftBreastTotal + RightBreastTotal;
+    public List<FeedingTime> LeftBreast { get; init; } = [];
+
+    public List<FeedingTime> RightBreast { get; init; } = [];
 
     public void StartLeftBreast()
     {
         var date = DateTime.UtcNow;
 
-        if (_leftBreast.Count == 0 && _rightBreast.Count == 0)
+        if (LeftBreast.Count == 0 && RightBreast.Count == 0)
         {
             Started = date;
         }
-        else if (_leftBreast.LastOrDefault() != null && !_leftBreast.Last().EndTime.HasValue)
+        else if (LeftBreast.LastOrDefault() != null && !LeftBreast.Last().EndTime.HasValue)
         {
             return;
         }
 
-        _leftBreast.Add(new FeedingTime { StartTime = date });
+        LeftBreast.Add(new FeedingTime { StartTime = date });
         EndRightBreast(date);
     }
 
     public void EndLeftBreast(DateTime? value = null)
     {
-        if(_leftBreast.LastOrDefault() == null || _leftBreast.Last().EndTime.HasValue)
+        if(LeftBreast.LastOrDefault() == null || LeftBreast.Last().EndTime.HasValue)
         {
             return;
         }
-        _leftBreast.Last().EndTime = value ?? DateTime.UtcNow;
-        _leftBreastTotal = GetTotalTime(LeftBreast);
+        LeftBreast.Last().EndTime = value ?? DateTime.UtcNow;
+        Calculate();
     }
 
     public void StartRightBreast()
     {
         var date = DateTime.UtcNow;
-        if (_leftBreast.Count == 0 && _rightBreast.Count == 0)
+        if (LeftBreast.Count == 0 && RightBreast.Count == 0)
         {
             Started = date;
         }
-        else if (_rightBreast.LastOrDefault() != null && !_rightBreast.Last().EndTime.HasValue)
+        else if (RightBreast.LastOrDefault() != null && !RightBreast.Last().EndTime.HasValue)
         {
             return;
         }
-        _rightBreast.Add(new FeedingTime { StartTime = date });
+        RightBreast.Add(new FeedingTime { StartTime = date });
         EndLeftBreast(date);
     }
 
     public void EndRightBreast(DateTime? value = null)
     {
-        if (_rightBreast.LastOrDefault() == null || _rightBreast.Last().EndTime.HasValue)
+        if (RightBreast.LastOrDefault() == null || RightBreast.Last().EndTime.HasValue)
         {
             return;
         }
-        _rightBreast.Last().EndTime = value ?? DateTime.UtcNow;
-        _rightBreastTotal = GetTotalTime(RightBreast);
+        RightBreast.Last().EndTime = value ?? DateTime.UtcNow;
+        Calculate();
     }
+
+    public void Calculate()
+    {
+        LeftBreastTotal = GetTotalTime(LeftBreast);
+        RightBreastTotal = GetTotalTime(RightBreast);
+        TotalTime = LeftBreastTotal + RightBreastTotal;
+    }
+
+    public void Finish()
+    {
+        Finished = DateTime.UtcNow;
+        EndRightBreast(Finished);
+        EndLeftBreast(Finished);
+    }
+
+    public static TimeSpan GetTotalTime(IEnumerable<FeedingTime> breast)
+    {
+        return breast.Aggregate(TimeSpan.Zero, (acc, x) => acc + ((x.EndTime ?? DateTime.UtcNow) - x.StartTime));
+    }
+
+    public bool IsFinished => Finished is not null;
+}
+
+public class FeedingTime
+{
+    public DateTime StartTime { get; set; }
+    public DateTime? EndTime { get; set; }
+}
+
+public class OldFeeding
+{
+    public Guid Id { get; set; }
+    public List<FeedingTime> LeftBreast { get; set; } = [];
+    public TimeSpan LeftBreastTotal { get; set; }
+    public List<FeedingTime> RightBreast { get; set; } = [];
+    public TimeSpan RightBreastTotal { get; set; }
+    public TimeSpan TotalTime => LeftBreastTotal + RightBreastTotal;
 
     public void Calculate()
     {
@@ -112,10 +129,4 @@ public class Feeding
 
     public DateTime Started { get; set; }
     public DateTime Finished { get; set; }
-}
-
-public class FeedingTime
-{
-    public DateTime StartTime { get; set; }
-    public DateTime? EndTime { get; set; }
 }

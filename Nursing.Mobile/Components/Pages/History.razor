@@ -1,14 +1,15 @@
 @page "/history"
 @using BlazorDateRangePicker
-@inject Nursing.Mobile.Services.IDatabase Database
+@using Nursing.Core.Models.DTO
+@inject Nursing.Core.Services.IDatabase Database
 
 <h1>History</h1>
 
 <div class="container">
     <div class="row">
         <DateRangePicker OnRangeSelect="OnDateRangeChanged"
-                         StartDate="DateTime.Now.AddDays(-7)"
-                         EndDate="DateTime.Now"
+                         StartDate="StartTime"
+                         EndDate="EndTime"
                          MaxDate="DateTime.Now"
                          class="form-control"></DateRangePicker>
     </div>
@@ -51,7 +52,7 @@
                         <td><DurationCount Duration="feeding.TotalTime" /></td>
                         <td><DurationCount Duration="feeding.LeftBreastTotal" /></td>
                         <td><DurationCount Duration="feeding.RightBreastTotal" /></td>
-                        <td>@(feeding.IsFinished ? "Yes" : "No")</td>
+                        <td>@(feeding.Finished != null ? "Yes" : "No")</td>
                     </tr>
                 }
             </tbody>
@@ -60,12 +61,13 @@
 </div>
 
 @code {
-    private List<Feeding> Feedings = new();
+    private List<FeedingDto> Feedings = new();
 
-    private DateTime MinTime;
+    private DateTime StartTime = DateTime.Now.AddDays(-7);
+    private DateTime EndTime = DateTime.Now;
 
     private TimeSpan AverageFed => Average(Feedings.Select(x => x.TotalTime));
-    private TimeSpan AverageTook => Average(Feedings.Select(x => x.Finished - x.Started));
+    private TimeSpan AverageTook => Average(Feedings.Where(x => x.Finished != null).Select(x => x.Finished.Value - x.Started));
     private TimeSpan AverageTimeBetween
     {
         get
@@ -102,6 +104,8 @@
 
     private async Task OnDateRangeChanged(DateRange dateRange)
     {
+        StartTime = dateRange.Start.DateTime;
+        EndTime = dateRange.End.DateTime;
         Feedings = await Database.GetFeedings(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
     }
 }

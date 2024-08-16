@@ -17,10 +17,16 @@
     public bool ShowHours { get; set; } = false;
 
     [Parameter]
+    public bool ShowNegative { get; set; } = false;
+
+    [Parameter]
     public bool IsTimer { get; set; } = false;
 
-    public async Task ManualUpdate()
+    private Timer? timer = null;
+
+    public async Task ManualUpdate(TimeSpan duration)
     {
+        Duration = duration;
         await InvokeAsync(StateHasChanged);
     }
 
@@ -30,9 +36,9 @@
         if (IsTimer)
         {
             previousDuration = Duration;
-            new Timer(async _ =>
+            timer = new Timer(async _ =>
             {
-                if(StartTime.HasValue && EndTime.HasValue)
+                if (StartTime.HasValue && EndTime.HasValue)
                 {
                     Duration = EndTime.Value - StartTime.Value;
                 }
@@ -54,19 +60,28 @@
         }
     }
 
-    private string DurationToString(TimeSpan duration)
+    private string DurationToString(TimeSpan time)
     {
-        var minutesText = ShowHours ? duration.Minutes.ToString("00") : ((int)duration.TotalMinutes).ToString("00");
-        var secondsText = duration.Seconds.ToString("00");
+        if (time < TimeSpan.Zero && !ShowNegative)
+        {
+            return DurationToString(TimeSpan.Zero);
+        }
 
-        var text = $"{minutesText}:{secondsText}";
+        var duration = time.Duration();
+
+        var text = ShowHours ? duration.Minutes.ToString("00") : ((int)duration.TotalMinutes).ToString("0");
 
         if (ShowHours)
         {
-            var hoursText = ShowHours ? ((int)duration.TotalHours).ToString("00") : "";
+            var hoursText = ShowHours ? ((int)duration.TotalHours).ToString("0") : "";
             text = hoursText + ":" + text;
         }
-        if (duration < TimeSpan.Zero)
+        else
+        {
+            text += ":" + duration.Seconds.ToString("00");
+        }
+
+        if (time < TimeSpan.Zero)
         {
             text = "-" + text;
         }
