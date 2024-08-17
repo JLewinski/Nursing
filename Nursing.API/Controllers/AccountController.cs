@@ -10,6 +10,8 @@ using System.Text;
 
 namespace Nursing.API.Controllers;
 
+[ApiController]
+[Route("[controller]")]
 public class AccountController : ControllerBase
 {
     private readonly UserManager<NursingUser> _userManager;
@@ -23,8 +25,12 @@ public class AccountController : ControllerBase
         _signInManager = signInManager;
     }
 
-    public async Task<IActionResult> Register(string username, string password)
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
+        var username = model.Username;
+        var password = model.Password;
+
         var user = new NursingUser
         {
             UserName = username,
@@ -43,8 +49,13 @@ public class AccountController : ControllerBase
         }
     }
 
-    public async Task<IActionResult> Login(string username, string password, bool rememberMe)
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
+        var username = model.Username;
+        var password = model.Password;
+        var rememberMe = model.RememberMe;
+
         var user = await _userManager.FindByEmailAsync(username);
 
         if (user == null)
@@ -71,6 +82,8 @@ public class AccountController : ControllerBase
 
             var token = GetToken(username, claims, rememberMe);
 
+            await _signInManager.SignInAsync(user, rememberMe);
+
             return Ok(token);
         }
         else
@@ -89,7 +102,7 @@ public class AccountController : ControllerBase
 
     private string GetToken(string username, IEnumerable<Claim> claims, bool rememberMe)
     {
-        var tokenManagement = _configuration.GetValue<TokenManagement>("Token");
+        var tokenManagement = _configuration.GetSection("Token").Get<TokenManagement>();
 
         if (tokenManagement == null)
         {
