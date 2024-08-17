@@ -1,9 +1,9 @@
 ﻿using Nursing.Core.Models.DTO;
 
-namespace Nursing.API.Models;
+namespace Nursing.Core.Models;
 
 public class SyncModel
 {
     public DateTime LastSync { get; set; }
-    public FeedingDto[] Feedings { get; set; } = null!;
+    public List<FeedingDto> Feedings { get; set; } = null!;
 }

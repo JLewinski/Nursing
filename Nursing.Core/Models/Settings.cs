@@ -8,6 +8,8 @@ public class Settings
     public int Id { get; set; } = 1;
     public TimeSpan Duration { get; set; } = TimeSpan.FromMinutes(210);
     public ThemeSetting Theme { get; set; } = ThemeSetting.Auto;
+    public DateTime LastSync { get; set; } = DateTime.MinValue;
+    public string? Token { get; set; }
 }
 
 public enum ThemeSetting

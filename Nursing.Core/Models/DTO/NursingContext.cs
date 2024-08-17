@@ -64,8 +64,28 @@ public class NursingContext : DbContext, Nursing.Core.Services.IDatabase
         return Feedings.OrderByDescending(x => x.Started).FirstAsync();
     }
 
+    public Task<List<FeedingDto>> GetUpdatedFeedings(DateTime lastUpdated)
+    {
+        return Feedings.Where(x => x.LastUpdated > lastUpdated).ToListAsync();
+    }
+
+    public Task SaveUpdated(List<FeedingDto> feedings)
+    {
+        var ids = Feedings.Where(x => feedings.Select(x => x.Id).Contains(x.Id)).Select(x => x.Id).ToList();
+        
+        var updateList = feedings.Where(x => ids.Contains(x.Id)).ToList();
+        var insertList = feedings.Where(x => !ids.Contains(x.Id)).ToList();
+
+        ChangeTracker.Clear();
+
+        Feedings.UpdateRange(updateList);
+        Feedings.AddRange(insertList);
+        return SaveChangesAsync();
+    }
+
     public Task<bool> SaveFeeding(FeedingDto feeding)
     {
+        feeding.LastUpdated = DateTime.UtcNow;
         if (feeding.Id == Guid.Empty)
         {
             feeding.Id = Guid.NewGuid();
