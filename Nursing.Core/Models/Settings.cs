@@ -10,6 +10,7 @@ public class Settings
     public ThemeSetting Theme { get; set; } = ThemeSetting.Auto;
     public DateTime LastSync { get; set; } = DateTime.MinValue;
     public string? Token { get; set; }
+    public string? RefreshToken { get; set; }
 }
 
 public enum ThemeSetting

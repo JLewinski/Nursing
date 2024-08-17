@@ -29,13 +29,13 @@ public class SyncService
         return settings.Token != null;
     }
 
-    public async Task<bool> Sync()
+    public async Task<bool> Sync(bool afterRefresh = false)
     {
         var syncDate = DateTime.UtcNow;
 
         var settings = await _cacheService.GetSettings();
 
-        if(settings.Token == null)
+        if (settings.Token == null)
         {
             return false;
         }
@@ -49,6 +49,23 @@ public class SyncService
 
         if (!result.IsSuccessStatusCode)
         {
+            if (settings.RefreshToken == null || afterRefresh)
+            {
+                return false;
+            }
+
+            result = await _httpClient.PostAsJsonAsync(new Uri(_settings.RootUrl + "/Account/refreshToken"), settings.RefreshToken);
+            if (await this.ReadResult(result))
+            {
+                return await Sync(true);
+            }
+            else
+            {
+                settings.Token = null;
+                settings.RefreshToken = null;
+                await _cacheService.SaveSettings(settings);
+            }
+
             return false;
         }
 
@@ -59,27 +76,41 @@ public class SyncService
             updated = true;
             await _database.SaveUpdated(resultData.Feedings);
         }
-        
+
         settings.LastSync = syncDate;
         await _cacheService.SaveSettings(settings);
 
         return updated;
     }
 
+    private async Task<bool> ReadResult(HttpResponseMessage result)
+    {
+        if (!result.IsSuccessStatusCode)
+        {
+            return false;
+        }
+
+        var token = await result.Content.ReadFromJsonAsync<SignInResult>();
+        if (token == null)
+        {
+            return false;
+        }
+
+        var settings = await _cacheService.GetSettings();
+        settings.Token = token.AuthToken;
+        settings.RefreshToken = token.RefreshToken;
+
+        await _cacheService.SaveSettings(settings);
+        return true;
+    }
+
     public async Task<bool> Login(string username, string password, bool rememberMe)
     {
         LoginModel loginModel = new() { Username = username, Password = password, RememberMe = rememberMe };
-        
+
         var result = await _httpClient.PostAsJsonAsync(new Uri(_settings.RootUrl + "/Account/login"), loginModel);
-        if (result.IsSuccessStatusCode)
-        {
-            var token = await result.Content.ReadAsStringAsync();
-            var settings = await _cacheService.GetSettings();
-            settings.Token = token;
-            await _cacheService.SaveSettings(settings);
-            return true;
-        }
-        return false;
+
+        return await ReadResult(result);
     }
 
     public async Task<bool> Logout()
