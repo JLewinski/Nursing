@@ -86,7 +86,6 @@ public class SyncService
     {
         var settings = await _cacheService.GetSettings();
         settings.Token = null;
-        settings.LastSync = DateTime.MinValue;
         await _cacheService.SaveSettings(settings);
         return true;
     }
