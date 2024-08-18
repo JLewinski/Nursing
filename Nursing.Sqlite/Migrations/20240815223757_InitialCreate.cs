@@ -68,8 +68,6 @@ namespace Nursing.Sqlite.Migrations
             }
 
             migrationBuilder.InsertData("Feedings", columns, data);
-
-            cacheDatabase.DeleteAll();
         }
 
         /// <inheritdoc />
