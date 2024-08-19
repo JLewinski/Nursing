@@ -20,11 +20,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
 
-        builder.Configuration.Sources
-            .Add(new JsonConfigurationSource { Path = "appsettings.json", Optional = false, ReloadOnChange = true });
 
         builder.Services.AddSingleton<HttpClient>();
-        builder.Services.Configure<SyncOptions>(builder.Configuration.GetSection(nameof(SyncOptions)).Bind);
 
         var sqliteFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing.db");
         //var sqliteFilePath = "temp.db";

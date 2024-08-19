@@ -13,14 +13,12 @@ public class SyncService
     private readonly HttpClient _httpClient;
     private readonly Nursing.Core.Services.IDatabase _database;
     private readonly CacheService _cacheService;
-    private readonly SyncOptions _settings;
 
-    public SyncService(HttpClient httpClient, Nursing.Services.EFDatabase database, IOptions<SyncOptions> settings, CacheService cacheService)
+    public SyncService(HttpClient httpClient, Nursing.Services.EFDatabase database, CacheService cacheService)
     {
         _httpClient = httpClient;
         _database = database;
         _cacheService = cacheService;
-        _settings = settings.Value;
     }
 
     public async Task<bool> IsLoggedIn()
@@ -45,7 +43,7 @@ public class SyncService
 
         var data = new SyncModel { LastSync = settings.LastSync, Feedings = feedingsUp };
 
-        var result = await _httpClient.PostAsJsonAsync(new Uri(_settings.RootUrl + "/Sync/sync"), data);
+        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Sync/sync"), data);
 
         if (!result.IsSuccessStatusCode)
         {
@@ -54,7 +52,7 @@ public class SyncService
                 return false;
             }
 
-            result = await _httpClient.PostAsJsonAsync(new Uri(_settings.RootUrl + "/Account/refreshToken"), settings.RefreshToken);
+            result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/refreshToken"), settings.RefreshToken);
             if (await this.ReadResult(result))
             {
                 return await Sync(true);
@@ -108,7 +106,7 @@ public class SyncService
     {
         LoginModel loginModel = new() { Username = username, Password = password, RememberMe = rememberMe };
 
-        var result = await _httpClient.PostAsJsonAsync(new Uri(_settings.RootUrl + "/Account/login"), loginModel);
+        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/login"), loginModel);
 
         return await ReadResult(result);
     }
@@ -124,7 +122,7 @@ public class SyncService
     public async Task<bool> Register(string username, string password)
     {
         RegisterModel registerModel = new() { Username = username, Password = password };
-        var result = await _httpClient.PostAsJsonAsync(new Uri(_settings.RootUrl + "/Account/register"), registerModel);
+        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/register"), registerModel);
         if (result.IsSuccessStatusCode)
         {
             return true;
@@ -133,7 +131,13 @@ public class SyncService
     }
 }
 
-public class SyncOptions
+public static class ApiOptions
 {
-    public required string RootUrl { get; set; }
+#if DEBUG
+    public const string RootUrl = "https://localhost:7238";
+#elif TEST
+    public const string RootUrl = "https://localhost:7238";
+#elif RELEASE
+    public const string RootUrl = "https://nursingapi.lewinskitech.com";
+#endif
 }
