@@ -14,9 +14,9 @@ This app only requires the permission to store data locally in the app folder on
 
 ## Data Deletion
 
-Currently, there is no way to delete data from the app. The data is stored in the application folder on the device and should be deleted if the app is deleted.
+The data is stored in the application folder on the device and should be deleted if the app is deleted.
 
-The data will eventually be able to be deleted by the user by clicking on a delete button in the app.
+The data is also able to be deleted by the user by clicking on a delete button in the settings page.
 
 ## Contact
 
