@@ -1,4 +1,4 @@
-﻿@page "/"
+@page "/"
 @using Nursing.Mobile.Services
 @inject NavigationManager Navigation
 @inject Nursing.Core.Services.IDatabase Database
@@ -16,17 +16,25 @@
         else if (lastTime.HasValue)
         {
             var lastTimeValue = lastTime.Value;
-            <div class="col-6">
-                <p class="p-0 m-0 h3">Last Fed</p>
-                <p class="p-0 m-0 h4">@lastTimeValue.ToLocalTime().ToShortTimeString()</p>
-                <p class="h4"><DurationCount StartTime="lastTimeValue" ShowHours="true" IsTimer="true" /></p>
-            </div>
             var nextFeeding = lastTimeValue + TimeBetweenFeedings;
-            <div class="col-6">
-                <p class="p-0 m-0 h3">Next Feeding</p>
-                <p class="p-0 m-0 h4">@nextFeeding.ToLocalTime().ToShortTimeString()</p>
-                <p class="h4"><DurationCount EndTime="nextFeeding" ShowHours="true" IsTimer="true" /></p>
-            </div>
+            <table class="table table-striped table-borderless table-responsive text-center">
+                <thead>
+                    <tr>
+                        <th>Last</th>
+                        <th>Next</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>@lastTimeValue.ToLocalTime().ToShortTimeString()</td>
+                        <td>@((lastTimeValue + TimeBetweenFeedings).ToLocalTime().ToShortTimeString())</td>
+                    </tr>
+                    <tr>
+                        <td><DurationCount StartTime="lastTimeValue" ShowHours="true" IsTimer="true" /></td>
+                        <td><DurationCount EndTime="nextFeeding" ShowHours="true" IsTimer="true" /></td>
+                    </tr>
+                </tbody>
+            </table>
         }
     </div>
     <div class="row">
@@ -175,6 +183,7 @@
         var cache = await Cache.Get();
         feeding = cache.CurrentFeeding;
         lastTime = cache.LastStart;
+        startTime = feeding.Finish != null ? feeding.Started : null;
         leftRightNeither = cache.LastWasLeft switch
         {
             true => LeftRightNeither.Left,
@@ -222,6 +231,7 @@
     private async Task Reset()
     {
         await Database.Delete(feeding);
+        await Cache.Cache(new Feeding(await Database.GetLast()));
         Navigation.Refresh();
     }
 
