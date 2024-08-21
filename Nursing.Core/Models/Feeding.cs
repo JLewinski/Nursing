@@ -47,7 +47,12 @@ public class Feeding
 
     public void StartLeftBreast()
     {
-        _leftBreast.Add(new FeedingTime { StartTime = DateTime.UtcNow });
+        var date = DateTime.UtcNow;
+        if (_leftBreast.Count == 0 && _rightBreast.Count == 0)
+        {
+            FirstFinish = date;
+        }
+        _leftBreast.Add(new FeedingTime { StartTime = date });
     }
 
     public void EndLeftBreast()
@@ -59,7 +64,12 @@ public class Feeding
 
     public void StartRightBreast()
     {
-        _rightBreast.Add(new FeedingTime { StartTime = DateTime.UtcNow });
+        var date = DateTime.UtcNow;
+        if (_leftBreast.Count == 0 && _rightBreast.Count == 0)
+        {
+            FirstFinish = date;
+        }
+        _rightBreast.Add(new FeedingTime { StartTime = date });
     }
 
     public void EndRightBreast()
@@ -76,6 +86,7 @@ public class Feeding
 
     public bool IsFinished { get; set; }
 
+    public DateTime FirstFinish { get; set; }
     public DateTime LastFinish { get; set; }
 }
 

@@ -3,7 +3,7 @@ using SQLite;
 
 namespace Nursing.Mobile.Services;
 
-internal class LocalDatabase : IDatabase
+internal class LocalDatabase// : IDatabase
 {
     private const string DatabaseFilename = "Nursing.db3";
 

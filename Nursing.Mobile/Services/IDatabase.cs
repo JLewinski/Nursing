@@ -9,5 +9,6 @@ namespace Nursing.Mobile.Services
         Task<List<Feeding>> GetFeedings(DateTime? start, DateTime? end);
         Task<List<Feeding>> GetLast();
         Task<bool> SaveFeeding(Feeding feeding);
+        Task<TimeSpan> GetInBetween();
     }
 }
