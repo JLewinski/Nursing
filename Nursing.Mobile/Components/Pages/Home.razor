@@ -1,27 +1,121 @@
 ﻿@page "/"
+@inject NavigationManager Navigation
+@inject Services.IDatabase Database
 
-<h1>Feed!</h1>
+<div class="container text-center">
+    <div class="row">
+        <h1>Feed!</h1>
 
-<div class="row">
-    @if(startTime.HasValue)
+        @if (startTime.HasValue)
+        {
+            <div class="col-12">
+                <p>Started: @startTime.Value.ToString("h:mm tt")</p>
+            </div>
+        }
+    </div>
+    @if (!feeding.IsFinished)
     {
-        <div class="col-12">
-            <p>Started: @startTime.Value.ToString("h:mm tt")</p>
+        <div class="row">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button class="btn btn-primary" @onclick=ToggleLeft>@LeftText</button>
+            </div>
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button class="btn btn-primary" @onclick=ToggleRight>@RightText</button>
+            </div>
         </div>
     }
-</div>
-<div class="row">
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-primary" @onclick=ToggleLeft>@LeftText</button>
-        <p>@LeftTotal</p>
+    <div class="row">
+        <div class="col-6">
+            @if (leftRightNeither == LeftRightNeither.Left)
+            {
+                <p>Last Used</p>
+            }
+        </div>
+        <div class="col-6">
+            @if (leftRightNeither == LeftRightNeither.Right)
+            {
+                <p>Last Used</p>
+            }
+        </div>
     </div>
-    <div class="d-grid gap-2 col-6 mx-auto">
-        <button class="btn btn-primary" @onclick=ToggleRight>@RightText</button>
-        <p>@RightTotal</p>
-    </div>
+    @if (feeding.LeftBreast.Count > 0 || feeding.RightBreast.Count > 0)
+    {
+        <div class="row">
+            <div class="col-6">
+                <p>@LeftTotal</p>
+            </div>
+            <div class="col-6">
+                <p>@RightTotal</p>
+            </div>
+        </div>
+        <div class="row">
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button class="btn btn-primary" @onclick=Reset>Reset</button>
+            </div>
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button class="btn btn-primary" @onclick=Finish>Finish</button>
+            </div>
+        </div>
+        <table class="table table-borderless table-striped table-responsive align-middle mt-5">
+            <tbody>
+                @{
+                    var leftIndex = feeding.LeftBreast.Count;
+                    var rightIndex = feeding.RightBreast.Count;
+                }
+                @while (leftIndex > 0 || rightIndex > 0)
+                {
+                    <tr>
+                        @if (--leftIndex >= 0)
+                        {
+                            var startFinish = feeding.LeftBreast[leftIndex];
+                            <td class="col-3">@startFinish.StartTime.ToString("'Start: 'h:mm:ss tt")</td>
+                            <td class="col-3">@(startFinish.EndTime?.ToString("'End: 'h:mm:ss tt"))</td>
+                        }
+                        else
+                        {
+                            <td class="col-3"></td>
+                            <td class="col-3"></td>
+                        }
+                        @if (--rightIndex >= 0)
+                        {
+                            var startFinish = feeding.RightBreast[rightIndex];
+                            <td class="col-3">@startFinish.StartTime.ToString("'Start: 'h:mm:ss tt")</td>
+                            <td class="col-3">@(startFinish.EndTime?.ToString("'End: 'h:mm:ss tt"))</td>
+                        }
+                        else
+                        {
+                            <td class="col-3"></td>
+                            <td class="col-3"></td>
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
 </div>
-
 @code {
+    enum LeftRightNeither
+    {
+        Left,
+        Right,
+        Neither
+    }
+
+    private Feeding feeding = new Feeding();
+
+    private DateTime? startTime;
+
+    private string LeftTotal = "00:00";
+    private string RightTotal = "00:00";
+
+    private bool leftInProgress = false;
+    private bool rightInProgress = false;
+
+    private string LeftText => leftInProgress ? "End Left" : "Start Left";
+    private string RightText => rightInProgress ? "End Right" : "Start Right";
+
+    private LeftRightNeither leftRightNeither = LeftRightNeither.Neither;
+
     protected override async Task OnInitializedAsync()
     {
         await base.OnInitializedAsync();
@@ -34,47 +128,120 @@
                 await InvokeAsync(StateHasChanged);
             }
         }, null, 0, 100);
+        await Load();
+    }
 
-        var path = Path.Combine(FileSystem.Current.CacheDirectory, "Feedings.json");
-        if (File.Exists(path))
+    private async Task Load()
+    {
+        var last2 = await Database.GetLast();
+
+        var last = last2.FirstOrDefault();
+        if (last != null && !last.IsFinished)
         {
-            var data = await File.ReadAllTextAsync(path);
-            var previousFeeding = System.Text.Json.JsonSerializer.Deserialize<Feeding>(data);
-
-            if (previousFeeding != null && !previousFeeding.IsFinished)
+            Load(last);
+            if (last2.Count == 2)
             {
-                feeding = previousFeeding;
-                if (feeding.LeftBreast.Count > 0)
+                var previous = last2.Last();
+                if (previous != null)
                 {
-                    leftInProgress = feeding.LeftBreast.Last().EndTime == null;
-                    startTime = feeding.LeftBreast.First().StartTime;
-                }
-
-                if (feeding.RightBreast.Count > 0)
-                {
-                    rightInProgress = feeding.RightBreast.Last().EndTime == null;
-                    if (startTime == null || feeding.RightBreast.First().StartTime < startTime)
-                    {
-                        startTime = feeding.RightBreast.First().StartTime;
-                    }
+                    LoadPrevious(previous);
                 }
             }
+        }
+        else if (last != null)
+        {
+            LoadPrevious(last);
+        }
+    }
+
+    private void Load(Feeding loadedFeeding)
+    {
+        feeding = loadedFeeding;
+        if (feeding.LeftBreast.Count > 0)
+        {
+            leftInProgress = feeding.LeftBreast.Last().EndTime == null;
+            startTime = feeding.LeftBreast.First().StartTime;
+        }
+
+        if (feeding.RightBreast.Count > 0)
+        {
+            rightInProgress = feeding.RightBreast.Last().EndTime == null;
+            if (startTime == null || feeding.RightBreast.First().StartTime < startTime)
+            {
+                startTime = feeding.RightBreast.First().StartTime;
+            }
+        }
+    }
+
+    public async Task<Feeding?> Load(string path)
+    {
+        if (!File.Exists(path))
+        {
+            return null;
+        }
+
+        var data = await File.ReadAllTextAsync(path);
+        var cachedFeeding = System.Text.Json.JsonSerializer.Deserialize<Feeding>(data);
+        return cachedFeeding;
+    }
+
+    private void LoadPrevious(Feeding previousFeeding)
+    {
+        var maxLeft = previousFeeding.LeftBreast.Count > 0 ? previousFeeding.LeftBreast.Max(x => x.EndTime) : null;
+        var maxRight = previousFeeding.RightBreast.Count > 0 ? previousFeeding.RightBreast.Max(x => x.EndTime) : null;
+
+        if (maxLeft.HasValue && maxRight.HasValue)
+        {
+            if (maxLeft > maxRight)
+            {
+                leftRightNeither = LeftRightNeither.Left;
+            }
+            else
+            {
+                leftRightNeither = LeftRightNeither.Right;
+            }
+        }
+        else if (maxLeft.HasValue)
+        {
+            leftRightNeither = LeftRightNeither.Left;
+        }
+        else if (maxRight.HasValue)
+        {
+            leftRightNeither = LeftRightNeither.Right;
         }
     }
 
     private async Task Save()
     {
-        var path = Path.Combine(FileSystem.Current.CacheDirectory, "Feedings.json");
-        var data = System.Text.Json.JsonSerializer.Serialize(feeding);
-        await File.WriteAllTextAsync(path, data);
+        await Database.SaveFeeding(feeding);
     }
 
-    private Feeding feeding = new Feeding();
+    private async Task Reset()
+    {
+        await Database.Delete(feeding.Id);
+        Navigation.Refresh();
+    }
 
-    private DateTime? startTime;
+    private async Task Finish()
+    {
+        if (leftInProgress)
+        {
+            feeding.EndLeftBreast();
+            leftInProgress = false;
+        }
 
-    private string LeftTotal = "00:00";
-    private string RightTotal = "00:00";
+        if (rightInProgress)
+        {
+            feeding.EndRightBreast();
+            rightInProgress = false;
+        }
+
+        feeding.IsFinished = true;
+
+        await Save();
+
+        Navigation.Refresh();
+    }
 
     private bool UpdateLeft()
     {
@@ -111,12 +278,6 @@
         feeding.StartRightBreast();
         rightInProgress = true;
     }
-
-    private bool leftInProgress = false;
-    private bool rightInProgress = false;
-
-    private string LeftText => leftInProgress ? "End" : "Start";
-    private string RightText => rightInProgress ? "End" : "Start";
 
     private async Task ToggleLeft()
     {
