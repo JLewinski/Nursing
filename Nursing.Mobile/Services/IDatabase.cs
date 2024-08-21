@@ -12,4 +12,6 @@ internal interface IDatabase
     Task<TimeSpan> GetInBetween();
 
     Task DeleteAll();
+    Task<Settings> GetSettings();
+    Task SaveSettings(Settings settings);
 }

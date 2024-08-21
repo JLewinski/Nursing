@@ -182,4 +182,21 @@ internal class CacheDatabase : IDatabase
         Directory.Delete(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing"), true);
         return Task.FromResult(true);
     }
+
+    public async Task<Settings> GetSettings()
+    {
+        if (!File.Exists(SettingsPath))
+        {
+            return new();
+        }
+
+        var data = await File.ReadAllTextAsync(SettingsPath);
+        return JsonSerializer.Deserialize<Settings>(data) ?? new();
+    }
+
+    public async Task SaveSettings(Settings settings)
+    {
+        var json = JsonSerializer.Serialize(settings);
+        await File.WriteAllTextAsync(SettingsPath, json);
+    }
 }
