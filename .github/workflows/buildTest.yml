@@ -31,7 +31,6 @@ jobs:
       with:
         dotnet-version: 9.0.x
         dotnet-quality: 'preview'
-        cache: true
         
     - name: Setup Workloads
       run: dotnet workload restore
