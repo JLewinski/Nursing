@@ -11,6 +11,11 @@ public class SqlContext : IdentityDbContext<NursingUser, IdentityRole<Guid>, Gui
     {
     }
 
+    public void Migrate()
+    {
+        Database.Migrate();
+    }
+
     public DbSet<Feeding> Feedings { get; set; }
     public DbSet<Invite> Invites { get; set; }
 }

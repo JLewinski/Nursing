@@ -8,6 +8,8 @@ using Nursing.Core.Models.DTO;
 namespace Nursing.API.Controllers
 {
     [Authorize]
+    [ApiController]
+    [Route("[controller]")]
     public class SyncController : ControllerBase
     {
         private readonly SqlContext _context;
@@ -16,8 +18,13 @@ namespace Nursing.API.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Sync(DateTime lastSync, FeedingDto[] feedings)
+        [HttpPost("sync")]
+        [ProducesResponseType(200, Type = typeof(SyncResult))]
+        public async Task<IActionResult> Sync([FromBody] SyncModel sync)
         {
+            var lastSync = sync.LastSync;
+            var feedings = sync.Feedings;
+
             if (User.Identity == null)
             {
                 return Unauthorized();
@@ -43,7 +50,7 @@ namespace Nursing.API.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Ok(new { success = true, feedings = toSend, badIds });
+                return Ok(new SyncResult { Success = true, Feedings = toSend, BadIds = badIds });
             }
             catch (Exception)
             {
@@ -51,6 +58,7 @@ namespace Nursing.API.Controllers
             }
         }
 
+        [HttpPost("invite/{username}")]
         public async Task<IActionResult> Invite(string userName)
         {
             if (User.Identity == null)
@@ -77,6 +85,7 @@ namespace Nursing.API.Controllers
             return Ok();
         }
 
+        [HttpGet("acceptInvite/{id}")]
         public async Task<IActionResult> AcceptInvite(Guid id)
         {
             if (User.Identity == null)
@@ -95,7 +104,7 @@ namespace Nursing.API.Controllers
             _context.Invites.Remove(invite);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(id);
         }
     }
 }
