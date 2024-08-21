@@ -1,4 +1,4 @@
-﻿namespace Nursing.API.Models;
+﻿namespace Nursing.Core.Models;
 
 public class RegisterModel
 {

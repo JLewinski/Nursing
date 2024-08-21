@@ -34,6 +34,12 @@ namespace Nursing.Sqlite.Migrations
             Services.CacheDatabase cacheDatabase = new();
             
             var feedings = cacheDatabase.GetAllFeedings();
+
+            if(feedings.Count == 0)
+            {
+                return;
+            }
+
             var columns = new[] {
                     "Id",
                     "LeftBreastTotal",

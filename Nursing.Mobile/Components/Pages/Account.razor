@@ -1,0 +1,77 @@
+@page "/account"
+@inject Nursing.Mobile.Services.SyncService Sync
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Account</h1>
+        </div>
+    </div>
+    @if (IsLoggedIn)
+    {
+        <div class="row">
+            <div class="col-12">
+                <button class="btn btn-primary" @onclick="SyncNow">Sync Now</button>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary" @onclick="Logout">Log Out</button>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="row">
+            <div class="col-12">
+                <input type="text" class="form-control" @bind="username" placeholder="Username" />
+            </div>
+            <div class="col-12">
+                <input type="password" class="form-control" @bind="password" placeholder="Password" />
+            </div>
+            <div class="col-12">
+                <input type="checkbox" @bind="rememberMe" />
+                <label for="rememberMe">Remember Me</label>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-primary" @onclick="Login">Log In</button>
+            </div>
+        </div>
+    }
+
+</div>
+
+@code {
+    private bool IsLoggedIn;
+
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private bool rememberMe = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        IsLoggedIn = await Sync.IsLoggedIn();
+        await base.OnInitializedAsync();
+    }
+
+    private async Task SyncNow()
+    {
+        if (await Sync.Sync())
+        {
+            //show success
+        }
+        else
+        {
+            //show error
+        }
+    }
+
+    private async Task Login()
+    {
+        IsLoggedIn = await Sync.Login(username, password, rememberMe);
+    }
+
+    private async Task Logout()
+    {
+        await Sync.Logout();
+        IsLoggedIn = false;
+    }
+    }

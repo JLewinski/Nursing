@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nursing.API.Models;
 using Nursing.API.Services;
+using Nursing.Core.Models;
 using Nursing.Core.Models.DTO;
 
 namespace Nursing.API.Controllers
@@ -36,17 +37,37 @@ namespace Nursing.API.Controllers
 
                 var toSend = await _context.Feedings
                     .Where(f => f.LastUpdated > lastSync && f.GroupId == currentUser.GroupId)
+                    .Select(f => new FeedingDto(f))
                     .ToListAsync();
 
                 var ids = feedings.Select(x => x.Id).ToList();
 
-                var badIds = await _context.Feedings.Where(f => ids.Contains(f.Id) && f.GroupId != currentUser.GroupId)
-                    .Select(x => x.Id)
+                var existing = await _context.Feedings.Where(f => ids.Contains(f.Id))
+                    .Select(x => new { x.Id, x.GroupId })
                     .ToListAsync();
 
-                _context.Feedings.UpdateRange(feedings
-                    .Where(x => !badIds.Contains(x.Id))
-                    .Select(x => new Feeding(x, currentUser.GroupId)));
+                var badIds = existing
+                    .Where(x => x.GroupId != currentUser.GroupId)
+                    .Select(x => x.Id)
+                    .ToList();
+
+                var existingIds = existing.Where(x => x.GroupId == currentUser.GroupId).Select(x => x.Id).ToList();
+
+                var updateList = feedings
+                    .Where(x => existingIds.Contains(x.Id))
+                    .Select(x => new Feeding(x, currentUser.GroupId))
+                    .ToList();
+
+                var insertList = feedings
+                    .Where(x => !existingIds.Contains(x.Id) && !badIds.Contains(x.Id))
+                    .Select(x => new Feeding(x, currentUser.GroupId))
+                    .ToList();
+
+                _context.ChangeTracker.Clear();
+
+                _context.Feedings.UpdateRange(updateList);
+
+                _context.Feedings.AddRange(insertList);
 
                 await _context.SaveChangesAsync();
 
