@@ -1,9 +1,13 @@
-namespace Nursing;
+namespace Nursing.Models;
 
 public class Feeding
 {
     private List<FeedingTime> _leftBreast = [];
-    public IReadOnlyCollection<FeedingTime> LeftBreast => _leftBreast;
+    public IReadOnlyCollection<FeedingTime> LeftBreast
+    {
+        get => _leftBreast;
+        init => _leftBreast = value.ToList();
+    }
     private TimeSpan? _leftBreastTotal;
     public TimeSpan LeftBreastTotal
     {
@@ -19,7 +23,11 @@ public class Feeding
     }
 
     private List<FeedingTime> _rightBreast = [];
-    public IReadOnlyCollection<FeedingTime> RightBreast => _rightBreast;
+    public IReadOnlyCollection<FeedingTime> RightBreast
+    {
+        get => _rightBreast;
+        init => _rightBreast = value.ToList();
+    }
     private TimeSpan? _rightBreastTotal;
     public TimeSpan RightBreastTotal
     {
