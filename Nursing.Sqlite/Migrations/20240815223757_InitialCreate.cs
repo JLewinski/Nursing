@@ -32,11 +32,9 @@ namespace Nursing.Sqlite.Migrations
                 });
 
             Services.CacheDatabase cacheDatabase = new();
-            List<OldFeeding> feedings;
-            try
-            {
-                feedings = cacheDatabase.GetAllFeedings();
-                var columns = new[] {
+            
+            var feedings = cacheDatabase.GetAllFeedings();
+            var columns = new[] {
                     "Id",
                     "LeftBreastTotal",
                     "RightBreastTotal",
@@ -47,30 +45,25 @@ namespace Nursing.Sqlite.Migrations
                     "LastUpdated"
                 };
 
-                object[,] data = new object[feedings.Count, columns.Length];
+            object[,] data = new object[feedings.Count, columns.Length];
 
-                for (int i = 0; i < feedings.Count; i++)
-                {
-                    var maxLeft = feedings[i].LeftBreast.Count > 0 ? feedings[i].LeftBreast.Max(x => x.StartTime) : DateTime.MinValue;
-                    var maxRight = feedings[i].RightBreast.Count > 0 ? feedings[i].RightBreast.Max(x => x.StartTime) : DateTime.MinValue;
-                    data[i, 0] = feedings[i].Id;
-                    data[i, 1] = feedings[i].LeftBreastTotal;
-                    data[i, 2] = feedings[i].RightBreastTotal;
-                    data[i, 3] = feedings[i].TotalTime;
-                    data[i, 4] = feedings[i].Started;
-                    data[i, 5] = feedings[i].Finished;
-                    data[i, 6] = maxLeft > maxRight;
-                    data[i, 7] = DateTime.UtcNow;
-                }
-
-                migrationBuilder.InsertData("Feedings", columns, data);
-
-                cacheDatabase.DeleteAll();
-            }
-            catch (Exception ex)
+            for (int i = 0; i < feedings.Count; i++)
             {
-                throw;
+                var maxLeft = feedings[i].LeftBreast.Count > 0 ? feedings[i].LeftBreast.Max(x => x.StartTime) : DateTime.MinValue;
+                var maxRight = feedings[i].RightBreast.Count > 0 ? feedings[i].RightBreast.Max(x => x.StartTime) : DateTime.MinValue;
+                data[i, 0] = feedings[i].Id;
+                data[i, 1] = feedings[i].LeftBreastTotal;
+                data[i, 2] = feedings[i].RightBreastTotal;
+                data[i, 3] = feedings[i].TotalTime;
+                data[i, 4] = feedings[i].Started;
+                data[i, 5] = feedings[i].Finished;
+                data[i, 6] = maxLeft > maxRight;
+                data[i, 7] = DateTime.UtcNow;
             }
+
+            migrationBuilder.InsertData("Feedings", columns, data);
+
+            cacheDatabase.DeleteAll();
         }
 
         /// <inheritdoc />
