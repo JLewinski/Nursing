@@ -12,10 +12,15 @@ public class NursingContext : DbContext, Nursing.Core.Services.IDatabase
 
     public DbSet<FeedingDto> Feedings { get; set; }
 
-    public Task Delete(FeedingDto feeding)
+    public async Task Delete(FeedingDto feeding)
     {
-        Feedings.Remove(feeding);
-        return SaveChangesAsync();
+        var temp = await Feedings.FirstOrDefaultAsync(x => x.Id == feeding.Id);
+
+        if (temp != null)
+        {
+            Feedings.Remove(temp);
+            await SaveChangesAsync();
+        }
     }
 
     public Task DeleteAll()
