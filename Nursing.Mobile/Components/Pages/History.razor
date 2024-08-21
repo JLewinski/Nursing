@@ -6,10 +6,14 @@
 
 <div class="container">
     <div class="row">
-        <DateRangePicker OnRangeSelect="OnDateRangeChanged" class="form-control"></DateRangePicker>
+        <DateRangePicker OnRangeSelect="OnDateRangeChanged"
+            StartDate="DateTime.Now.AddDays(-7)"
+            EndDate="DateTime.Now"
+            MaxDate="DateTime.Now"
+            class="form-control"></DateRangePicker>
     </div>
-    <div class="row">
-        <table class="table table-responsive table-striped mb-3">
+    <div class="row mt-2 mb-2">
+        <table class="table table-responsive table-striped table-bordered mb-3">
             <tr>
                 <th>Average Time Fed</th>
                 <td><DurationCount Duration="AverageFed" /></td>
@@ -53,10 +57,9 @@
 </div>
 
 @code {
-    private DateTime StartDate { get; set; } = DateTime.Now.AddMonths(-1);
-    private DateTime EndDate { get; set; } = DateTime.Now;
+    private List<Feeding> Feedings = new();
 
-    private List<Feeding> Feedings { get; set; } = new();
+    private DateTime MinTime;
 
     private TimeSpan AverageFed => Average(Feedings.Select(x => x.TotalTime));
     private TimeSpan AverageTook => Average(Feedings.Select(x => x.Finished - x.Started));
@@ -80,6 +83,10 @@
 
     private TimeSpan Average(IEnumerable<TimeSpan> list)
     {
+        if (!list.Any())
+        {
+            return TimeSpan.Zero;
+        }
         var averageTicks = list.Average(x => x.Ticks);
         return TimeSpan.FromTicks((long)averageTicks);
     }
@@ -87,17 +94,11 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        Feedings = await GetHistory(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow);
-    }
-
-    private async Task<List<Feeding>> GetHistory(DateTime startDate, DateTime endDate)
-    {
-        var data = await Database.GetFeedings(startDate, endDate);
-        return data;
+        Feedings = await Database.GetFeedings(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow);
     }
 
     private async Task OnDateRangeChanged(DateRange dateRange)
     {
-        Feedings = await GetHistory(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
+        Feedings = await Database.GetFeedings(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
     }
 }
