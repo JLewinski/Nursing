@@ -1,5 +1,168 @@
 ﻿@page "/"
 
-<h1>Hello, world!</h1>
+<h1>Feed!</h1>
 
-Welcome to your new app.
+<div class="row">
+    @if(startTime.HasValue)
+    {
+        <div class="col-12">
+            <p>Started: @startTime.Value.ToString("h:mm tt")</p>
+        </div>
+    }
+</div>
+<div class="row">
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <button class="btn btn-primary" @onclick=ToggleLeft>@LeftText</button>
+        <p>@LeftTotal</p>
+    </div>
+    <div class="d-grid gap-2 col-6 mx-auto">
+        <button class="btn btn-primary" @onclick=ToggleRight>@RightText</button>
+        <p>@RightTotal</p>
+    </div>
+</div>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+        new Timer(async _ =>
+        {
+            var updatedLeft = UpdateLeft();
+            var updatedRight = UpdateRight();
+            if (updatedLeft || updatedRight)
+            {
+                await InvokeAsync(StateHasChanged);
+            }
+        }, null, 0, 100);
+
+        var path = Path.Combine(FileSystem.Current.CacheDirectory, "Feedings.json");
+        if (File.Exists(path))
+        {
+            var data = await File.ReadAllTextAsync(path);
+            var previousFeeding = System.Text.Json.JsonSerializer.Deserialize<Feeding>(data);
+
+            if (previousFeeding != null && !previousFeeding.IsFinished)
+            {
+                feeding = previousFeeding;
+                if (feeding.LeftBreast.Count > 0)
+                {
+                    leftInProgress = feeding.LeftBreast.Last().EndTime == null;
+                    startTime = feeding.LeftBreast.First().StartTime;
+                }
+
+                if (feeding.RightBreast.Count > 0)
+                {
+                    rightInProgress = feeding.RightBreast.Last().EndTime == null;
+                    if (startTime == null || feeding.RightBreast.First().StartTime < startTime)
+                    {
+                        startTime = feeding.RightBreast.First().StartTime;
+                    }
+                }
+            }
+        }
+    }
+
+    private async Task Save()
+    {
+        var path = Path.Combine(FileSystem.Current.CacheDirectory, "Feedings.json");
+        var data = System.Text.Json.JsonSerializer.Serialize(feeding);
+        await File.WriteAllTextAsync(path, data);
+    }
+
+    private Feeding feeding = new Feeding();
+
+    private DateTime? startTime;
+
+    private string LeftTotal = "00:00";
+    private string RightTotal = "00:00";
+
+    private bool UpdateLeft()
+    {
+        var total = feeding.GetTotalTime(feeding.LeftBreast);
+        var text = total.TotalMinutes.ToString("00") + ":" + total.Seconds.ToString("00");
+        if (text.Equals(LeftTotal))
+        {
+            return false;
+        }
+        LeftTotal = text;
+        return true;
+    }
+
+    private bool UpdateRight()
+    {
+        var total = feeding.GetTotalTime(feeding.RightBreast);
+        var text = total.TotalMinutes.ToString("00") + ":" + total.Seconds.ToString("00");
+        if (text.Equals(RightTotal))
+        {
+            return false;
+        }
+        RightTotal = text;
+        return true;
+    }
+
+    private void StartLeft()
+    {
+        feeding.StartLeftBreast();
+        leftInProgress = true;
+    }
+
+    private void StartRight()
+    {
+        feeding.StartRightBreast();
+        rightInProgress = true;
+    }
+
+    private bool leftInProgress = false;
+    private bool rightInProgress = false;
+
+    private string LeftText => leftInProgress ? "End" : "Start";
+    private string RightText => rightInProgress ? "End" : "Start";
+
+    private async Task ToggleLeft()
+    {
+        if (!startTime.HasValue)
+        {
+            startTime = DateTime.Now;
+        }
+        if (leftInProgress)
+        {
+            feeding.EndLeftBreast();
+            leftInProgress = false;
+        }
+        else
+        {
+            if (rightInProgress)
+            {
+                feeding.EndRightBreast();
+                rightInProgress = false;
+            }
+            StartLeft();
+        }
+
+        await Save();
+    }
+
+    private async Task ToggleRight()
+    {
+        if (!startTime.HasValue)
+        {
+            startTime = DateTime.Now;
+        }
+        if (rightInProgress)
+        {
+            feeding.EndRightBreast();
+            rightInProgress = false;
+        }
+        else
+        {
+            if (leftInProgress)
+            {
+                feeding.EndLeftBreast();
+                leftInProgress = false;
+            }
+            StartRight();
+        }
+
+        await Save();
+    }
+}
