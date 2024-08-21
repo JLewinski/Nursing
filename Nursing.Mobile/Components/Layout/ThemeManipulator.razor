@@ -1,11 +1,21 @@
 @inject IJSRuntime JSRuntime
+@inject Services.IDatabase Database
+
 @code {
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        await JSRuntime.InvokeVoidAsync("toggleTheme", IsDarkTheme);
-    }
 
-    [Parameter]
-    public bool IsDarkTheme { get; set; } = true;
+        var settings = await Database.GetSettings();
+
+        var isDarkTheme = settings.Theme switch
+        {
+            ThemeSetting.Dark => true,
+            ThemeSetting.Light => false,
+            ThemeSetting.Auto => await JSRuntime.InvokeAsync<bool>("isDarkPreferred"),
+            _ => throw new NotImplementedException()
+        };
+
+        await JSRuntime.InvokeVoidAsync("toggleTheme", isDarkTheme);
+    }
 }
