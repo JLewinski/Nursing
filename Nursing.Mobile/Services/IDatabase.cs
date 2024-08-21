@@ -4,7 +4,7 @@ namespace Nursing.Mobile.Services;
 
 internal interface IDatabase
 {
-    Task Delete(Guid id);
+    Task Delete(Feeding feeding);
     Task<(TimeSpan averageTotal, TimeSpan averageRight, TimeSpan averageLeft)> GetAverages(DateTime? start, DateTime? end);
     Task<List<Feeding>> GetFeedings(DateTime? start, DateTime? end);
     Task<List<Feeding>> GetLast();

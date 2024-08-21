@@ -5,39 +5,68 @@ namespace Nursing.Mobile.Services;
 
 internal class CacheDatabase : IDatabase
 {
-    private const string DatabaseFilename = "Nursing.json";
-    private static string DatabasePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), DatabaseFilename);
+    private static string DatabasePath => CreateDatabasePath(DateTime.UtcNow);
 
     private const string SettingsFilename = "Settings.json";
     private static string SettingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), SettingsFilename);
 
-    public CacheDatabase()
+    private static string CreateDatabasePath(DateTime date)
     {
-        //File.Delete(DatabasePath);
+        return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing", $"Data.{date:yyyy.MM.dd}.json");
     }
 
-    private async Task Init()
+    public CacheDatabase()
     {
-        if (File.Exists(DatabasePath))
+        //var files = Directory.GetFiles(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing"));
+        //foreach (var file in files)
+        //{
+        //    File.Delete(file);
+        //}
+    }
+
+    private static bool IsInit(string? dbPath = null)
+    {
+        if (File.Exists(dbPath ?? DatabasePath))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public async Task Delete(Feeding feeding)
+    {
+        var path = CreateDatabasePath(feeding.Started);
+
+        var all = await GetFeedings(path);
+
+        var temp = all.FirstOrDefault(x => x.Id == feeding.Id);
+        if (temp is null)
         {
             return;
         }
 
-        await File.WriteAllTextAsync(DatabasePath, JsonSerializer.Serialize(new List<Feeding>()));
+        all.Remove(temp);
+        await Save(all, path);
     }
 
-    public async Task Delete(Guid id)
-    {
-        var all = await GetFeedings();
-        var feeding = all.First(x => x.Id == id);
-        all.Remove(feeding);
-        await Save(all);
-    }
-
-    private async Task Save(List<Feeding> feedings)
+    private static async Task Save(IEnumerable<Feeding> feedings, string path)
     {
         var json = JsonSerializer.Serialize(feedings);
-        await File.WriteAllTextAsync(DatabasePath, json);
+        await File.WriteAllTextAsync(path, json);
+    }
+
+    private static async Task Save(List<Feeding> feedings)
+    {
+        feedings.Sort((x, y) => x.Started.CompareTo(y.Started));
+
+        var totalCount = feedings.Count;
+
+        while (totalCount > 0)
+        {
+            var last = feedings.Last().Started.Date;
+            await Save(feedings.Where(x => x.Started.Date == last), CreateDatabasePath(last));
+        }
     }
 
     public async Task<(TimeSpan averageTotal, TimeSpan averageRight, TimeSpan averageLeft)> GetAverages(DateTime? start, DateTime? end)
@@ -54,18 +83,49 @@ internal class CacheDatabase : IDatabase
         return (total / data.Count, right / data.Count, left / data.Count);
     }
 
-    public async Task<List<Feeding>> GetFeedings(DateTime? start = null, DateTime? end = null)
+    public async Task<List<Feeding>> GetFeedings(string fileName)
     {
-        await Init();
+        if (!IsInit(fileName))
+        {
+            return [];
+        }
 
-        var jsonData = await File.ReadAllTextAsync(DatabasePath);
+        var jsonData = await File.ReadAllTextAsync(fileName);
 
         if (jsonData == string.Empty)
         {
             return [];
         }
 
-        var feedings = JsonSerializer.Deserialize<List<Feeding>>(jsonData);
+        return JsonSerializer.Deserialize<List<Feeding>>(jsonData) ?? [];
+    }
+
+    public async Task<List<Feeding>> GetFeedings(DateTime? start = null, DateTime? end = null)
+    {
+        if (start is null && end is null && !IsInit())
+        {
+            return [];
+        }
+
+        List<Feeding> feedings = [];
+
+        if (start is null)
+        {
+            feedings = await GetFeedings(DatabasePath);
+        }
+        else
+        {
+            var dateIterator = start.Value.Date;
+
+            while (dateIterator <= (end ?? DateTime.UtcNow).Date)
+            {
+                feedings.AddRange(await GetFeedings(CreateDatabasePath(dateIterator)));
+
+                dateIterator = dateIterator.AddDays(1);
+            }
+        }
+
+
         return feedings?
             .Where(x => x.Finished >= (start ?? DateTime.MinValue) && x.Finished <= (end ?? DateTime.UtcNow))
             .OrderByDescending(x => x.Finished)
@@ -80,9 +140,10 @@ internal class CacheDatabase : IDatabase
 
     public async Task<bool> SaveFeeding(Feeding feeding)
     {
-        var all = await GetFeedings();
+        var path = CreateDatabasePath(feeding.Started);
+        var all = await GetFeedings(path);
         var existing = all.FirstOrDefault(x => x.Id == feeding.Id);
-        
+
         if (existing is not null)
         {
             all.Remove(existing);
@@ -93,7 +154,8 @@ internal class CacheDatabase : IDatabase
         }
 
         all.Add(feeding);
-        await Save(all);
+
+        await Save(all, path);
 
         return true;
     }
