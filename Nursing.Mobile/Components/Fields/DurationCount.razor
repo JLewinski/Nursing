@@ -1,0 +1,12 @@
+﻿<text>@DurationToString(Duration)</text>
+
+@code {
+
+    [Parameter]
+    public TimeSpan Duration { get; set; }
+
+    private string DurationToString(TimeSpan duration)
+    {
+        return $"{duration.TotalMinutes.ToString("00")}:{duration.Seconds.ToString("00")}";
+    }
+}
