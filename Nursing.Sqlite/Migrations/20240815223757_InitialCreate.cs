@@ -35,7 +35,7 @@ namespace Nursing.Sqlite.Migrations
             List<OldFeeding> feedings;
             try
             {
-                feedings = cacheDatabase.GetFeedings(DateTime.MinValue, DateTime.MaxValue).Result;
+                feedings = cacheDatabase.GetAllFeedings();
                 var columns = new[] {
                     "Id",
                     "LeftBreastTotal",
@@ -64,6 +64,8 @@ namespace Nursing.Sqlite.Migrations
                 }
 
                 migrationBuilder.InsertData("Feedings", columns, data);
+
+                cacheDatabase.DeleteAll();
             }
             catch (Exception ex)
             {
