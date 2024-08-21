@@ -1,13 +1,17 @@
 ﻿using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Nursing.API.Models;
 using Nursing.API.Services;
 using Nursing.Core.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
+
+using NursingSigninResult = Nursing.Core.Models.SignInResult;
 
 namespace Nursing.API.Controllers;
 
@@ -18,12 +22,14 @@ public class AccountController : ControllerBase
     private readonly UserManager<NursingUser> _userManager;
     private readonly SignInManager<NursingUser> _signInManager;
     private readonly IConfiguration _configuration;
+    private readonly SqlContext _context;
 
-    public AccountController(IConfiguration configuration, UserManager<NursingUser> userManager, SignInManager<NursingUser> signInManager)
+    public AccountController(IConfiguration configuration, UserManager<NursingUser> userManager, SignInManager<NursingUser> signInManager, SqlContext context)
     {
         _configuration = configuration;
         _userManager = userManager;
         _signInManager = signInManager;
+        _context = context;
     }
 
     [HttpPost("register")]
@@ -51,6 +57,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("login")]
+    [ProducesResponseType<NursingSigninResult>(200)]
     public async Task<IActionResult> Login([FromBody] LoginModel model)
     {
         var username = model.Username;
@@ -59,6 +66,13 @@ public class AccountController : ControllerBase
 
         var user = await _userManager.FindByEmailAsync(username);
 
+        if (user == null)
+        {
+            return BadRequest("Invalid Password");
+        }
+        
+        user = await _context.Users.FindAsync(user.Id);
+        
         if (user == null)
         {
             return BadRequest("Invalid Password");
@@ -82,10 +96,15 @@ public class AccountController : ControllerBase
             }
 
             var token = GetToken(username, claims, rememberMe);
+            var refreshToken = GenerateRefreshToken();
+            user.RefreshTokens ??= [];
+            user.RefreshTokens.Add(refreshToken);
+            _context.Update(user);
+            await _context.SaveChangesAsync();
 
             await _signInManager.SignInAsync(user, rememberMe);
 
-            return Ok(token);
+            return Ok(new NursingSigninResult { AuthToken = token, RefreshToken = refreshToken.Token });
         }
         else
         {
@@ -99,6 +118,77 @@ public class AccountController : ControllerBase
                 return BadRequest("Invalid Password");
             }
         }
+    }
+
+    [HttpPost("refreshToken")]
+    [ProducesResponseType<NursingSigninResult>(200)]
+    public async Task<IActionResult> RefreshToken([FromBody] string clientToken)
+    {
+        var user = await _context.Users
+            .Where(u => u.RefreshTokens.Any(t => t.Token == clientToken))
+            .Include(u => u.RefreshTokens)
+            .SingleOrDefaultAsync();
+
+        if (user == null || user.UserName == null)
+        {
+            return BadRequest("Invalid Token");
+        }
+
+        var refreshToken = user.RefreshTokens.SingleOrDefault(t => t.Token == clientToken);
+        if (refreshToken == null || refreshToken.Revoked != null)
+        {
+            return BadRequest("Invalid Token");
+        }
+
+        if (refreshToken.IsExpired)
+        {
+            return BadRequest("Token Expired");
+        }
+
+
+        var newRefreshToken = GenerateRefreshToken();
+
+        refreshToken.Revoked = DateTime.UtcNow;
+        refreshToken.RevokedByIp = GetClientIp();
+        refreshToken.ReplacedByToken = newRefreshToken.Token;
+
+        user.RefreshTokens.Add(newRefreshToken);
+        await _context.SaveChangesAsync();
+
+        var claims = await _userManager.GetClaimsAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+        var token = GetToken(user.UserName, claims, false);
+        await _signInManager.SignInAsync(user, false);
+
+        return Ok(new NursingSigninResult { AuthToken = token, RefreshToken = newRefreshToken.Token });
+    }
+
+    private string GetClientIp()
+    {
+        var ip = Request.Headers["X-Forwarded-For"].FirstOrDefault();
+        if (string.IsNullOrEmpty(ip))
+        {
+            ip = Request.HttpContext.Connection.RemoteIpAddress?.ToString();
+        }
+        return ip;
+    }
+
+    private RefreshToken GenerateRefreshToken()
+    {
+        var randomNumber = new byte[32];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return new RefreshToken
+        {
+            Token = Convert.ToBase64String(randomNumber),
+            Expires = DateTime.UtcNow.AddDays(7),
+            Created = DateTime.UtcNow,
+            CreatedByIp = GetClientIp()
+        };
     }
 
     private string GetToken(string username, IEnumerable<Claim> claims, bool rememberMe)
@@ -119,10 +209,12 @@ public class AccountController : ControllerBase
             tokenManagement.Issuer,
             tokenManagement.Audience,
             claimsList,
-            expires: rememberMe ? DateTime.MaxValue : DateTime.Now.AddHours(tokenManagement.Expiration),
+            expires: rememberMe ? DateTime.MaxValue : DateTime.Now.AddMinutes(tokenManagement.Expiration),
             signingCredentials: credentials
         );
 
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
+
+
 }

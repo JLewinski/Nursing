@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Nursing.API.Services;
 
@@ -11,9 +12,11 @@ using Nursing.API.Services;
 namespace Nursing.API.Migrations
 {
     [DbContext(typeof(SqlContext))]
-    partial class SqlContextModelSnapshot : ModelSnapshot
+    [Migration("20240817054812_RefreshTokens")]
+    partial class RefreshTokens
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
