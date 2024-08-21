@@ -1,9 +1,10 @@
-﻿using Nursing.Models;
+﻿using Nursing.Core.Models.DTO;
+using Nursing.Models;
 using SQLite;
 
 namespace Nursing.Mobile.Services;
 
-internal class LocalDatabase// : IDatabase
+internal class LocalDatabase : Nursing.Core.Services.IDatabase
 {
     private const string DatabaseFilename = "Nursing.db3";
 
@@ -28,12 +29,24 @@ internal class LocalDatabase// : IDatabase
 
         File.Delete(DatabasePath);
 
+        CacheDatabase cacheDatabase = new();
+
         Database = new SQLiteAsyncConnection(DatabasePath, Flags);
 
-        await Database.CreateTableAsync<Feeding>();
+        await Database.CreateTableAsync<FeedingDto>();
+
+        var feedings = await cacheDatabase.GetFeedings(DateTime.MinValue, DateTime.MaxValue);
+        if (feedings.Count > 0)
+        {
+            await Database.InsertAllAsync(feedings.Select(x => new Feeding(x)).Cast<FeedingDto>());
+            await cacheDatabase.DeleteAll();
+        }
+
+        CacheService cacheService = new();
+        await cacheService.Save(new(await GetLast()));
     }
 
-    public async Task<bool> SaveFeeding(Feeding feeding)
+    public async Task<bool> SaveFeeding(FeedingDto feeding)
     {
         await Init();
         int result;
@@ -50,55 +63,73 @@ internal class LocalDatabase// : IDatabase
         return result == 1;
     }
 
-    public async Task Delete(Guid id)
+    private async Task Delete(Guid id)
     {
         await Init();
-        await Database.Table<Feeding>().DeleteAsync(x => x.Id == id);
+        await Database.Table<FeedingDto>().DeleteAsync(x => x.Id == id);
     }
 
-    public async Task<List<Feeding>> GetFeedings(DateTime? start, DateTime? end)
+    public async Task<List<FeedingDto>> GetFeedings(DateTime? start, DateTime? end)
     {
         await Init();
-        return await Database.Table<Feeding>()
-            .Where(x => x.Finished >= (start ?? DateTime.MinValue) && x.Finished <= (end ?? DateTime.UtcNow))
-            .OrderByDescending(x => x.Finished)
+        return await Database.Table<FeedingDto>()
+            .Where(x => x.Started >= (start ?? DateTime.MinValue) && x.Started <= (end ?? DateTime.UtcNow))
+            .OrderByDescending(x => x.Started)
             .ToListAsync();
     }
 
-    public async Task<(TimeSpan averageTotal, TimeSpan averageRight, TimeSpan averageLeft)> GetAverages(DateTime? start, DateTime? end)
+    public async Task<(TimeSpan averageTotal, TimeSpan averageRight, TimeSpan averageLeft, TimeSpan averageFinish)> GetAverages(DateTime? start, DateTime? end)
     {
         await Init();
         var data = await Database.Table<Feeding>()
-            .Where(x => x.Finished >= (start ?? DateTime.MinValue) && x.Finished <= (end ?? DateTime.UtcNow))
+            .Where(x => x.IsFinished && x.Finished != null && x.Started >= (start ?? DateTime.MinValue) && x.Started <= (end ?? DateTime.UtcNow))
             .ToListAsync();
 
-        var (total, right, left) = data.Aggregate((total: TimeSpan.Zero, right: TimeSpan.Zero, left: TimeSpan.Zero), (acc, x) =>
+        var (total, right, left, finish) = data.Aggregate((total: TimeSpan.Zero, right: TimeSpan.Zero, left: TimeSpan.Zero, finish: TimeSpan.Zero), (acc, x) =>
         {
-            acc.total += x.RightBreastTotal + x.LeftBreastTotal;
+            acc.total += x.TotalTime;
             acc.right += x.RightBreastTotal;
             acc.left += x.LeftBreastTotal;
+            acc.finish += (x.Finished ?? DateTime.MaxValue) - x.Started;
             return acc;
         });
 
         return (
             TimeSpan.FromTicks(total.Ticks / data.Count),
             TimeSpan.FromTicks(right.Ticks / data.Count),
-            TimeSpan.FromTicks(left.Ticks / data.Count));
+            TimeSpan.FromTicks(left.Ticks / data.Count),
+            TimeSpan.FromTicks(finish.Ticks / data.Count));
     }
 
-    public async Task<List<Feeding>> GetLast()
+    public async Task<FeedingDto> GetLast()
     {
-        try
-        {
-            await Init();
-            return await Database.Table<Feeding>()
-            .OrderByDescending(x => x.Finished)
-            .Take(2)
-            .ToListAsync();
-        }
-        catch (Exception)
-        {
-            return new List<Feeding>();
-        }
+        await Init();
+
+        return await Database.Table<FeedingDto>()
+            .OrderByDescending(x => x.Started)
+            .FirstOrDefaultAsync();
+    }
+
+    public Task Delete(FeedingDto feeding)
+    {
+        return Delete(feeding.Id);
+    }
+
+    public async Task DeleteAll()
+    {
+        await Init();
+        await Database.Table<FeedingDto>().DeleteAsync();
+    }
+
+    public async Task<Settings> GetSettings()
+    {
+        var settings = await Database.Table<Settings>().FirstOrDefaultAsync();
+        return settings ?? new();
+    }
+
+    public async Task SaveSettings(Settings settings)
+    {
+        await Init();
+        await Database.InsertOrReplaceAsync(settings);
     }
 }

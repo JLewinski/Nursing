@@ -17,5 +17,6 @@ namespace Nursing.Core.Models.DTO
         public DateTime Started { get; set; }
         public DateTime? Finished { get; set; }
         public bool LastIsLeft { get; set; }
+        public DateTime LastUpdated { get; set; }
     }
 }

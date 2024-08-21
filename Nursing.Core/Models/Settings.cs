@@ -1,13 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Nursing.Models;
 
 public class Settings
 {
+    [Key]
+    public int Id { get; set; } = 1;
     public TimeSpan Duration { get; set; } = TimeSpan.FromMinutes(210);
     public ThemeSetting Theme { get; set; } = ThemeSetting.Auto;
 }
