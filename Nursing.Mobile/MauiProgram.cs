@@ -24,7 +24,6 @@ public static class MauiProgram
         builder.Services.AddSingleton<HttpClient>();
 
         var sqliteFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing.db");
-        //var sqliteFilePath = "temp.db";
         builder.Services.AddDbContext<IDatabase, EFDatabase>(options =>
             options.UseSqlite($"Data Source={sqliteFilePath}", opts =>
                 opts.MigrationsAssembly("Nursing.Sqlite")));
