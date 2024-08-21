@@ -1,0 +1,22 @@
+@page "/settings"
+@inject Services.IDatabase Database
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Settings</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12">
+            <button class="btn btn-danger" @onclick="Delete">Delete Data</button>
+        </div>
+    </div>
+</div>
+
+@code {
+    private async Task Delete()
+    {
+        await Database.DeleteAll();
+    }
+}
