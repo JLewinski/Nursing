@@ -15,4 +15,4 @@ jobs:
           dotnet-version: 9.0.x # optional
           # Optional quality of the build. The possible values are: daily, signed, validated, preview, ga.
           dotnet-quality: preview # optional
-      - run: dotnet build
+      - run: dotnet build Nursing.sln
