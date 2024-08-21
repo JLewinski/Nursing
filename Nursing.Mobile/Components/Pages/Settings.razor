@@ -1,6 +1,8 @@
 @page "/settings"
+@using Nursing.Core.Services
 @inject NavigationManager Navigation
-@inject Services.IDatabase Database
+@inject IDatabase Database
+@inject Nursing.Mobile.Services.CacheService Cache
 
 <div class="container">
     <div class="row">
@@ -40,7 +42,7 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        settings = await Database.GetSettings();
+        settings = await Cache.GetSettings();
         hoursBetweenFeedings = settings.Duration.TotalHours;
     }
 
@@ -52,7 +54,7 @@
     private async Task Save()
     {
         settings.Duration = TimeSpan.FromHours(hoursBetweenFeedings);
-        await Database.SaveSettings(settings);
+        await Cache.SaveSettings(settings);
         Navigation.Refresh();
     }
 }

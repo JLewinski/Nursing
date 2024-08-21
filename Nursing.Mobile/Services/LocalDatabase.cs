@@ -27,23 +27,37 @@ internal class LocalDatabase : Nursing.Core.Services.IDatabase
             return;
         }
 
-        File.Delete(DatabasePath);
-
         CacheDatabase cacheDatabase = new();
 
         Database = new SQLiteAsyncConnection(DatabasePath, Flags);
 
         await Database.CreateTableAsync<FeedingDto>();
 
-        var feedings = await cacheDatabase.GetFeedings(DateTime.MinValue, DateTime.MaxValue);
-        if (feedings.Count > 0)
+        try
         {
-            await Database.InsertAllAsync(feedings.Select(x => new Feeding(x)).Cast<FeedingDto>());
-            await cacheDatabase.DeleteAll();
+
+            var feedings = await cacheDatabase.GetFeedings(DateTime.MinValue, DateTime.MaxValue);
+            var dtos = feedings.Select(x => new FeedingDto(x)).ToList();
+            if (feedings.Count > 0)
+            {
+                await Database.InsertAllAsync(dtos);
+                var all = await Database.Table<FeedingDto>().ToListAsync();
+                await cacheDatabase.DeleteAll();
+            }
+        }
+        catch (Exception ex)
+        {
+            throw;
         }
 
         CacheService cacheService = new();
-        await cacheService.Save(new(await GetLast()));
+        await cacheService.Cache(new(await GetLast()));
+    }
+
+    public async Task<FeedingDto> GetFeeding(Guid id)
+    {
+        await Init();
+        return await Database.Table<FeedingDto>().FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<bool> SaveFeeding(FeedingDto feeding)

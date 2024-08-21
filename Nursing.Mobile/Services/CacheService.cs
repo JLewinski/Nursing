@@ -52,8 +52,16 @@ public class CacheService
             return new();
         }
 
+        try
+        {
+
         var json = await File.ReadAllTextAsync(path);
         return JsonSerializer.Deserialize<T>(json) ?? new();
+        }
+        catch
+        {
+            return new();
+        }
     }
 
     public async Task<FeedingCache> Get()
