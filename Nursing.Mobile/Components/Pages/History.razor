@@ -8,8 +8,8 @@
 <div class="container">
     <div class="row">
         <DateRangePicker OnRangeSelect="OnDateRangeChanged"
-                         StartDate="DateTime.Now.AddDays(-7)"
-                         EndDate="DateTime.Now"
+                         StartDate="StartTime"
+                         EndDate="EndTime"
                          MaxDate="DateTime.Now"
                          class="form-control"></DateRangePicker>
     </div>
@@ -63,7 +63,8 @@
 @code {
     private List<FeedingDto> Feedings = new();
 
-    private DateTime MinTime;
+    private DateTime StartTime = DateTime.Now.AddDays(-7);
+    private DateTime EndTime = DateTime.Now;
 
     private TimeSpan AverageFed => Average(Feedings.Select(x => x.TotalTime));
     private TimeSpan AverageTook => Average(Feedings.Where(x => x.Finished != null).Select(x => x.Finished.Value - x.Started));
@@ -103,6 +104,8 @@
 
     private async Task OnDateRangeChanged(DateRange dateRange)
     {
+        StartTime = dateRange.Start.DateTime;
+        EndTime = dateRange.End.DateTime;
         Feedings = await Database.GetFeedings(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
     }
 }
