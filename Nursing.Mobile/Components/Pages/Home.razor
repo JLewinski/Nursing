@@ -289,20 +289,7 @@
 
     private async Task Finish()
     {
-        if (leftInProgress)
-        {
-            feeding.EndLeftBreast();
-            leftInProgress = false;
-        }
-
-        if (rightInProgress)
-        {
-            feeding.EndRightBreast();
-            rightInProgress = false;
-        }
-
-        feeding.Finished = DateTime.UtcNow;
-        feeding.IsFinished = true;
+        feeding.Finish();
 
         await Save();
 
