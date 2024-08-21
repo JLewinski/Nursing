@@ -4,46 +4,38 @@
 
 <div class="container text-center">
     <div class="row">
-        <h1>Feed!</h1>
-
         @if (startTime.HasValue)
         {
             <div class="col-12">
-                <p>Started: @startTime.Value.ToLocalTime().ToString("h:mm tt")</p>
+                <p>Started: @startTime.Value.ToLocalTime().ToShortTimeString()</p>
             </div>
         }
         else if (lastTime.HasValue)
         {
-            var duration = DateTime.UtcNow - lastTime.Value;
-
+            var lastTimeValue = lastTime.Value;
             <div class="col-6">
-                <p>Last Fed: @lastTime.Value.ToLocalTime().ToString("h:mm tt")</p>
-                <p>@(((int)duration.TotalHours).ToString("00")):@duration.Minutes.ToString("00"):@duration.Seconds.ToString("00") Ago</p>
+                <p class="p-0 m-0">Last Fed</p>
+                <p class="p-0 m-0">@lastTimeValue.ToLocalTime().ToShortTimeString()</p>
+                <p><DurationCount StartTime="lastTimeValue" ShowHours="true" IsTimer="true" /></p>
             </div>
-            var nextFeeding = lastTime.Value.ToLocalTime() + TimeBetweenFeedings;
-            var timeUntilNext = nextFeeding - DateTime.Now;
+            var nextFeeding = lastTimeValue + TimeBetweenFeedings;
             <div class="col-6">
-                <p>Next Feeding: @nextFeeding.ToString("h:mm tt")</p>
-                <p>@(timeUntilNext < TimeSpan.Zero ? "-" : "")@(((int)timeUntilNext.TotalHours).ToString("00")):@timeUntilNext.Minutes.ToString("00"):@timeUntilNext.Seconds.ToString("00") To Go</p>
+                <p class="p-0 m-0">Next Feeding</p>
+                <p class="p-0 m-0">@nextFeeding.ToLocalTime().ToShortTimeString()</p>
+                <p><DurationCount EndTime="nextFeeding" ShowHours="true" IsTimer="true" /></p>
             </div>
         }
     </div>
-    @if (!feeding.IsFinished)
-    {
-        <div class="row">
-            <div class="d-grid gap-2 col-6 mx-auto">
-                <button class="btn btn-primary" @onclick=ToggleLeft>@LeftText</button>
-            </div>
-            <div class="d-grid gap-2 col-6 mx-auto">
-                <button class="btn btn-primary" @onclick=ToggleRight>@RightText</button>
-            </div>
-        </div>
-    }
     <div class="row">
         <div class="col-6">
             @if (leftRightNeither == LeftRightNeither.Left)
             {
-                <p>Last Used</p>
+                //TODO: Make this a badge (bootstrap)
+                <p class="badge rounded-pill text-bg-info">Last Used</p>
+            }
+            else
+            {
+                <p></p>
             }
         </div>
         <div class="col-6">
@@ -51,18 +43,23 @@
             {
                 <p>Last Used</p>
             }
+            else
+            {
+                <p></p>
+            }
         </div>
     </div>
-    @if (feeding.LeftBreast.Count > 0 || feeding.RightBreast.Count > 0)
-    {
-        <div class="row">
-            <div class="col-6">
-                <p>@LeftTotal</p>
-            </div>
-            <div class="col-6">
-                <p>@RightTotal</p>
-            </div>
+    <div class="row mb-3">
+        <div class="col-6">
+            <BoobTimer Feedings="feeding.LeftBreast" OnToggle="Save" />
         </div>
+        <div class="col-6">
+            <BoobTimer Feedings="feeding.RightBreast" OnToggle="Save" />
+        </div>
+    </div>
+    
+    @if (startTime.HasValue)
+    {
         <div class="row">
             <div class="d-grid gap-2 col-6 mx-auto">
                 <button class="btn btn-primary" @onclick=Reset>Reset</button>
@@ -71,7 +68,7 @@
                 <button class="btn btn-primary" @onclick=Finish>Finish</button>
             </div>
         </div>
-        <table class="table table-borderless table-striped table-responsive align-middle mt-5">
+        <table class="table table-borderless table-striped table-responsive align-middle mt-5 d-none d-md-block">
             <tbody>
                 @{
                     var leftIndex = feeding.LeftBreast.Count;
@@ -122,8 +119,8 @@
     private DateTime? lastTime;
     private TimeSpan TimeBetweenFeedings;
 
-    private string LeftTotal = "00:00";
-    private string RightTotal = "00:00";
+    private TimeSpan LeftTotal = TimeSpan.Zero;
+    private TimeSpan RightTotal = TimeSpan.Zero;
 
     private bool leftInProgress = false;
     private bool rightInProgress = false;
@@ -137,27 +134,12 @@
     {
         await base.OnInitializedAsync();
         TimeBetweenFeedings = await Database.GetInBetween();
-        new Timer(async _ =>
-        {
-            if (startTime == null)
-            {
-                await InvokeAsync(StateHasChanged);
-                return;
-            }
-            var updatedLeft = UpdateLeft();
-            var updatedRight = UpdateRight();
-            if (updatedLeft || updatedRight)
-            {
-                await InvokeAsync(StateHasChanged);
-            }
-        }, null, 0, 100);
         await Load();
     }
 
     private async Task Load()
     {
         var last2 = await Database.GetLast();
-
         var last = last2.FirstOrDefault();
         if (last != null && !last.IsFinished)
         {
@@ -210,7 +192,7 @@
 
     private void LoadPrevious(Feeding previousFeeding)
     {
-        lastTime = previousFeeding.FirstFinish;
+        lastTime = previousFeeding.Started;
         var maxLeft = previousFeeding.LeftBreast.Count > 0 ? previousFeeding.LeftBreast.Max(x => x.EndTime) : null;
         var maxRight = previousFeeding.RightBreast.Count > 0 ? previousFeeding.RightBreast.Max(x => x.EndTime) : null;
 
@@ -237,6 +219,19 @@
 
     private async Task Save()
     {
+        if (startTime is null)
+        {
+            startTime = feeding.LeftBreast.FirstOrDefault()?.StartTime ?? feeding.RightBreast.FirstOrDefault()?.StartTime;
+
+            if (startTime is null)
+            {
+                throw new InvalidOperationException("Start time is null");
+            }
+
+            feeding.Started = startTime.Value;
+            await InvokeAsync(StateHasChanged);
+        }
+        
         await Database.SaveFeeding(feeding);
     }
 
@@ -260,6 +255,7 @@
             rightInProgress = false;
         }
 
+        feeding.Finished = DateTime.UtcNow;
         feeding.IsFinished = true;
 
         await Save();
@@ -267,87 +263,4 @@
         Navigation.Refresh();
     }
 
-    private bool UpdateLeft()
-    {
-        var total = feeding.GetTotalTime(feeding.LeftBreast);
-        var text = total.TotalMinutes.ToString("00") + ":" + total.Seconds.ToString("00");
-        if (text.Equals(LeftTotal))
-        {
-            return false;
-        }
-        LeftTotal = text;
-        return true;
-    }
-
-    private bool UpdateRight()
-    {
-        var total = feeding.GetTotalTime(feeding.RightBreast);
-        var text = total.TotalMinutes.ToString("00") + ":" + total.Seconds.ToString("00");
-        if (text.Equals(RightTotal))
-        {
-            return false;
-        }
-        RightTotal = text;
-        return true;
-    }
-
-    private void StartLeft()
-    {
-        feeding.StartLeftBreast();
-        leftInProgress = true;
-    }
-
-    private void StartRight()
-    {
-        feeding.StartRightBreast();
-        rightInProgress = true;
-    }
-
-    private async Task ToggleLeft()
-    {
-        if (!startTime.HasValue)
-        {
-            startTime = DateTime.Now;
-        }
-        if (leftInProgress)
-        {
-            feeding.EndLeftBreast();
-            leftInProgress = false;
-        }
-        else
-        {
-            if (rightInProgress)
-            {
-                feeding.EndRightBreast();
-                rightInProgress = false;
-            }
-            StartLeft();
-        }
-
-        await Save();
-    }
-
-    private async Task ToggleRight()
-    {
-        if (!startTime.HasValue)
-        {
-            startTime = DateTime.Now;
-        }
-        if (rightInProgress)
-        {
-            feeding.EndRightBreast();
-            rightInProgress = false;
-        }
-        else
-        {
-            if (leftInProgress)
-            {
-                feeding.EndLeftBreast();
-                leftInProgress = false;
-            }
-            StartRight();
-        }
-
-        await Save();
-    }
 }
