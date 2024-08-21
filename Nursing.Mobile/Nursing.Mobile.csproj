@@ -133,6 +133,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Nursing.Core\Nursing.Core.csproj" />
+      <ProjectReference Include="..\Nursing.Sqlite\Nursing.Sqlite.csproj" />
     </ItemGroup>
 
     <ItemGroup>

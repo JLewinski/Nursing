@@ -32,7 +32,7 @@ namespace Nursing.Sqlite.Migrations
                 });
 
             Services.CacheDatabase cacheDatabase = new();
-            List<Models.OldFeeding> feedings;
+            List<OldFeeding> feedings;
             try
             {
                 feedings = cacheDatabase.GetFeedings(DateTime.MinValue, DateTime.MaxValue).Result;
