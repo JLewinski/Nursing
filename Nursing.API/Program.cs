@@ -4,8 +4,8 @@ using Microsoft.IdentityModel.Tokens;
 using Nursing.API.Models;
 using Nursing.API.Services;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer; // Add this using directive
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using AspNetCore.Identity.CosmosDb.Extensions; // Add this using directive
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -37,11 +37,27 @@ builder.Services.AddAuthentication(x =>
 
 builder.Services.AddAuthorization();
 
-builder.Services.AddDbContext<SqlContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+var cosmosSettings = builder.Configuration.GetSection("CosmosSettings").Get<CosmosSettings>();
 
-builder.Services.AddIdentity<NursingUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<SqlContext>();
+if(cosmosSettings == null)
+{
+    throw new ArgumentNullException(nameof(cosmosSettings));
+}
+
+builder.Services.AddDbContext<SqlContext>(options =>
+    options.UseCosmos(
+        cosmosSettings.Endpoint,
+        cosmosSettings.Key,
+        databaseName: cosmosSettings.DatabaseName
+    ));
+
+builder.Services.AddCosmosIdentity<SqlContext, NursingUser, IdentityRole<Guid>, Guid>(options =>
+{
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedPhoneNumber = false;
+    options.SignIn.RequireConfirmedAccount = true;
+    options.User.RequireUniqueEmail = true;
+});
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -49,7 +65,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.Migrate();
+await app.EnsureCreated();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

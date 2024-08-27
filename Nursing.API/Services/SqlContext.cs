@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using AspNetCore.Identity.CosmosDb;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Nursing.API.Models;
 
 namespace Nursing.API.Services;
 
-public class SqlContext : IdentityDbContext<NursingUser, IdentityRole<Guid>, Guid>
+public class SqlContext : CosmosIdentityDbContext<NursingUser, IdentityRole<Guid>, Guid>
 {
     public SqlContext(DbContextOptions<SqlContext> options) : base(options)
     {

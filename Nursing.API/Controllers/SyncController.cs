@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nursing.API.Models;
@@ -8,7 +9,7 @@ using Nursing.Core.Models.DTO;
 
 namespace Nursing.API.Controllers
 {
-    [Authorize]
+    [Authorize(JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
     [Route("[controller]")]
     public class SyncController : ControllerBase

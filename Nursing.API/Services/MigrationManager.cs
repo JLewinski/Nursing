@@ -2,18 +2,12 @@
 
 public static class MigrationManager
 {
-    public static WebApplication Migrate(this WebApplication app)
+    public static async Task<WebApplication> EnsureCreated(this WebApplication app)
     {
         using (var scope = app.Services.CreateScope())
         {
             using var context = scope.ServiceProvider.GetRequiredService<SqlContext>();
-            try
-            {
-                context.Migrate();
-            }
-            catch (Exception)
-            {
-            }
+            await context.Database.EnsureCreatedAsync();
         }
         return app;
     }
