@@ -23,9 +23,9 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build ./Nursing.API/Nursing.API.csproj --configuration Release
 
-      - name: dotnet publish ./Nursing.API/Nursing.API.csproj
+      - name: dotnet publish
         run: dotnet publish ./Nursing.API/Nursing.API.csproj -c Release -o ${{env.DOTNET_ROOT}}/nursing
 
       - name: Upload artifact for deployment job
