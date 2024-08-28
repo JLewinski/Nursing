@@ -115,15 +115,15 @@ internal class CacheDatabase
     {
         List<OldFeeding> feedings = [];
 
-            if (!Directory.Exists(DatabaseFolderPath))
-            {
-                return [];
-            }
-            var files = Directory.GetFiles(DatabaseFolderPath);
-            foreach (var file in files)
-            {
-                feedings.AddRange(GetFeedings(file));
-            }
+        if (!Directory.Exists(DatabaseFolderPath))
+        {
+            return [];
+        }
+        var files = Directory.GetFiles(DatabaseFolderPath);
+        foreach (var file in files)
+        {
+            feedings.AddRange(GetFeedings(file));
+        }
         return feedings;
     }
 
@@ -136,14 +136,14 @@ internal class CacheDatabase
             start = DateTime.UtcNow.AddDays(-1);
         }
 
-        if(start == DateTime.MinValue)
+        if (start == DateTime.MinValue)
         {
-            if(!Directory.Exists(DatabaseFolderPath))
+            if (!Directory.Exists(DatabaseFolderPath))
             {
                 return feedings;
             }
             var files = Directory.GetFiles(DatabaseFolderPath);
-            foreach(var file in files)
+            foreach (var file in files)
             {
                 feedings.AddRange(await GetFeedingsAsync(file));
             }
@@ -213,12 +213,18 @@ internal class CacheDatabase
 
     public void DeleteAll()
     {
-        Directory.Delete(DatabaseFolderPath, true);
+        if (Directory.Exists(DatabaseFolderPath))
+        {
+            Directory.Delete(DatabaseFolderPath, true);
+        }
     }
 
     public Task DeleteAllAsync()
     {
-        Directory.Delete(DatabaseFolderPath, true);
+        if (Directory.Exists(DatabaseFolderPath))
+        {
+            Directory.Delete(DatabaseFolderPath, true);
+        }
         return Task.FromResult(true);
     }
 

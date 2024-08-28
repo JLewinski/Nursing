@@ -92,12 +92,10 @@
           <PrivateAssets>all</PrivateAssets>
           <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
-        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.71" />
-        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.71" />
-        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.71" />
+        <PackageReference Include="Microsoft.Maui.Controls" Version="8.0.80" />
+        <PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="8.0.80" />
+        <PackageReference Include="Microsoft.AspNetCore.Components.WebView.Maui" Version="8.0.80" />
         <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="8.0.0" />
-        <PackageReference Include="sqlite-net-pcl" Version="1.9.172" />
-        <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.1.8" />
         <PackageReference Include="System.Text.Json" Version="8.0.4" />
     </ItemGroup>
 
