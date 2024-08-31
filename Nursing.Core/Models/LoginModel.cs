@@ -1,15 +1,11 @@
 ﻿namespace Nursing.Core.Models;
 
-public class AccountModel
+public class RegisterModel
 {
     public required string Username { get; set; }
     public required string Password { get; set; }
 }
-public class RegisterModel : AccountModel
-{
-    public required bool IsAdmin { get; set; }
-}
-public class LoginModel : AccountModel
+public class LoginModel : RegisterModel
 {
     public bool RememberMe { get; set; }
 }
