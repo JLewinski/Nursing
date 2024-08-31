@@ -121,7 +121,7 @@ public class SyncService
 
     public async Task<bool> Register(string username, string password)
     {
-        RegisterModel registerModel = new() { Username = username, Password = password };
+        AccountModel registerModel = new() { Username = username, Password = password };
         var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/register"), registerModel);
         if (result.IsSuccessStatusCode)
         {

@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -35,6 +36,19 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
+        var initialAdmin = _configuration.GetValue<string>("InitialAdmin.User");
+        if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Admin"))
+        {
+            if (model.Username != initialAdmin)
+            {
+                return Unauthorized();
+            }
+            if (await _userManager.FindByNameAsync(initialAdmin) != null)
+            {
+                return BadRequest("Initial Admin already exists");
+            }
+        }
+
         var username = model.Username;
         var password = model.Password;
 
@@ -46,8 +60,13 @@ public class AccountController : ControllerBase
         };
 
         var result = await _userManager.CreateAsync(user, password);
+
         if (result.Succeeded)
         {
+            if (model.IsAdmin || username == initialAdmin)
+            {
+                await _userManager.AddToRoleAsync(user, "Admin");
+            }
             return Ok();
         }
         else
@@ -70,9 +89,9 @@ public class AccountController : ControllerBase
         {
             return BadRequest("Invalid Password");
         }
-        
+
         user = await _context.Users.FindAsync(user.Id);
-        
+
         if (user == null)
         {
             return BadRequest("Invalid Password");
@@ -118,6 +137,21 @@ public class AccountController : ControllerBase
                 return BadRequest("Invalid Password");
             }
         }
+    }
+
+    [HttpDelete("delete/{username}")]
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> DeleteAccount(string username)
+    {
+        var user = await _userManager.FindByEmailAsync(username);
+        if (user == null)
+        {
+            return BadRequest("Invalid User");
+        }
+
+        await _userManager.DeleteAsync(user);
+
+        return Ok();
     }
 
     [HttpPost("refreshToken")]
@@ -216,5 +250,5 @@ public class AccountController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 
-
+    
 }
