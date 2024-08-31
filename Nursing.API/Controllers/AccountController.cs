@@ -36,12 +36,12 @@ public class AccountController : ControllerBase
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var initialAdmin = _configuration.GetValue<string>("InitialAdmin.User");
+        var initialAdmin = _configuration.GetSection("InitialAdmin").GetValue<string>("User");
         if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Admin"))
         {
             if (model.Username != initialAdmin)
             {
-                return Unauthorized();
+                return Unauthorized("User is not " + initialAdmin);
             }
             if (await _userManager.FindByNameAsync(initialAdmin) != null)
             {
