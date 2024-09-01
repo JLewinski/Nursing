@@ -50,7 +50,7 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-app.Migrate();
+await app.Migrate();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
