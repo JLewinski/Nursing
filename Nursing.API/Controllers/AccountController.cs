@@ -154,6 +154,14 @@ public class AccountController : ControllerBase
         return Ok();
     }
 
+    [HttpGet("IsAdmin")]
+    [Authorize]
+    [ProducesResponseType<bool>(200)]
+    public IActionResult IsAdmin()
+    {
+        return Ok(User.IsInRole("Admin"));
+    }
+
     [HttpPost("refreshToken")]
     [ProducesResponseType<NursingSigninResult>(200)]
     public async Task<IActionResult> RefreshToken([FromBody] string clientToken)
@@ -208,7 +216,7 @@ public class AccountController : ControllerBase
         {
             ip = Request.HttpContext.Connection.RemoteIpAddress?.ToString();
         }
-        return ip;
+        return ip ?? "NA";
     }
 
     private RefreshToken GenerateRefreshToken()

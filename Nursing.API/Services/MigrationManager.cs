@@ -1,18 +1,19 @@
-﻿namespace Nursing.API.Services;
+﻿using Microsoft.AspNetCore.Identity;
+
+namespace Nursing.API.Services;
 
 public static class MigrationManager
 {
-    public static WebApplication Migrate(this WebApplication app)
+    public static async Task<WebApplication> Migrate(this WebApplication app)
     {
         using (var scope = app.Services.CreateScope())
         {
             using var context = scope.ServiceProvider.GetRequiredService<SqlContext>();
-            try
+            context.Migrate();
+            using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
+            if (!roleManager.Roles.Any())
             {
-                context.Migrate();
-            }
-            catch (Exception)
-            {
+                await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
             }
         }
         return app;
