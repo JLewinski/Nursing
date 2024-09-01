@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nursing.API.Models;
@@ -20,7 +20,7 @@ namespace Nursing.API.Controllers
         }
 
         [HttpPost("sync")]
-        [ProducesResponseType(200, Type = typeof(SyncResult))]
+        [ProducesResponseType<SyncResult>(200)]
         public async Task<IActionResult> Sync([FromBody] SyncModel sync)
         {
             var lastSync = sync.LastSync;
@@ -79,7 +79,8 @@ namespace Nursing.API.Controllers
             }
         }
 
-        [HttpPost("invite/{username}")]
+        [HttpPost("invite")]
+        [ProducesResponseType<Guid>(200)]
         public async Task<IActionResult> Invite(string userName)
         {
             if (User.Identity == null)
