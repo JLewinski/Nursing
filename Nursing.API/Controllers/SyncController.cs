@@ -1,4 +1,4 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nursing.API.Models;
@@ -91,7 +91,7 @@ namespace Nursing.API.Controllers
             var currentUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == User.Identity.Name);
             var invitedUser = await _context.Users.FirstOrDefaultAsync(u => u.UserName == userName);
 
-            if (currentUser == null || invitedUser == null)
+            if (currentUser == null || invitedUser == null || User.Identity.Name == userName)
             {
                 return BadRequest();
             }
@@ -103,8 +103,9 @@ namespace Nursing.API.Controllers
             };
 
             _context.Invites.Add(invite);
+            await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok(invite.GroupId);
         }
 
         [HttpGet("acceptInvite/{id}")]
@@ -114,7 +115,7 @@ namespace Nursing.API.Controllers
             {
                 return Unauthorized();
             }
-
+            
             var currentUser = await _context.Users.FirstAsync(u => u.UserName == User.Identity.Name);
             var invite = await _context.Invites.FirstOrDefaultAsync(i => i.UserId == currentUser.Id && i.GroupId == id);
             if (currentUser == null || invite == null)
