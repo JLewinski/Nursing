@@ -34,21 +34,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("register")]
+    [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var initialAdmin = _configuration.GetSection("InitialAdmin").GetValue<string>("User");
-        if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Admin"))
-        {
-            if (model.Username != initialAdmin)
-            {
-                return Unauthorized("User is not " + initialAdmin);
-            }
-            if (await _userManager.FindByNameAsync(initialAdmin) != null)
-            {
-                return BadRequest("Initial Admin already exists");
-            }
-        }
-
         var username = model.Username;
         var password = model.Password;
 
@@ -62,18 +50,16 @@ public class AccountController : ControllerBase
 
         var result = await _userManager.CreateAsync(user, password);
 
-        if (result.Succeeded)
-        {
-            if (model.IsAdmin || username == initialAdmin)
-            {
-                await _userManager.AddToRoleAsync(user, "Admin");
-            }
-            return Ok();
-        }
-        else
+        if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
+        
+        if (model.IsAdmin)
+        {
+            await _userManager.AddToRoleAsync(user, "Admin");
+        }
+        return Ok();
     }
 
     [HttpPost("login")]
