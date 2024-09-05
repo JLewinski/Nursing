@@ -1,3 +1,4 @@
+@using Nursing.Mobile.Services
 @inject IJSRuntime JSRuntime
 @inject Nursing.Mobile.Services.CacheService Database
 
@@ -11,10 +12,10 @@
         {
             ThemeSetting.Dark => true,
             ThemeSetting.Light => false,
-            ThemeSetting.Auto => await JSRuntime.InvokeAsync<bool>("themeManager.isDarkPreferred"),
+            ThemeSetting.Auto => await JSRuntime.CheckIsDarkPrefered(),
             _ => throw new NotImplementedException()
         };
 
-        await JSRuntime.InvokeVoidAsync("themeManager.toggleTheme", isDarkTheme);
+        await JSRuntime.ToggleTheme(isDarkTheme);
     }
 }
