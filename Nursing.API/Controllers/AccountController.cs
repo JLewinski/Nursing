@@ -56,7 +56,8 @@ public class AccountController : ControllerBase
         {
             UserName = username,
             Email = username,
-            GroupId = Guid.NewGuid()
+            GroupId = Guid.NewGuid(),
+            RefreshTokens = new()
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -115,7 +116,7 @@ public class AccountController : ControllerBase
             }
 
             var token = GetToken(username, claims, rememberMe);
-            var refreshToken = GenerateRefreshToken();
+            var refreshToken = RefreshToken.Generate(user, GetClientIp());
             user.RefreshTokens ??= [];
             user.RefreshTokens.Add(refreshToken);
             _context.Update(user);
@@ -123,7 +124,7 @@ public class AccountController : ControllerBase
 
             await _signInManager.SignInAsync(user, rememberMe);
 
-            return Ok(new NursingSigninResult { AuthToken = token, RefreshToken = refreshToken.Token });
+            return Ok(new NursingSigninResult { AuthToken = token, RefreshToken = refreshToken.Token, IsAdmin = await _userManager.IsInRoleAsync(user, "Admin") });
         }
         else
         {
@@ -164,7 +165,7 @@ public class AccountController : ControllerBase
 
     [HttpPost("refreshToken")]
     [ProducesResponseType<NursingSigninResult>(200)]
-    public async Task<IActionResult> RefreshToken([FromBody] string clientToken)
+    public async Task<IActionResult> RefreshUserToken([FromBody] string clientToken)
     {
         var user = await _context.Users
             .Where(u => u.RefreshTokens.Any(t => t.Token == clientToken))
@@ -187,11 +188,11 @@ public class AccountController : ControllerBase
             return BadRequest("Token Expired");
         }
 
-
-        var newRefreshToken = GenerateRefreshToken();
+        var clientIp = GetClientIp();
+        var newRefreshToken = RefreshToken.Generate(user, clientIp);
 
         refreshToken.Revoked = DateTime.UtcNow;
-        refreshToken.RevokedByIp = GetClientIp();
+        refreshToken.RevokedByIp = clientIp;
         refreshToken.ReplacedByToken = newRefreshToken.Token;
 
         user.RefreshTokens.Add(newRefreshToken);
@@ -219,20 +220,6 @@ public class AccountController : ControllerBase
         return ip ?? "NA";
     }
 
-    private RefreshToken GenerateRefreshToken()
-    {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return new RefreshToken
-        {
-            Token = Convert.ToBase64String(randomNumber),
-            Expires = DateTime.UtcNow.AddDays(7),
-            Created = DateTime.UtcNow,
-            CreatedByIp = GetClientIp()
-        };
-    }
-
     private string GetToken(string username, IEnumerable<Claim> claims, bool rememberMe)
     {
         var tokenManagement = _configuration.GetSection("Token").Get<TokenManagement>();
@@ -258,5 +245,5 @@ public class AccountController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 
-    
+
 }

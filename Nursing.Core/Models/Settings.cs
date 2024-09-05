@@ -11,6 +11,7 @@ public class Settings
     public DateTime LastSync { get; set; } = DateTime.MinValue;
     public string? Token { get; set; }
     public string? RefreshToken { get; set; }
+    public bool IsAdmin { get; set; } = false;
 }
 
 public enum ThemeSetting
