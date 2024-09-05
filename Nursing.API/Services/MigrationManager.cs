@@ -42,7 +42,8 @@ public static class MigrationManager
         {
             UserName = username,
             Email = username,
-            GroupId = Guid.NewGuid()
+            GroupId = Guid.NewGuid(),
+            RefreshTokens = new()
         };
 
         using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<NursingUser>>();
