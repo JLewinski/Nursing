@@ -1,17 +1,16 @@
+@using Nursing.Mobile.Services
 @inject NavigationManager Navigation
-@inject Nursing.Mobile.Services.SyncService Sync
+@inject SyncService Sync
+@inject IJSRuntime JSRuntime
 
 <div class="row">
     <div class="col-12">
-        <button type="button" @onclick="SyncNow" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#LoadingModal">
+        <button type="button" @onclick="SyncNow" class="btn btn-primary btn-lg">
             Sync Now
         </button>
-
-        
-
     </div>
     <div class="col-12">
-        <button type="button" @onclick="Logout" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#LoadingModal">
+        <button type="button" @onclick="Logout" class="btn btn-primary btn-lg">
             Log Out
         </button>
     </div>
@@ -24,14 +23,16 @@
 
     private async Task SyncNow()
     {
+        await JSRuntime.ShowLoadingModal();
         var result = await Sync.Sync();
+        await JSRuntime.HideLoadingModal();
         await alertError.ShowAlert(result.message, result.success);
-
     }
 
     private async Task Logout()
     {
+        await JSRuntime.ShowLoadingModal();
         await Sync.Logout();
-        Navigation.Refresh();
+        Navigation.NavigateTo("/login");
     }
 }

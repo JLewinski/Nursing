@@ -26,7 +26,7 @@ var loadingModal = (() => {
             if (this.#loadingModal) {
                 return;
             }
-            this.#loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            this.#loadingModal = new bootstrap.Modal(document.getElementById('LoadingModal'));
         }
 
         /**

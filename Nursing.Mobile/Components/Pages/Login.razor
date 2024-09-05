@@ -1,6 +1,8 @@
 @page "/login"
+@using Nursing.Mobile.Services
 @inject NavigationManager Navigation
-@inject Nursing.Mobile.Services.SyncService Sync
+@inject SyncService Sync
+@inject IJSRuntime JSRuntime
 
 <div class="container">
     <h1>Login</h1>
@@ -37,8 +39,10 @@
 
     private async Task LoginUser()
     {
+        await JSRuntime.ShowLoadingModal("Logging In");
         var result = await Sync.Login(username, password, rememberMe);
         password = "";
+        await JSRuntime.HideLoadingModal();
         if (result.success)
         {
             Navigation.NavigateTo("/account");
