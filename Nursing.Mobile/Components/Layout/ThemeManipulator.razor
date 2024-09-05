@@ -2,20 +2,19 @@
 @inject Nursing.Mobile.Services.CacheService Database
 
 @code {
-    protected override async Task OnParametersSetAsync()
-    {
-        await base.OnParametersSetAsync();
 
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
         var settings = await Database.GetSettings();
 
         var isDarkTheme = settings.Theme switch
         {
             ThemeSetting.Dark => true,
             ThemeSetting.Light => false,
-            ThemeSetting.Auto => await JSRuntime.InvokeAsync<bool>("isDarkPreferred"),
+            ThemeSetting.Auto => await JSRuntime.InvokeAsync<bool>("themeManager.isDarkPreferred"),
             _ => throw new NotImplementedException()
         };
 
-        await JSRuntime.InvokeVoidAsync("toggleTheme", isDarkTheme);
+        await JSRuntime.InvokeVoidAsync("themeManager.toggleTheme", isDarkTheme);
     }
 }
