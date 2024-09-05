@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Options;
 using Nursing.Core.Models;
 using Nursing.Core.Models.DTO;
-using Nursing.Core.Services;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 
@@ -11,7 +10,7 @@ namespace Nursing.Mobile.Services;
 public class SyncService
 {
     private readonly HttpClient _httpClient;
-    private readonly Nursing.Core.Services.IDatabase _database;
+    private readonly Nursing.Services.EFDatabase _database;
     private readonly CacheService _cacheService;
 
     public SyncService(HttpClient httpClient, Nursing.Services.EFDatabase database, CacheService cacheService)
@@ -27,7 +26,7 @@ public class SyncService
         return settings.Token != null;
     }
 
-    public async Task<bool> Sync(bool afterRefresh = false)
+    public async Task<(bool success, string message)> Sync(bool afterRefresh = false)
     {
         var syncDate = DateTime.UtcNow;
 
@@ -35,7 +34,7 @@ public class SyncService
 
         if (settings.Token == null)
         {
-            return false;
+            return (false, "Not logged in");
         }
         var feedingsUp = await _database.GetUpdatedFeedings(settings.LastSync);
 
@@ -49,11 +48,12 @@ public class SyncService
         {
             if (settings.RefreshToken == null || afterRefresh)
             {
-                return false;
+                return (false, "User is not logged in");
             }
 
             result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/refreshToken"), settings.RefreshToken);
-            if (await this.ReadResult(result))
+            var outcome = await this.ReadResult(result);
+            if (outcome.success)
             {
                 return await Sync(true);
             }
@@ -63,8 +63,8 @@ public class SyncService
                 settings.RefreshToken = null;
                 await _cacheService.SaveSettings(settings);
             }
+            return (false, "User has been logged out");
 
-            return false;
         }
 
         bool updated = false;
@@ -78,37 +78,45 @@ public class SyncService
         settings.LastSync = syncDate;
         await _cacheService.SaveSettings(settings);
 
-        return updated;
+        return (updated, updated ? "Synced successfully" : "No new data");
     }
 
-    private async Task<bool> ReadResult(HttpResponseMessage result)
+    private async Task<(bool success, string message)> ReadResult(HttpResponseMessage result)
     {
         if (!result.IsSuccessStatusCode)
         {
-            return false;
+            var message = await result.Content.ReadAsStringAsync();
+            return (false, message);
         }
 
         var token = await result.Content.ReadFromJsonAsync<SignInResult>();
         if (token == null)
         {
-            return false;
+            return (false, "Something went wrong when signing in. Please contact support to solve this issue.");
         }
 
         var settings = await _cacheService.GetSettings();
         settings.Token = token.AuthToken;
         settings.RefreshToken = token.RefreshToken;
+        settings.IsAdmin = token.IsAdmin;
 
         await _cacheService.SaveSettings(settings);
-        return true;
+        return (true, "Logged In");
     }
 
-    public async Task<bool> Login(string username, string password, bool rememberMe)
+    public async Task<(bool success, string message)> Login(string username, string password, bool rememberMe)
     {
         LoginModel loginModel = new() { Username = username, Password = password, RememberMe = rememberMe };
 
-        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/login"), loginModel);
-
-        return await ReadResult(result);
+        try
+        {
+            var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/login"), loginModel);
+            return await ReadResult(result);
+        }
+        catch
+        {
+            return (false, "Could not connect to server. Please try again later");
+        }
     }
 
     public async Task<bool> Logout()

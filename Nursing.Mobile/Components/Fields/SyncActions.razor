@@ -1,0 +1,37 @@
+@inject NavigationManager Navigation
+@inject Nursing.Mobile.Services.SyncService Sync
+
+<div class="row">
+    <div class="col-12">
+        <button type="button" @onclick="SyncNow" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#LoadingModal">
+            Sync Now
+        </button>
+
+        
+
+    </div>
+    <div class="col-12">
+        <button type="button" @onclick="Logout" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#LoadingModal">
+            Log Out
+        </button>
+    </div>
+</div>
+
+<AlertError @ref="alertError" />
+
+@code {
+    private AlertError alertError = null!;
+
+    private async Task SyncNow()
+    {
+        var result = await Sync.Sync();
+        await alertError.ShowAlert(result.message, result.success);
+
+    }
+
+    private async Task Logout()
+    {
+        await Sync.Logout();
+        Navigation.Refresh();
+    }
+}
