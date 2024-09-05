@@ -1,10 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Nursing.Core.Services;
 using Nursing.Mobile.Services;
 using Nursing.Services;
-using Microsoft.Extensions.Configuration.Json;
-using Microsoft.Extensions.Configuration;
 
 namespace Nursing.Mobile;
 
@@ -23,7 +20,12 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<HttpClient>();
 
-        var sqliteFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing.db");
+        if(!Directory.Exists(CacheService.DataDirectory))
+        {
+            Directory.CreateDirectory(CacheService.DataDirectory);
+        }
+        
+        var sqliteFilePath = Path.Combine(CacheService.DataDirectory, "Nursing.db");
         builder.Services.AddDbContext<EFDatabase>(options =>
             options.UseSqlite($"Data Source={sqliteFilePath}", opts =>
                 opts.MigrationsAssembly("Nursing.Sqlite")));

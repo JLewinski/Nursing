@@ -11,8 +11,9 @@ namespace Nursing.Mobile.Services;
 
 public class CacheService
 {
-    private static string CachePath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Nursing.json");
-    private static string SettingsPath => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Settings.json");
+    public static string DataDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NWTS");
+    private static string CachePath => Path.Combine(DataDirectory, "Nursing.json");
+    private static string SettingsPath => Path.Combine(DataDirectory, "Settings.json");
     private FeedingCache? feedingCache;
     private Settings? settingsCache;
 

@@ -25,7 +25,7 @@
         <ApplicationTitle>Nursing.Mobile</ApplicationTitle>
 
         <!-- App Identifier -->
-        <ApplicationId>com.companyname.nursing.mobile</ApplicationId>
+        <ApplicationId>com.companyname.nursing</ApplicationId>
 
         <!-- Versions -->
         <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
