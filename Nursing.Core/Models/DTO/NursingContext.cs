@@ -3,7 +3,7 @@ using Nursing.Core.Models.DTO;
 
 namespace Nursing.Models;
 
-public class NursingContext : DbContext, Nursing.Core.Services.IDatabase
+public class NursingContext : DbContext
 {
 
     public NursingContext(DbContextOptions options) : base(options)
