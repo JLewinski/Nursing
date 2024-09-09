@@ -3,16 +3,13 @@
 @inject SyncService Sync
 @inject IJSRuntime JSRuntime
 
-<div class="row">
-    <div class="col-12">
-        <button type="button" @onclick="SyncNow" class="btn btn-primary btn-lg">
-            Sync Now
-        </button>
-    </div>
-    <div class="col-12">
-        <button type="button" @onclick="Logout" class="btn btn-primary btn-lg">
-            Log Out
-        </button>
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <button type="button" @onclick="SyncNow" class="btn btn-primary btn-lg">
+                Sync Now
+            </button>
+        </div>
     </div>
 </div>
 
@@ -27,12 +24,5 @@
         var result = await Sync.Sync();
         await JSRuntime.HideLoadingModal();
         await alertError.ShowAlert(result.message, result.success);
-    }
-
-    private async Task Logout()
-    {
-        await JSRuntime.ShowLoadingModal();
-        await Sync.Logout();
-        Navigation.NavigateTo("/login");
     }
 }

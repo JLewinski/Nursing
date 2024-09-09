@@ -26,6 +26,12 @@ public class SyncService
         return settings.Token != null;
     }
 
+    public async Task<bool> IsAdmin()
+    {
+        var settings = await _cacheService.GetSettings();
+        return settings.Token != null && settings.IsAdmin;
+    }
+
     public async Task<(bool success, string message)> Sync(bool afterRefresh = false)
     {
         var syncDate = DateTime.UtcNow;
@@ -52,8 +58,8 @@ public class SyncService
             }
 
             result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/refreshToken"), settings.RefreshToken);
-            var outcome = await this.ReadResult(result);
-            if (outcome.success)
+            var (success, _) = await this.ReadAuthResult(result);
+            if (success)
             {
                 return await Sync(true);
             }
@@ -81,7 +87,7 @@ public class SyncService
         return (updated, updated ? "Synced successfully" : "No new data");
     }
 
-    private async Task<(bool success, string message)> ReadResult(HttpResponseMessage result)
+    private async Task<(bool success, string message)> ReadAuthResult(HttpResponseMessage result)
     {
         if (!result.IsSuccessStatusCode)
         {
@@ -111,7 +117,7 @@ public class SyncService
         try
         {
             var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/login"), loginModel);
-            return await ReadResult(result);
+            return await ReadAuthResult(result);
         }
         catch
         {
@@ -146,6 +152,6 @@ public static class ApiOptions
 #elif TEST
     public const string RootUrl = "https://localhost:7238";
 #elif RELEASE
-    public const string RootUrl = "https://nursingapi.lewinskitech.com";
+    public const string RootUrl = "https://nursing-h2azd7b5f6gnd0dz.eastus-01.azurewebsites.net";
 #endif
 }

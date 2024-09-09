@@ -8,17 +8,66 @@
             <h1>Account</h1>
         </div>
     </div>
-    <SyncActions />
+    <button type="button" @onclick="Logout" class="btn btn-primary btn-lg">
+        Log Out
+    </button>
+
+    <!-- Nav tabs -->
+    <ul class="nav nav-tabs" id="myTab" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active" id="sync-tab" data-bs-toggle="tab" data-bs-target="#sync" type="button"
+                role="tab" aria-controls="sync" aria-selected="true">
+                Sync
+            </button>
+        </li>
+        @if (IsAdmin)
+        {
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="register-tab" data-bs-toggle="tab" data-bs-target="#register" type="button"
+                    role="tab" aria-controls="register" aria-selected="false">
+                    Register
+                </button>
+            </li>
+        }
+        <li class="nav-item" role="presentation">
+            <button class="nav-link" id="data-tab" data-bs-toggle="tab" data-bs-target="#data" type="button" role="tab"
+                aria-controls="data" aria-selected="false">
+                Data
+            </button>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active" id="sync" role="tabpanel" aria-labelledby="sync-tab">
+            <SyncActions />
+        </div>
+        @if (IsAdmin)
+        {
+            <div class="tab-pane" id="register" role="tabpanel" aria-labelledby="register-tab">
+                register
+            </div>
+        }
+        <div class="tab-pane" id="data" role="tabpanel" aria-labelledby="data-tab">
+            data
+        </div>
+    </div>
 </div>
 
 @code {
+    private bool IsAdmin = false;
     protected override async Task OnInitializedAsync()
     {
+        IsAdmin = await Sync.IsAdmin();
         if (!await Sync.IsLoggedIn())
         {
             Navigation.NavigateTo("/login");
         }
     }
 
-
+    private async Task Logout()
+    {
+        await Sync.Logout();
+        Navigation.NavigateTo("/login");
+    }
 }
