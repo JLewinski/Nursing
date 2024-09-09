@@ -13,6 +13,8 @@ public static class MigrationManager
 
         context.Migrate();
 
+        await AddRole(scope);
+
         var initialAdminConfig = app.Configuration.GetSection("InitialAdmin");
         var username = initialAdminConfig.GetValue<string>("User") ?? throw new NullReferenceException();
         var password = initialAdminConfig.GetValue<string>("Password") ?? throw new NullReferenceException();
@@ -48,5 +50,6 @@ public static class MigrationManager
 
         using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<NursingUser>>();
         await userManager.CreateAsync(user, password);
+        await userManager.AddToRoleAsync(user, "Admin");
     }
 }
