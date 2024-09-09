@@ -4,7 +4,9 @@
 @inject SyncService Sync
 @inject IJSRuntime JSRuntime
 
-<div class="container">
+
+
+<form class="container" @onsubmit="LoginUser">
     <h1>Login</h1>
     <div class="mb-3">
         <input type="text" class="form-control" @bind="username" placeholder="Username" />
@@ -15,9 +17,9 @@
     <div class="mb-3">
         <input type="checkbox" @bind="rememberMe" />
         <label for="rememberMe">Remember Me</label>
-        <button class="btn btn-primary" @onclick="LoginUser">Log In</button>
+        <button class="btn btn-primary" type="submit">Log In</button>
     </div>
-</div>
+</form>
 
 
 <AlertError @ref="alert" />
