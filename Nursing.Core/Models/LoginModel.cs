@@ -13,3 +13,9 @@ public class LoginModel : AccountModel
 {
     public bool RememberMe { get; set; }
 }
+
+public class ChangePasswordModel
+{
+    public required string CurrentPassword { get; set; }
+    public required string NewPassword { get; set; }
+}

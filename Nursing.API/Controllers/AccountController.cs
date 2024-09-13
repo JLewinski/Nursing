@@ -146,6 +146,15 @@ public class AccountController : ControllerBase
         return Ok();
     }
 
+    [HttpPost("changePassword")]
+    [Authorize]
+    public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+    {
+        var user = await _userManager.FindByEmailAsync(User.Identity?.Name ?? throw new NullReferenceException("User"));
+        var result = await _userManager.ChangePasswordAsync(user ?? throw new ArgumentNullException("User"), model.CurrentPassword, model.NewPassword);
+        return result.Succeeded ? Ok() : BadRequest(result.Errors);
+    }
+
     [HttpGet("IsAdmin")]
     [Authorize]
     [ProducesResponseType<bool>(200)]
