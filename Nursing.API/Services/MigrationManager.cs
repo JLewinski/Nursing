@@ -9,7 +9,7 @@ public static class MigrationManager
     public static async Task<WebApplication> Migrate(this WebApplication app)
     {
         using var scope = app.Services.CreateScope();
-        using var context = scope.ServiceProvider.GetRequiredService<SqlContext>();
+        using var context = scope.ServiceProvider.GetRequiredService<PostgresContext>();
 
         context.Migrate();
 
@@ -33,19 +33,19 @@ public static class MigrationManager
         }
     }
 
-    private static async Task AddUser(SqlContext context, string username, string password, IServiceScope scope)
+    private static async Task AddUser(PostgresContext context, string username, string password, IServiceScope scope)
     {
         if (await context.Users.AnyAsync(x => x.UserName == username))
         {
             return;
         }
         
-        var user = new Models.NursingUser
+        var user = new NursingUser
         {
             UserName = username,
             Email = username,
             GroupId = Guid.NewGuid(),
-            RefreshTokens = new()
+            RefreshTokens = new(),
         };
 
         using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<NursingUser>>();

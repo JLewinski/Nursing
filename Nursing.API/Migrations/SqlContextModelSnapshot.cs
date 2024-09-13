@@ -10,7 +10,7 @@ using Nursing.API.Services;
 
 namespace Nursing.API.Migrations
 {
-    [DbContext(typeof(SqlContext))]
+    [DbContext(typeof(PostgresContext))]
     partial class SqlContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

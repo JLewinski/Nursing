@@ -11,7 +11,7 @@ using Nursing.API.Services;
 
 namespace Nursing.API.Migrations
 {
-    [DbContext(typeof(SqlContext))]
+    [DbContext(typeof(PostgresContext))]
     [Migration("20240910223456_InitialPostgres")]
     partial class InitialPostgres
     {

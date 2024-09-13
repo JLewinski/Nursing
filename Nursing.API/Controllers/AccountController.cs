@@ -23,9 +23,9 @@ public class AccountController : ControllerBase
     private readonly UserManager<NursingUser> _userManager;
     private readonly SignInManager<NursingUser> _signInManager;
     private readonly IConfiguration _configuration;
-    private readonly SqlContext _context;
+    private readonly PostgresContext _context;
 
-    public AccountController(IConfiguration configuration, UserManager<NursingUser> userManager, SignInManager<NursingUser> signInManager, SqlContext context)
+    public AccountController(IConfiguration configuration, UserManager<NursingUser> userManager, SignInManager<NursingUser> signInManager, PostgresContext context)
     {
         _configuration = configuration;
         _userManager = userManager;

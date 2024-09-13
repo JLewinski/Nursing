@@ -13,8 +13,8 @@ namespace Nursing.API.Controllers
     [Route("[controller]")]
     public class SyncController : ControllerBase
     {
-        private readonly SqlContext _context;
-        public SyncController(SqlContext context)
+        private readonly PostgresContext _context;
+        public SyncController(PostgresContext context)
         {
             _context = context;
         }

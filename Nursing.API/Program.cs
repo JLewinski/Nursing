@@ -4,9 +4,7 @@ using Microsoft.IdentityModel.Tokens;
 using Nursing.API.Models;
 using Nursing.API.Services;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer; // Add this using directive
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,12 +35,12 @@ builder.Services.AddAuthentication(x =>
 });
 
 builder.Services.AddAuthorization();
-
-builder.Services.AddDbContext<SqlContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<PostgresContext>(options =>
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddIdentity<NursingUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<SqlContext>();
+    .AddEntityFrameworkStores<PostgresContext>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
