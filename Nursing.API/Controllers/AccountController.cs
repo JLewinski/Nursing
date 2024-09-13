@@ -54,7 +54,7 @@ public class AccountController : ControllerBase
         {
             return BadRequest(result.Errors);
         }
-        
+
         if (model.IsAdmin)
         {
             await _userManager.AddToRoleAsync(user, "Admin");
@@ -127,9 +127,14 @@ public class AccountController : ControllerBase
     }
 
     [HttpDelete("delete")]
-    [Authorize(Roles = "Admin")]
+    [Authorize]
     public async Task<IActionResult> DeleteAccount(string username)
     {
+        if (User.Identity?.Name != username && !User.IsInRole("Admin"))
+        {
+            return Unauthorized("You do not have permission to delete this user.");
+        }
+
         var user = await _userManager.FindByEmailAsync(username);
         if (user == null)
         {
