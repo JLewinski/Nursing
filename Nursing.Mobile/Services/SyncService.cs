@@ -1,9 +1,7 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
-using Nursing.Core.Models;
-using Nursing.Core.Models.DTO;
+﻿using Nursing.Core.Models;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Result = (bool success, string message);
 
 namespace Nursing.Mobile.Services;
 
@@ -32,7 +30,18 @@ public class SyncService
         return settings.Token != null && settings.IsAdmin;
     }
 
-    public async Task<(bool success, string message)> Sync(bool afterRefresh = false)
+    public async Task<Result> ChangePassword(string currentPassword, string newPassword)
+    {
+        var settings = await _cacheService.GetSettings();
+        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/changePassword"), new ChangePasswordModel { CurrentPassword = currentPassword, NewPassword = newPassword });
+        if (result.IsSuccessStatusCode)
+        {
+            return (true, "Password changed successfully");
+        }
+        return (false, "Could not change password");
+    }
+
+    public async Task<Result> Sync(bool afterRefresh = false)
     {
         var syncDate = DateTime.UtcNow;
 
