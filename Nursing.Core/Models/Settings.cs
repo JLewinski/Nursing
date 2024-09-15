@@ -12,6 +12,20 @@ public class Settings
     public string? Token { get; set; }
     public string? RefreshToken { get; set; }
     public bool IsAdmin { get; set; } = false;
+    public string? Username { get; set; } = null;
+    public bool RememberMe { get; set; } = false;
+
+    public void Logout()
+    {
+        Token = null;
+        RefreshToken = null;
+        LastSync = DateTime.MinValue;
+        IsAdmin = false;
+        if (!RememberMe)
+        {
+            Username = null;
+        }
+    }
 }
 
 public enum ThemeSetting

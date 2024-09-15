@@ -126,8 +126,34 @@ public class AccountController : ControllerBase
         }
     }
 
-    [HttpDelete("delete")]
+    [HttpGet("getUsers")]
+    [Authorize(Roles = "Admin")]
+    [ProducesResponseType<List<SimpleUser>>(200)]
+    public async Task<IActionResult> GetUsers()
+    {
+        var users = await _context.Users
+            .Select(x => new SimpleUser
+            {
+                Username = x.UserName ?? x.Email ?? x.Id.ToString(),
+                GroupId = x.GroupId
+            })
+            .ToListAsync();
+
+        return Ok(users);
+    }
+
+    [HttpGet("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        await _signInManager.SignOutAsync();
+        return Ok();
+    }
+
+    [HttpDelete("delete/{username}")]
     [Authorize]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
     public async Task<IActionResult> DeleteAccount(string username)
     {
         if (User.Identity?.Name != username && !User.IsInRole("Admin"))
@@ -141,9 +167,25 @@ public class AccountController : ControllerBase
             return BadRequest("Invalid User");
         }
 
+        var usernames = await _context.Users
+            .Where(x => x.GroupId == user.GroupId && x.Id != user.Id)
+            .Select(x => x.UserName)
+            .ToListAsync();
+
+        if (usernames.Count == 0)
+        {
+            await _context.Feedings.Where(x => x.GroupId == user.GroupId).ExecuteDeleteAsync();
+            await _userManager.DeleteAsync(user);
+            return Ok($"{username} and all data belonging to {username} were deleted");
+        }
+
         await _userManager.DeleteAsync(user);
 
-        return Ok();
+        if (User.Identity.Name == username)
+        {
+            await _signInManager.SignOutAsync();
+        }
+        return Ok($"{username} was deleted. Data still in database attached to the following users: {string.Join(", ", usernames)}");
     }
 
     [HttpPost("changePassword")]

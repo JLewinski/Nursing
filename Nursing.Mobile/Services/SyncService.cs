@@ -32,13 +32,47 @@ public class SyncService
 
     public async Task<Result> ChangePassword(string currentPassword, string newPassword)
     {
-        var settings = await _cacheService.GetSettings();
-        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/changePassword"), new ChangePasswordModel { CurrentPassword = currentPassword, NewPassword = newPassword });
+        var result = await Request("Account/changePassword", new ChangePasswordModel { CurrentPassword = currentPassword, NewPassword = newPassword });
         if (result.IsSuccessStatusCode)
         {
             return (true, "Password changed successfully");
         }
         return (false, "Could not change password");
+    }
+
+    private async Task ApplyBearer()
+    {
+        var settings = await _cacheService.GetSettings();
+        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.Token);
+    }
+
+    private async Task<HttpResponseMessage> Request(string path, object data)
+    {
+        await ApplyBearer();
+        return await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + path), data);
+    }
+
+    private async Task<Result> Refresh()
+    {
+        var settings = await _cacheService.GetSettings();
+        if (settings.RefreshToken == null)
+        {
+            return (false, "User is not logged in");
+        }
+
+        var result = await Request("Account/refreshToken", settings.RefreshToken);
+        var (success, _) = await ReadAuthResult(result, settings.Username);
+        if (success)
+        {
+            return (true, string.Empty);
+        }
+        else
+        {
+            settings.Token = null;
+            settings.RefreshToken = null;
+            await _cacheService.SaveSettings(settings);
+        }
+        return (false, "User has been logged out");
     }
 
     public async Task<Result> Sync(bool afterRefresh = false)
@@ -53,33 +87,19 @@ public class SyncService
         }
         var feedingsUp = await _database.GetUpdatedFeedings(settings.LastSync);
 
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", settings.Token);
 
         var data = new SyncModel { LastSync = settings.LastSync, Feedings = feedingsUp };
 
-        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Sync/sync"), data);
+        var result = await Request("Sync/sync", data);
 
         if (!result.IsSuccessStatusCode)
         {
-            if (settings.RefreshToken == null || afterRefresh)
-            {
-                return (false, "User is not logged in");
-            }
-
-            result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/refreshToken"), settings.RefreshToken);
-            var (success, _) = await this.ReadAuthResult(result);
-            if (success)
+            if (!afterRefresh && (await Refresh()).success)
             {
                 return await Sync(true);
             }
-            else
-            {
-                settings.Token = null;
-                settings.RefreshToken = null;
-                await _cacheService.SaveSettings(settings);
-            }
-            return (false, "User has been logged out");
 
+            return (false, "User is not logged in");
         }
 
         bool updated = false;
@@ -96,7 +116,7 @@ public class SyncService
         return (updated, updated ? "Synced successfully" : "No new data");
     }
 
-    private async Task<(bool success, string message)> ReadAuthResult(HttpResponseMessage result)
+    private async Task<(bool success, string message)> ReadAuthResult(HttpResponseMessage result, string? username)
     {
         if (!result.IsSuccessStatusCode)
         {
@@ -114,6 +134,10 @@ public class SyncService
         settings.Token = token.AuthToken;
         settings.RefreshToken = token.RefreshToken;
         settings.IsAdmin = token.IsAdmin;
+        if (username != null)
+        {
+            settings.Username = username;
+        }
 
         await _cacheService.SaveSettings(settings);
         return (true, "Logged In");
@@ -125,8 +149,8 @@ public class SyncService
 
         try
         {
-            var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/login"), loginModel);
-            return await ReadAuthResult(result);
+            var result = await Request("Account/login", loginModel);
+            return await ReadAuthResult(result, username);
         }
         catch
         {
@@ -136,31 +160,56 @@ public class SyncService
 
     public async Task<bool> Logout()
     {
+        await ApplyBearer();
+        await _httpClient.GetAsync(new Uri(ApiOptions.RootUrl + "Account/logout"));
         var settings = await _cacheService.GetSettings();
-        settings.Token = null;
+        settings.Logout();
         await _cacheService.SaveSettings(settings);
         return true;
     }
 
-    public async Task<bool> Register(string username, string password)
+    public async Task<Result> Register(string username, string password, bool isAdmin)
     {
-        AccountModel registerModel = new() { Username = username, Password = password };
-        var result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "/Account/register"), registerModel);
+        RegisterModel registerModel = new() { Username = username, Password = password, IsAdmin = isAdmin };
+        var result = await Request("Account/register", registerModel);
         if (result.IsSuccessStatusCode)
         {
-            return true;
+            return (true, $"{username} has been registered");
         }
-        return false;
+        return (false, $"{username} could not be registered");
+    }
+
+    public async Task<Result> Delete(string username)
+    {
+        await ApplyBearer();
+        var result = await _httpClient.DeleteAsync(new Uri(ApiOptions.RootUrl + $"Account/delete/{username}"));
+        if (result.IsSuccessStatusCode)
+        {
+            var settings = await _cacheService.GetSettings();
+            if (settings.Username == username)
+            {
+                settings.RememberMe = false;
+                settings.Logout();
+                await _cacheService.SaveSettings(settings);
+            }
+
+            return (true, await result.Content.ReadAsStringAsync());
+        }
+        else if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            return (false, $"You do not have permission to delete {username}");
+        }
+        return (false, $"{username} could not be deleted or could not be found");
     }
 }
 
 public static class ApiOptions
 {
 #if DEBUG
-    public const string RootUrl = "https://localhost:7238";
+    public const string RootUrl = "https://localhost:7238/";
 #elif TEST
-    public const string RootUrl = "https://localhost:7238";
+    public const string RootUrl = "https://localhost:7238/";
 #elif RELEASE
-    public const string RootUrl = "https://nursing-h2azd7b5f6gnd0dz.eastus-01.azurewebsites.net";
+    public const string RootUrl = "https://nursing-h2azd7b5f6gnd0dz.eastus-01.azurewebsites.net/";
 #endif
 }
