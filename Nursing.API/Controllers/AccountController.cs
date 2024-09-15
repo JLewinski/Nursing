@@ -17,7 +17,7 @@ using NursingSigninResult = Nursing.Core.Models.SignInResult;
 namespace Nursing.API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
     private readonly UserManager<NursingUser> _userManager;

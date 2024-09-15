@@ -10,7 +10,7 @@ namespace Nursing.API.Controllers
 {
     [Authorize]
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class SyncController : ControllerBase
     {
         private readonly PostgresContext _context;
