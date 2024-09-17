@@ -1,0 +1,114 @@
+﻿<h2>@Title</h2>
+<button class="btn btn-@color p-5 rounded-circle" @onclick=Toggle>
+    <div>@buttonText</div>
+    <div class="h3"><DurationCount Duration="Duration" /></div>
+</button>
+
+
+@code {
+    private string Title => IsLeft ? "Left" : "Right";
+
+    private string color => isOff ? "primary" : "info";
+
+    [Parameter]
+    public Feeding ViewModel { get; init; } = new();
+
+    private List<FeedingTime> feedings => IsLeft ? ViewModel.LeftBreast : ViewModel.RightBreast;
+
+    [Parameter]
+    public EventCallback OnToggle { get; init; }
+
+    [Parameter]
+    public EventCallback<TimeSpan> OnUpdate { get; init; }
+
+    private TimeSpan Duration => IsLeft ? ViewModel.LeftBreastTotal : ViewModel.RightBreastTotal;
+
+    [Parameter]
+    public bool IsLeft { get; init; }
+
+    public FeedingTime? CurrentFeeding => feedings.LastOrDefault();
+
+    private bool isOff => CurrentFeeding?.StartTime == null || CurrentFeeding.EndTime != null;
+
+    private string buttonText => isOff ? "Start" : "Stop";
+
+    private Timer? timer;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await base.OnParametersSetAsync();
+
+        if (feedings.Count > 0)
+        {
+            StartTimer();
+        }
+    }
+
+    private async Task Toggle()
+    {
+        if (isOff)
+        {
+            if (IsLeft)
+            {
+                ViewModel.StartLeftBreast();
+            }
+            else
+            {
+                ViewModel.StartRightBreast();
+            }
+
+            StartTimer();
+        }
+        else
+        {
+            if (IsLeft)
+            {
+                ViewModel.EndLeftBreast();
+            }
+            else
+            {
+                ViewModel.EndRightBreast();
+            }
+            EndTimer();
+        }
+        await OnToggle.InvokeAsync();
+    }
+
+    public void EndTimer()
+    {
+        if (timer == null)
+        {
+            return;
+        }
+
+        timer.Dispose();
+        timer = null;
+    }
+
+    public void StartTimer()
+    {
+        if (timer != null)
+        {
+            return;
+        }
+
+        timer = new Timer(async _ =>
+            {
+                if(isOff)
+                {
+                    EndTimer();
+                    return;
+                }
+
+                var previous = Duration;
+                ViewModel.Calculate();
+
+                if (previous.TotalSeconds != Duration.TotalSeconds)
+                {
+                    await InvokeAsync(() => OnUpdate.InvokeAsync(ViewModel.TotalTime));
+                    await InvokeAsync(StateHasChanged);
+                }
+
+            }, null, 0, 100);
+    }
+}

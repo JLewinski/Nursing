@@ -86,7 +86,13 @@ public class Feeding : FeedingDto
 
     public void Finish()
     {
+        var maxLeft = LeftBreast.Count > 0 ? LeftBreast.Max(x => x.StartTime) : DateTime.MinValue;
+        var maxRight = RightBreast.Count > 0 ? RightBreast.Max(x => x.StartTime) : DateTime.MinValue;
+
+        LastIsLeft = maxLeft > maxRight;
+
         Finished = DateTime.UtcNow;
+        
         EndRightBreast(Finished);
         EndLeftBreast(Finished);
     }

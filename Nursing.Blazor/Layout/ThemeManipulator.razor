@@ -1,0 +1,22 @@
+@using Nursing.Blazor.Services
+@using Nursing.Models
+@inject IJSRuntime JSRuntime
+@inject Nursing.Blazor.Services.CacheService Database
+
+@code {
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        var settings = await Database.GetSettings();
+
+        var isDarkTheme = settings.Theme switch
+        {
+            ThemeSetting.Dark => true,
+            ThemeSetting.Light => false,
+            ThemeSetting.Auto => await JSRuntime.CheckIsDarkPrefered(),
+            _ => throw new NotImplementedException()
+        };
+
+        await JSRuntime.ToggleTheme(isDarkTheme);
+    }
+}
