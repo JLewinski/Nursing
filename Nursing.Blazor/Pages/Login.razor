@@ -40,9 +40,11 @@
         await JSRuntime.ShowLoadingModal("Logging In");
         var result = await Sync.Login(username, password, rememberMe);
         password = "";
+        await Task.Delay(1000);
         await JSRuntime.HideLoadingModal();
         if (result.success)
         {
+            toastService.ShowSuccess("Logged In");
             Navigation.NavigateTo("/account");
         }
         else

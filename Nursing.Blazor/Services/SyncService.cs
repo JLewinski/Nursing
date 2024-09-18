@@ -206,7 +206,7 @@ internal class SyncService
 public static class ApiOptions
 {
 #if DEBUG
-    public const string RootUrl = "https://localhost:7238/";
+    public const string RootUrl = "https://localhost:7238/api/";
 #elif TEST
     public const string RootUrl = "https://nursing-test.lewinskitech.com/api/";
 #elif RELEASE
