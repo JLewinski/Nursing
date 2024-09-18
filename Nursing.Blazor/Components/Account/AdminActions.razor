@@ -1,4 +1,5 @@
 @inject Nursing.Blazor.Services.SyncService Sync
+@inject IToastService toastService
 
 <div class="container">
     <form @onsubmit="Register" class="my-3">
@@ -36,10 +37,8 @@
         <button type="submit" class="btn btn-danger">Delete</button>
     </form>
 </div>
-<AlertError @ref="alertError" />
 
 @code {
-    private AlertError alertError = null!;
     private string RegisterUsername = string.Empty;
     private string Password = string.Empty;
     private bool IsAdmin = false;
@@ -48,13 +47,13 @@
 
     private async Task Register()
     {
-        var result = await Sync.Register(RegisterUsername, Password, IsAdmin);
-        await alertError.ShowAlert(result.message, result.success);
+        var (success, message) = await Sync.Register(RegisterUsername, Password, IsAdmin);
+        toastService.ShowToast(message, success);
     }
 
     private async Task DeleteUser()
     {
-        var result = await Sync.Delete(DeleteUsername);
-        await alertError.ShowAlert(result.message, result.success);
+        var (success, message) = await Sync.Delete(DeleteUsername);
+        toastService.ShowToast(message, success);
     }
 }

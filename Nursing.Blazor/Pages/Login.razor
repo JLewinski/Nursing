@@ -4,7 +4,7 @@
 @inject NavigationManager Navigation
 @inject SyncService Sync
 @inject IJSRuntime JSRuntime
-
+@inject IToastService toastService
 
 
 <form class="container" @onsubmit="LoginUser">
@@ -22,15 +22,10 @@
     </div>
 </form>
 
-
-<AlertError @ref="alert" />
-
 @code {
     private string username = string.Empty;
     private string password = string.Empty;
     private bool rememberMe = false;
-
-    AlertError alert = null!;
 
     protected override async Task OnInitializedAsync()
     {
@@ -52,7 +47,7 @@
         }
         else
         {
-            await alert.ShowError(result.message);
+            toastService.ShowError(result.message);
         }
     }
 }
