@@ -1,0 +1,18 @@
+﻿@using Nursing.Blazor.Models
+<div class="modal-body">
+    <p>@Message</p>
+</div>
+
+<div class="modal-footer">
+    <button type="button" class="btn btn-secondary" @onclick="Close">Close</button>
+    <button type="button" class="btn btn-primary" @onclick="Confirm">Confirm</button>
+</div>
+
+@code {
+    [CascadingParameter] BootstrapModal Modal { get; set; } = default!;
+    
+    [Parameter] public string Message { get; set; } = default!;
+
+    private async Task Close() => await Modal.Close(ModalResult.Cancel());
+    private async Task Confirm() => await Modal.Close(ModalResult.Ok());
+}

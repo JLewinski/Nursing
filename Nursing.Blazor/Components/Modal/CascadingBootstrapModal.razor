@@ -1,0 +1,9 @@
+﻿<CascadingValue Value="@ModalService" IsFixed="true">
+    <ModalManager />
+    @ChildContent
+</CascadingValue>
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    private BootstrapModalService ModalService { get; set; } = new();
+}

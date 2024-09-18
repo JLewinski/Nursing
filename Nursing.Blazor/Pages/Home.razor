@@ -1,4 +1,5 @@
 @page "/"
+@using Nursing.Blazor.Components.Modal
 @using Nursing.Blazor.Services
 @inject NavigationManager Navigation
 @inject Nursing.Blazor.Services.LocalDatabase Database
@@ -74,7 +75,7 @@
     <div class="container">
         <div class="row">
             <div class="d-grid gap-2 col-6 mx-auto">
-                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#resedModal">Reset</button>
+                <button class="btn btn-primary" @onclick="Reset">Reset</button>
             </div>
             <div class="d-grid gap-2 col-6 mx-auto">
                 <button class="btn btn-primary" @onclick=Finish>Finish</button>
@@ -128,49 +129,8 @@
     </div>
 }
 
-<div
-    class="modal fade"
-    id="resedModal"
-    tabindex="-1"
-    data-bs-backdrop="static"
-    data-bs-keyboard="false"
-    
-    role="dialog"
-    aria-labelledby="resetModalTitle"
-    aria-hidden="true"
->
-    <div
-        class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm"
-        role="document"
-    >
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="resetModalTitle">
-                    Reset
-                </h5>
-                <button
-                    type="button"
-                    class="btn-close"
-                    data-bs-dismiss="modal"
-                    aria-label="Close"
-                ></button>
-            </div>
-            <div class="modal-body">Are you sure you want to reset.</div>
-            <div class="modal-footer">
-                <button
-                    type="button"
-                    class="btn btn-secondary"
-                    data-bs-dismiss="modal"
-                >
-                    Close
-                </button>
-                <button type="button" class="btn btn-primary" data-bs-dismiss="modal" @onclick=Reset>Reset</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @code {
+
     private DurationCount totalDuration = null!;
     private Task ManualUpdate()
     {
@@ -269,8 +229,21 @@
         await Database.SaveFeeding(feeding);
     }
 
+    [CascadingParameter] private BootstrapModalService CascadedModalService { get; set; } = default!;
     private async Task Reset()
     {
+        Models.ModalParameters parameters = new()
+        {
+            { "Message", "Are you sure you want to reset this feeding?" }
+        };
+        var resetModal = CascadedModalService.Show<ConfirmationModal>("Reset", parameters);
+        var result = await resetModal.Result;
+
+        if (result.Cancelled)
+        {
+            return;
+        }
+
         await Database.Delete(feeding);
         await Cache.Cache(new Feeding(await Database.GetLast()));
         await Load();

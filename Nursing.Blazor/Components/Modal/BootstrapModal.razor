@@ -1,0 +1,32 @@
+﻿@using Nursing.Blazor.Models
+@inject IJSRuntime JsRuntime
+
+<div class="modal fade"
+     id="modal-@Id"
+     tabindex="-1"
+     data-bs-backdrop="static"
+     data-bs-keyboard="false"
+     role="dialog"
+     aria-labelledby="title-@Id"
+     aria-hidden="true">
+    <div class="modal-dialog modal-dialog-scrollable modal-dialog-centered modal-sm"
+         role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="title-@Id">
+                    @Title
+                </h5>
+                @if (!HideCloseButton)
+                {
+                    <button type="button"
+                            class="btn-close"
+                            aria-label="Close"
+                            @onclick="() => Close(ModalResult.Cancel())"></button>
+                }
+            </div>
+            <CascadingValue Value="this" IsFixed="true">
+                @Content
+            </CascadingValue>
+        </div>
+    </div>
+</div>

@@ -2,10 +2,16 @@
 @using Nursing.Models
 @inject IJSRuntime JSRuntime
 @inject Nursing.Blazor.Services.CacheService Database
+@inject NavigationManager Navigation
 
 @code {
+    protected override Task OnInitializedAsync()
+    {
+        Navigation.LocationChanged += async (object? sender, LocationChangedEventArgs e) => await ToggleTheme();
+        return base.OnInitializedAsync();
+    }
 
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+    private async Task ToggleTheme()
     {
         var settings = await Database.GetSettings();
 
