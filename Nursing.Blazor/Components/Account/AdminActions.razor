@@ -8,19 +8,19 @@
             <div class="col">
                 <div class="mb-3">
                     <label for="regUsername">Username</label>
-                    <input id="regUsername" @bind="RegisterUsername" />
+                    <input class="form-control" id="regUsername" @bind="RegisterUsername" />
                 </div>
             </div>
             <div class="col">
                 <div class="mb-3">
                     <label for="regPassword">Password</label>
-                    <input type="password" id="regPassword" @bind="Password" />
+                    <input class="form-control" type="password" id="regPassword" @bind="Password" />
                 </div>
             </div>
             <div class="col">
                 <div class="mb-3">
-                    <label for="regIsAdmin">Is Admin</label>
-                    <input type="checkbox" id="regIsAdmin" @bind="IsAdmin" />
+                    <label for="regIsAdmin">Is Admin <input type="checkbox" id="regIsAdmin" @bind="IsAdmin" /></label>
+                    
                 </div>
             </div>
         </div>

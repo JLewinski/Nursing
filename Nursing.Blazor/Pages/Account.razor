@@ -1,4 +1,5 @@
 @page "/account"
+@using Nursing.Blazor.Components.Account
 @inject NavigationManager Navigation
 @inject Nursing.Blazor.Services.SyncService Sync
 
@@ -42,7 +43,7 @@
         @if (IsAdmin)
         {
             <div class="tab-pane" id="register" role="tabpanel" aria-labelledby="register-tab">
-                register
+                <AdminActions />
             </div>
         }
         <div class="tab-pane" id="data" role="tabpanel" aria-labelledby="data-tab">

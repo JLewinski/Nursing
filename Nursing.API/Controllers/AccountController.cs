@@ -45,7 +45,7 @@ public class AccountController : ControllerBase
             UserName = username,
             Email = username,
             GroupId = Guid.NewGuid(),
-            RefreshTokens = new()
+            RefreshTokens = []
         };
 
         var result = await _userManager.CreateAsync(user, password);
@@ -181,7 +181,7 @@ public class AccountController : ControllerBase
 
         await _userManager.DeleteAsync(user);
 
-        if (User.Identity.Name == username)
+        if (User.Identity!.Name == username)
         {
             await _signInManager.SignOutAsync();
         }
@@ -192,8 +192,9 @@ public class AccountController : ControllerBase
     [Authorize]
     public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
     {
-        var user = await _userManager.FindByEmailAsync(User.Identity?.Name ?? throw new NullReferenceException("User"));
-        var result = await _userManager.ChangePasswordAsync(user ?? throw new ArgumentNullException("User"), model.CurrentPassword, model.NewPassword);
+        var user = await _userManager.FindByEmailAsync(User.Identity!.Name!);
+
+        var result = await _userManager.ChangePasswordAsync(user!, model.CurrentPassword, model.NewPassword);
         return result.Succeeded ? Ok() : BadRequest(result.Errors);
     }
 
@@ -264,13 +265,7 @@ public class AccountController : ControllerBase
 
     private string GetToken(string username, IEnumerable<Claim> claims, bool rememberMe)
     {
-        var tokenManagement = _configuration.GetSection("Token").Get<TokenManagement>();
-
-        if (tokenManagement == null)
-        {
-            throw new ArgumentException("Token management is missing");
-        }
-
+        var tokenManagement = _configuration.GetSection("Token").Get<TokenManagement>() ?? throw new ArgumentException("Token management is missing");
         var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(tokenManagement.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
