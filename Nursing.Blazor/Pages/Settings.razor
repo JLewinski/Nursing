@@ -38,7 +38,7 @@
 </div>
 
 @code {
-    [CascadingParameter] private BootstrapModalService CascadedModalService { get; set; } = default!;
+    [CascadingParameter] private IModalService CascadedModalService { get; set; } = default!;
 
     private Nursing.Models.Settings settings = new();
     private double hoursBetweenFeedings = 3.5;
@@ -52,7 +52,7 @@
 
     private async Task Delete()
     {
-        Models.ModalParameters parameters = new()
+        ModalParameters parameters = new()
         {
             { "Message", "Are you sure you want to delete all your local data?" }
         };
