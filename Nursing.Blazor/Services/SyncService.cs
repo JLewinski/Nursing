@@ -131,20 +131,19 @@ internal class SyncService
             {
                 return (false, "User is not logged in");
             }
-            
+
             return (false, "Could not sync");
         }
 
         bool updated = false;
         var resultData = await result.Content.ReadFromJsonAsync<SyncResult>();
-        if (resultData?.Success == true && resultData.Feedings.Count > 0)
+        if (resultData?.Success == true)
         {
-            updated = true;
+            updated = resultData.Feedings.Count > 0 || resultData.Updates > 0;
             await _database.SaveUpdated(resultData.Feedings);
+            settings.LastSync = DateTime.UtcNow;
+            await _cacheService.SaveSettings(settings);
         }
-
-        settings.LastSync = syncDate;
-        await _cacheService.SaveSettings(settings);
 
         return (updated, updated ? "Synced successfully" : "No new data");
     }

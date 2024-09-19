@@ -139,6 +139,7 @@ internal class LocalDatabase
 
     public async Task<bool> SaveFeeding(FeedingDto feeding)
     {
+        feeding.LastUpdated = DateTime.UtcNow;
         var path = CreateDatabasePath(feeding.Started);
         var all = await GetFeedingsAsync(path);
         var existing = all.FirstOrDefault(x => x.Id == feeding.Id);

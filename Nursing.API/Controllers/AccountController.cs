@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("register")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
         var username = model.Username;
@@ -127,7 +128,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("getUsers")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     [ProducesResponseType<List<SimpleUser>>(200)]
     public async Task<IActionResult> GetUsers()
     {
@@ -150,7 +151,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpDelete("delete/{username}")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType(200)]
     [ProducesResponseType(400)]
     [ProducesResponseType(401)]
@@ -189,7 +190,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("changePassword")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
     {
         var user = await _userManager.FindByEmailAsync(User.Identity!.Name!);
@@ -199,7 +200,7 @@ public class AccountController : ControllerBase
     }
 
     [HttpGet("IsAdmin")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType<bool>(200)]
     public IActionResult IsAdmin()
     {
