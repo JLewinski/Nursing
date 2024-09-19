@@ -42,6 +42,14 @@ public class CacheService
         await _localStorageService.SetItemAsync(CachePath, feedingCache);
     }
 
+    public async Task DeleteCache()
+    {
+        feedingCache = new();
+        await _localStorageService.SetItemAsync(CachePath, feedingCache);
+        settingsCache!.LastSync = DateTime.MinValue;
+        await SaveSettings(settingsCache);
+    }
+
     private async Task<T> GetFromLocalStorage<T>(string path) where T : new()
     {
         var data = await _localStorageService.GetItemAsync<T>(path);

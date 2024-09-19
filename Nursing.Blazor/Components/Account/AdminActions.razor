@@ -47,11 +47,21 @@
     {
         var (success, message) = await Sync.Register(RegisterUsername, Password, IsAdmin);
         toastService.ShowToast(message, success);
+        if (success)
+        {
+            RegisterUsername = string.Empty;
+            Password = string.Empty;
+            IsAdmin = false;
+        }
     }
 
     private async Task DeleteUser()
     {
         var (success, message) = await Sync.Delete(DeleteUsername);
         toastService.ShowToast(message, success);
+        if (success)
+        {
+            DeleteUsername = string.Empty;
+        }
     }
 }

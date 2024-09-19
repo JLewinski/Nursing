@@ -140,7 +140,7 @@ internal class SyncService
         if (resultData?.Success == true)
         {
             updated = resultData.Feedings.Count > 0 || resultData.Updates > 0;
-            await _database.SaveUpdated(resultData.Feedings);
+            await _database.SaveUpdated(resultData.Feedings, settings.LastSync);
             settings.LastSync = DateTime.UtcNow;
             await _cacheService.SaveSettings(settings);
         }
@@ -255,6 +255,87 @@ internal class SyncService
             return (false, $"You do not have permission to delete {username}");
         }
         return (false, $"{username} could not be deleted or could not be found");
+    }
+
+    public async Task<List<InviteViewModel>> GetInvites()
+    {
+        await ApplyBearer();
+        var result = await _httpClient.GetAsync(new Uri(ApiOptions.RootUrl + "Sync/invites"));
+
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadFromJsonAsync<List<InviteViewModel>>() ?? [];
+        }
+
+        return [];
+    }
+
+    public async Task<Result> SendInvite(string username)
+    {
+        await ApplyBearer();
+        HttpResponseMessage result;
+        try
+        {
+            result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "Sync/sendInvite"), username);
+        }
+        catch
+        {
+            return (false, "Could not connect to server");
+        }
+        if (result.IsSuccessStatusCode)
+        {
+            return (true, "Invite Sent");
+        }
+        return (false, "Could not send invite");
+    }
+
+    public async Task<Result> AcceptInvite(Guid groupId)
+    {
+        await ApplyBearer();
+        HttpResponseMessage result;
+        try
+        {
+            result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "Sync/acceptInvite"), groupId);
+        }
+        catch
+        {
+            return (false, "Could not connect to server");
+        }
+        if (result.IsSuccessStatusCode)
+        {
+            return (true, await result.Content.ReadAsStringAsync());
+        }
+        return (false, "Could not accept invite");
+    }
+
+    public async Task<Result> DeclineInvite(Guid groupId)
+    {
+        await ApplyBearer();
+        HttpResponseMessage result;
+        try
+        {
+            result = await _httpClient.PostAsJsonAsync(new Uri(ApiOptions.RootUrl + "Sync/declineInvite"), groupId);
+        }
+        catch
+        {
+            return (false, "Could not connect to server");
+        }
+        if (result.IsSuccessStatusCode)
+        {
+            return (true, await result.Content.ReadAsStringAsync());
+        }
+        return (false, "Could not decline invite");
+    }
+
+    public async Task<List<SimpleUser>> GetUsers()
+    {
+        await ApplyBearer();
+        var result = await _httpClient.GetAsync(new Uri(ApiOptions.RootUrl + "Account/users"));
+        if (result.IsSuccessStatusCode)
+        {
+            return await result.Content.ReadFromJsonAsync<List<SimpleUser>>() ?? [];
+        }
+        return [];
     }
 }
 

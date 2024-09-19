@@ -49,7 +49,7 @@
             </div>
         }
         <div class="tab-pane" id="data" role="tabpanel" aria-labelledby="data-tab">
-            <button class="btn btn-outline-danger" @onclick="Delete">Delete</button>
+            <Invites />
         </div>
     </div>
 </div>
@@ -71,28 +71,5 @@
     {
         await Sync.Logout();
         Navigation.NavigateTo("/login");
-    }
-
-    [CascadingParameter] private IModalService modalService { get; set; } = null!;
-
-    private async Task Delete()
-    {
-        ModalParameters parameters = new()
-        {
-            { "Message", "Are you sure you want to delete your account? This will also delete all your data if another account does not have access." }
-        };
-        var modal = modalService.Show<Components.Modal.ConfirmationModal>("Delete Account", parameters);
-        var modalResult = await modal.Result;
-        if (modalResult.Cancelled)
-        {
-            return;
-        }
-
-        var result = await JSRuntime.ShowLoadingModal(async () => await Sync.Delete(await Sync.GetUsername()));
-        if (result.success)
-        {
-            Navigation.NavigateTo("/login");
-        }
-        toastService.ShowToast(result.message, result.success);
     }
 }

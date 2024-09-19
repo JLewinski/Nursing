@@ -1,13 +1,14 @@
 @using Nursing.Blazor.Services
 @inject NavigationManager Navigation
 @inject SyncService Sync
+@inject CacheService Cache
 @inject IJSRuntime JSRuntime
 @inject IToastService toastService
 
 <div class="container">
     <div class="row mt-3">
         <div class="col-6">
-            <span>Last Synced: @(LastSynced?.ToString() ?? "Never")</span>
+            <span>Last Synced: @(settings.LastSync == DateTime.MinValue ? "Never" : settings.LastSync.ToShortDateString() + " " + settings.LastSync.ToShortTimeString())</span>
             <button type="button" @onclick="SyncNow" class="btn btn-primary">
                 Sync Now
             </button>
@@ -42,10 +43,16 @@
             </button>
         </div>
     </form>
+    <button class="btn btn-outline-danger" @onclick="Delete">Delete Account</button>
 </div>
 
 @code {
-    private DateTime? LastSynced = null;
+    private Settings settings = new();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        settings = await Cache.GetSettings();
+    }
 
     private async Task SyncNow()
     {
@@ -68,5 +75,26 @@
         toastService.ShowToast(result.message, result.success);
     }
 
-    
+    [CascadingParameter] private IModalService modalService { get; set; } = null!;
+
+    private async Task Delete()
+    {
+        ModalParameters parameters = new()
+        {
+            { "Message", "Are you sure you want to delete your account? This will also delete all your data if another account does not have access." }
+        };
+        var modal = modalService.Show<Components.Modal.ConfirmationModal>("Delete Account", parameters);
+        var modalResult = await modal.Result;
+        if (modalResult.Cancelled)
+        {
+            return;
+        }
+
+        var result = await JSRuntime.ShowLoadingModal(async () => await Sync.Delete(await Sync.GetUsername()));
+        if (result.success)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        toastService.ShowToast(result.message, result.success);
+    }
 }

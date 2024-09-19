@@ -87,19 +87,19 @@ internal class LocalDatabase
     {
         List<FeedingDto> feedings = [];
 
-        start ??= DateTime.UtcNow;
-        end ??= DateTime.UtcNow;
+        var startPath = start ?? DateTime.UtcNow;
+        var endPath = end ?? DateTime.UtcNow;
 
-        if (start != DateTime.MinValue)
+        if (startPath != DateTime.MinValue)
         {
-            start = start.Value.Date.AddDays(-1);
+            startPath = startPath.Date.AddDays(-1);
         }
-        if (end != DateTime.MaxValue)
+        if (endPath != DateTime.MaxValue)
         {
-            end = end.Value.Date.AddDays(1);
+            endPath = endPath.Date.AddDays(1);
         }
 
-        if (start == DateTime.MinValue)
+        if (startPath == DateTime.MinValue)
         {
             var keys = await _localStorageService.KeysAsync();
             foreach (var file in keys.Where(keys => keys.StartsWith("Data.")))
@@ -109,7 +109,7 @@ internal class LocalDatabase
         }
         else
         {
-            var dateIterator = start.Value.Date;
+            var dateIterator = startPath;
 
             while (dateIterator <= (end ?? DateTime.UtcNow).Date)
             {
@@ -137,9 +137,9 @@ internal class LocalDatabase
             : all[0];
     }
 
-    public async Task<bool> SaveFeeding(FeedingDto feeding)
+    public async Task<bool> SaveFeeding(FeedingDto feeding, DateTime? updated = null)
     {
-        feeding.LastUpdated = DateTime.UtcNow;
+        feeding.LastUpdated = updated ?? DateTime.UtcNow;
         var path = CreateDatabasePath(feeding.Started);
         var all = await GetFeedingsAsync(path);
         var existing = all.FirstOrDefault(x => x.Id == feeding.Id);
@@ -178,11 +178,11 @@ internal class LocalDatabase
         return await GetFeedings(lastUpdated);
     }
 
-    public async Task SaveUpdated(List<FeedingDto> feedings)
+    public async Task SaveUpdated(List<FeedingDto> feedings, DateTime? updated)
     {
         foreach (var feeding in feedings)
         {
-            await SaveFeeding(feeding);
+            await SaveFeeding(feeding, updated);
         }
     }
 

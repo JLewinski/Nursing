@@ -66,6 +66,7 @@
         }
 
         await Database.DeleteAll();
+        await Cache.DeleteCache();
     }
 
     private async Task Save()
