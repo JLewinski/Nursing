@@ -10,14 +10,18 @@
 <form class="container" @onsubmit="LoginUser">
     <h1>Login</h1>
     <div class="mb-3">
+        <label class="form-label" for="username">Username</label>
         <input type="text" class="form-control" @bind="username" placeholder="Username" />
     </div>
     <div class="mb-3">
+        <label class="form-label" for="password">Password</label>
         <input type="password" class="form-control" @bind="password" placeholder="Password" />
     </div>
     <div class="mb-3">
-        <input type="checkbox" @bind="rememberMe" />
-        <label for="rememberMe">Remember Me</label>
+        <div class="form-check-inline">
+            <input class="form-check-input" type="checkbox" id="rememberMe" @bind="rememberMe" />
+            <label class="form-check-label" for="rememberMe">Remember Me</label>
+        </div>
         <button class="btn btn-primary" type="submit">Log In</button>
     </div>
 </form>

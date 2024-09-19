@@ -90,8 +90,14 @@ internal class LocalDatabase
         start ??= DateTime.UtcNow;
         end ??= DateTime.UtcNow;
 
-        start = start.Value.Date.AddDays(-1);
-        end = end.Value.Date.AddDays(1);
+        if (start != DateTime.MinValue)
+        {
+            start = start.Value.Date.AddDays(-1);
+        }
+        if (end != DateTime.MaxValue)
+        {
+            end = end.Value.Date.AddDays(1);
+        }
 
         if (start == DateTime.MinValue)
         {

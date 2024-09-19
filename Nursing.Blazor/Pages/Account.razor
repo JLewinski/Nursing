@@ -2,6 +2,8 @@
 @using Nursing.Blazor.Components.Account
 @inject NavigationManager Navigation
 @inject Nursing.Blazor.Services.SyncService Sync
+@inject IJSRuntime JSRuntime
+@inject IToastService toastService
 
 <div class="container">
     <div class="row">
@@ -47,13 +49,15 @@
             </div>
         }
         <div class="tab-pane" id="data" role="tabpanel" aria-labelledby="data-tab">
-            data
+            <button class="btn btn-outline-danger" @onclick="Delete">Delete</button>
         </div>
     </div>
 </div>
 
 @code {
     private bool IsAdmin = false;
+    private string username = default!;
+
     protected override async Task OnInitializedAsync()
     {
         IsAdmin = await Sync.IsAdmin();
@@ -67,5 +71,28 @@
     {
         await Sync.Logout();
         Navigation.NavigateTo("/login");
+    }
+
+    [CascadingParameter] private IModalService modalService { get; set; } = null!;
+
+    private async Task Delete()
+    {
+        ModalParameters parameters = new()
+        {
+            { "Message", "Are you sure you want to delete your account? This will also delete all your data if another account does not have access." }
+        };
+        var modal = modalService.Show<Components.Modal.ConfirmationModal>("Delete Account", parameters);
+        var modalResult = await modal.Result;
+        if (modalResult.Cancelled)
+        {
+            return;
+        }
+
+        var result = await JSRuntime.ShowLoadingModal(async () => await Sync.Delete(await Sync.GetUsername()));
+        if (result.success)
+        {
+            Navigation.NavigateTo("/login");
+        }
+        toastService.ShowToast(result.message, result.success);
     }
 }

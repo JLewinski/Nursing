@@ -30,13 +30,34 @@ internal class SyncService
         return settings.Token != null && settings.IsAdmin;
     }
 
+    public async Task<string> GetUsername()
+    {
+        if (!await IsLoggedIn())
+        {
+            throw new Exception("User is not logged in");
+        }
+
+        var settings = await _cacheService.GetSettings();
+        return settings.Username!;
+    }
+
     public async Task<Result> ChangePassword(string currentPassword, string newPassword)
     {
-        var result = await Request("Account/changePassword", new ChangePasswordModel { CurrentPassword = currentPassword, NewPassword = newPassword });
+        HttpResponseMessage result;
+        try
+        {
+            result = await Request("Account/changePassword", new ChangePasswordModel { CurrentPassword = currentPassword, NewPassword = newPassword });
+        }
+        catch
+        {
+            return (false, "Could not connect to server");
+        }
+
         if (result.IsSuccessStatusCode)
         {
             return (true, "Password changed successfully");
         }
+
         return (false, "Could not change password");
     }
 
@@ -90,16 +111,28 @@ internal class SyncService
 
         var data = new SyncModel { LastSync = settings.LastSync, Feedings = feedingsUp };
 
-        var result = await Request("Sync/sync", data);
+        HttpResponseMessage result;
+        try
+        {
+            result = await Request("Sync/sync", data);
+        }
+        catch
+        {
+            return (false, "Could not connect to server");
+        }
 
         if (!result.IsSuccessStatusCode)
         {
-            if (!afterRefresh && (await Refresh()).success)
+            if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized && !afterRefresh && (await Refresh()).success)
             {
                 return await Sync(true);
             }
-
-            return (false, "User is not logged in");
+            else if (result.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                return (false, "User is not logged in");
+            }
+            
+            return (false, "Could not sync");
         }
 
         bool updated = false;
@@ -161,7 +194,11 @@ internal class SyncService
     public async Task<bool> Logout()
     {
         await ApplyBearer();
-        await _httpClient.GetAsync(new Uri(ApiOptions.RootUrl + "Account/logout"));
+        try
+        {
+            await _httpClient.GetAsync(new Uri(ApiOptions.RootUrl + "Account/logout"));
+        }
+        catch { }
         var settings = await _cacheService.GetSettings();
         settings.Logout();
         await _cacheService.SaveSettings(settings);
@@ -171,7 +208,16 @@ internal class SyncService
     public async Task<Result> Register(string username, string password, bool isAdmin)
     {
         RegisterModel registerModel = new() { Username = username, Password = password, IsAdmin = isAdmin };
-        var result = await Request("Account/register", registerModel);
+        HttpResponseMessage result;
+        try
+        {
+            result = await Request("Account/register", registerModel);
+        }
+        catch
+        {
+            return (false, "Could not connect to server. Please try again later");
+        }
+
         if (result.IsSuccessStatusCode)
         {
             return (true, $"{username} has been registered");
@@ -182,7 +228,17 @@ internal class SyncService
     public async Task<Result> Delete(string username)
     {
         await ApplyBearer();
-        var result = await _httpClient.DeleteAsync(new Uri(ApiOptions.RootUrl + $"Account/delete/{username}"));
+        HttpResponseMessage result;
+        try
+        {
+
+            result = await _httpClient.DeleteAsync(new Uri(ApiOptions.RootUrl + $"Account/delete/{username}"));
+        }
+        catch
+        {
+            return (false, "Could not connect to server");
+        }
+
         if (result.IsSuccessStatusCode)
         {
             var settings = await _cacheService.GetSettings();

@@ -23,7 +23,7 @@
             <h2>Change Password</h2>
         </div>
     </div>
-    <form class="row" @onsubmit="ChangePassword">
+    <form class="row mb-3" @onsubmit="ChangePassword">
         <div class="col-6">
             <div class="mb-3">
                 <label for="currentPassword" class="form-label">Current Password</label>
@@ -67,4 +67,6 @@
         var result = await JSRuntime.ShowLoadingModal(async () => await Sync.ChangePassword(CurrentPassword, NewPassword));
         toastService.ShowToast(result.message, result.success);
     }
+
+    
 }

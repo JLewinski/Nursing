@@ -18,6 +18,7 @@ public static class JavaScriptHelper
     {
         await JSRuntime.ShowLoadingModal(message);
         var result = await awaitableTask();
+        await Task.Delay(1000);
         await JSRuntime.HideLoadingModal();
         return result;
     }

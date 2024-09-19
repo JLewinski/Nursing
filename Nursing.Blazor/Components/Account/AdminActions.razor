@@ -7,31 +7,29 @@
         <div class="row">
             <div class="col">
                 <div class="mb-3">
-                    <label for="regUsername">Username</label>
+                    <label class="form-label" for="regUsername">Username</label>
                     <input class="form-control" id="regUsername" @bind="RegisterUsername" />
                 </div>
             </div>
             <div class="col">
                 <div class="mb-3">
-                    <label for="regPassword">Password</label>
+                    <label class="form-label" for="regPassword">Password</label>
                     <input class="form-control" type="password" id="regPassword" @bind="Password" />
                 </div>
             </div>
-            <div class="col">
-                <div class="mb-3">
-                    <label for="regIsAdmin">Is Admin <input type="checkbox" id="regIsAdmin" @bind="IsAdmin" /></label>
-                    
-                </div>
-            </div>
+        </div>
+        <div class="form-check-inline">
+            <input type="checkbox" class="form-check-input" id="regIsAdmin" @bind="IsAdmin" />
+            <label class="form-check-label" for="regIsAdmin">Is Admin </label>
         </div>
         <button type="submit" class="btn btn-primary">Register</button>
     </form>
     <form @onsubmit="DeleteUser">
         <h2>Delete User</h2>
-        <div class="row">
+        <div class="row mb-3">
             <div class="col">
-                <label for="delUsername">Username</label>
-                <input id="delUsername" @bind="DeleteUsername" />
+                <label class="form-label" for="delUsername">Username</label>
+                <input class="form-control" id="delUsername" @bind="DeleteUsername" />
             </div>
         </div>
         <button type="submit" class="btn btn-danger">Delete</button>
