@@ -19,6 +19,7 @@ public class Feeding : FeedingDto
         Finished = feeding.Finished;
         LastIsLeft = feeding.LastIsLeft;
         LastUpdated = feeding.LastUpdated;
+        Deleted = feeding.Deleted;
     }
 
     public List<FeedingTime> LeftBreast { get; init; } = [];
@@ -44,7 +45,7 @@ public class Feeding : FeedingDto
 
     public void EndLeftBreast(DateTime? value = null)
     {
-        if(LeftBreast.LastOrDefault() == null || LeftBreast.Last().EndTime.HasValue)
+        if (LeftBreast.LastOrDefault() == null || LeftBreast.Last().EndTime.HasValue)
         {
             return;
         }
@@ -92,7 +93,7 @@ public class Feeding : FeedingDto
         LastIsLeft = maxLeft > maxRight;
 
         Finished = DateTime.UtcNow;
-        
+
         EndRightBreast(Finished);
         EndLeftBreast(Finished);
     }
@@ -102,6 +103,7 @@ public class Feeding : FeedingDto
         return breast.Aggregate(TimeSpan.Zero, (acc, x) => acc + ((x.EndTime ?? DateTime.UtcNow) - x.StartTime));
     }
 
+    public bool IsStarted => Started != DateTime.MinValue;
     public bool IsFinished => Finished is not null;
 }
 

@@ -19,12 +19,23 @@ public class CacheService
     private FeedingCache? feedingCache;
     private Settings? settingsCache;
 
-    public static Task<FeedingCache> RefreshCache()
+    public async Task<FeedingCache> RefreshCache(LocalDatabase localDatabase)
     {
-        throw new NotImplementedException();
+        var feedings = await localDatabase.GetFeedings(DateTime.UtcNow.Date.AddDays(-1));
+        if (feedings.Count == 0)
+        {
+            return feedingCache ??= await Get();
+        }
+
+        if (feedings.Count > 1)
+        {
+            await Cache(new(feedings[1]));
+        }
+
+        return await Cache(new(feedings[0]));
     }
 
-    public async Task Cache(Feeding feeding)
+    public async Task<FeedingCache> Cache(Feeding feeding)
     {
         feedingCache ??= await Get();
 
@@ -40,6 +51,7 @@ public class CacheService
         }
 
         await _localStorageService.SetItemAsync(CachePath, feedingCache);
+        return feedingCache;
     }
 
     public async Task DeleteCache()
@@ -53,7 +65,7 @@ public class CacheService
     private async Task<T> GetFromLocalStorage<T>(string path) where T : new()
     {
         var data = await _localStorageService.GetItemAsync<T>(path);
-        return data ?? new ();
+        return data ?? new();
     }
 
     public async Task<FeedingCache> Get()

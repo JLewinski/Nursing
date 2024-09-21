@@ -14,6 +14,7 @@ public class Settings
     public bool IsAdmin { get; set; } = false;
     public string? Username { get; set; } = null;
     public bool RememberMe { get; set; } = false;
+    public bool AutoSync { get; set; } = true;
 
     public void Logout()
     {

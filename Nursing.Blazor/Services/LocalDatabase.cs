@@ -3,7 +3,7 @@ using Nursing.Core.Models.DTO;
 
 namespace Nursing.Blazor.Services;
 
-internal class LocalDatabase
+public class LocalDatabase
 {
     private readonly ILocalStorageService _localStorageService;
 
@@ -28,8 +28,7 @@ internal class LocalDatabase
         {
             return;
         }
-
-        all.Remove(temp);
+        temp.Deleted = DateTime.UtcNow;
         await Save(all, path);
     }
 
@@ -83,7 +82,8 @@ internal class LocalDatabase
         return feedings;
     }
 
-    public async Task<List<FeedingDto>> GetFeedings(DateTime? start = null, DateTime? end = null)
+    
+    public async Task<List<FeedingDto>> GetFeedings(DateTime? start = null, DateTime? end = null, bool includeDeleted = false)
     {
         List<FeedingDto> feedings = [];
 
@@ -120,7 +120,10 @@ internal class LocalDatabase
         }
 
         return feedings
-            .Where(x => x.Started >= (start ?? DateTime.MinValue) && x.Started <= (end ?? DateTime.UtcNow))
+            .Where(x =>
+                x.Started >= (start ?? DateTime.MinValue) &&
+                x.Started <= (end ?? DateTime.UtcNow) &&
+                (includeDeleted || x.Deleted is null))
             .OrderByDescending(x => x.Started)
             .ToList();
     }
@@ -175,7 +178,9 @@ internal class LocalDatabase
 
     public async Task<List<FeedingDto>> GetUpdatedFeedings(DateTime lastUpdated)
     {
-        return await GetFeedings(lastUpdated);
+        return (await GetAllFeedings())
+            .Where(x => x.LastUpdated > lastUpdated)
+            .ToList();
     }
 
     public async Task SaveUpdated(List<FeedingDto> feedings, DateTime? updated)

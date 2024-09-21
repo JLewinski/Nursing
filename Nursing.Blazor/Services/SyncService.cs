@@ -141,8 +141,15 @@ internal class SyncService
         {
             updated = resultData.Feedings.Count > 0 || resultData.Updates > 0;
             await _database.SaveUpdated(resultData.Feedings, settings.LastSync);
+            
             settings.LastSync = DateTime.UtcNow;
             await _cacheService.SaveSettings(settings);
+
+            var cache = await _cacheService.Get();
+            if (cache.CurrentFeeding.IsFinished || !cache.CurrentFeeding.IsStarted)
+            {
+                await _cacheService.RefreshCache(_database);
+            }
         }
 
         return (updated, updated ? "Synced successfully" : "No new data");

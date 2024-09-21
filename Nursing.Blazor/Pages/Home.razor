@@ -4,6 +4,7 @@
 @inject NavigationManager Navigation
 @inject Nursing.Blazor.Services.LocalDatabase Database
 @inject Nursing.Blazor.Services.CacheService Cache
+@inject Nursing.Blazor.Services.SyncService SyncService
 
 <div class="container text-center">
     <div class="row">
@@ -11,7 +12,9 @@
         {
             <div class="col-12">
                 <p>Started: @startTime.Value.ToLocalTime().ToShortTimeString()</p>
-                <p class="h3"><DurationCount @ref="totalDuration" Duration="feeding.TotalTime" /></p>
+                <p class="h3">
+                    <DurationCount @ref="totalDuration" Duration="feeding.TotalTime" />
+                </p>
             </div>
         }
         else if (lastTime.HasValue)
@@ -31,8 +34,12 @@
                         <td>@((lastTimeValue + TimeBetweenFeedings).ToLocalTime().ToShortTimeString())</td>
                     </tr>
                     <tr>
-                        <td><DurationCount StartTime="lastTimeValue" ShowHours="true" IsTimer="true" /></td>
-                        <td><DurationCount EndTime="nextFeeding" ShowHours="true" IsTimer="true" /></td>
+                        <td>
+                            <DurationCount StartTime="lastTimeValue" ShowHours="true" IsTimer="true" />
+                        </td>
+                        <td>
+                            <DurationCount EndTime="nextFeeding" ShowHours="true" IsTimer="true" />
+                        </td>
                     </tr>
                 </tbody>
             </table>
@@ -176,6 +183,10 @@
         await base.OnInitializedAsync();
         var settings = await Cache.GetSettings();
         TimeBetweenFeedings = settings.Duration;
+        if (settings.AutoSync)
+        {
+            await Sync();
+        }
         await Load();
     }
 
@@ -227,15 +238,22 @@
         await Cache.Cache(feeding);
 
         await Database.SaveFeeding(feeding);
+
+        await Sync();
+    }
+
+    private async Task Sync()
+    {
+        if (await SyncService.IsLoggedIn())
+        {
+            await SyncService.Sync();
+        }
     }
 
     [CascadingParameter] private IModalService CascadedModalService { get; set; } = default!;
     private async Task Reset()
     {
-        ModalParameters parameters = new()
-        {
-            { "Message", "Are you sure you want to reset this feeding?" }
-        };
+        ModalParameters parameters = new() { { "Message", "Are you sure you want to reset this feeding?" } };
         var resetModal = CascadedModalService.Show<ConfirmationModal>("Reset", parameters);
         var result = await resetModal.Result;
 
@@ -245,7 +263,7 @@
         }
 
         await Database.Delete(feeding);
-        await Cache.Cache(new Feeding(await Database.GetLast()));
+        await Cache.RefreshCache(Database);
         await Load();
     }
 
