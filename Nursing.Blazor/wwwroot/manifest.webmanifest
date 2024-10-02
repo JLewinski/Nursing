@@ -1,11 +1,11 @@
 {
-  "name": "Nursing With the Staints",
+  "name": "Nursing With the Saints",
   "short_name": "Nursing",
   "id": "./",
   "start_url": "https://nursing.lewinskitech.com",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#03173d",
+  "background_color": "#000000",
+  "theme_color": "#ffd59a",
   "prefer_related_applications": false,
   "icons": [
     {
