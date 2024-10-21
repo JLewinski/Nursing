@@ -6,4 +6,5 @@ public class SyncResult
     public bool Success { get; set; }
     public required List<FeedingDto> Feedings { get; set; }
     public required List<Guid> BadIds { get; set; }
+    public int Updates { get; set; }
 }

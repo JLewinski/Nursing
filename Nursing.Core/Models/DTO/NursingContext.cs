@@ -3,7 +3,7 @@ using Nursing.Core.Models.DTO;
 
 namespace Nursing.Models;
 
-public class NursingContext : DbContext, Nursing.Core.Services.IDatabase
+public class NursingContext : DbContext
 {
 
     public NursingContext(DbContextOptions options) : base(options)
@@ -59,9 +59,13 @@ public class NursingContext : DbContext, Nursing.Core.Services.IDatabase
             .ToListAsync();
     }
 
-    public Task<FeedingDto> GetLast()
+    public async Task<FeedingDto> GetLast()
     {
-        return Feedings.OrderByDescending(x => x.Started).FirstAsync();
+        var last = await Feedings.OrderByDescending(x => x.Started).FirstOrDefaultAsync();
+        return last ?? new()
+        {
+            Id = Guid.Empty
+        };
     }
 
     public Task<List<FeedingDto>> GetUpdatedFeedings(DateTime lastUpdated)
@@ -72,7 +76,7 @@ public class NursingContext : DbContext, Nursing.Core.Services.IDatabase
     public Task SaveUpdated(List<FeedingDto> feedings)
     {
         var ids = Feedings.Where(x => feedings.Select(x => x.Id).Contains(x.Id)).Select(x => x.Id).ToList();
-        
+
         var updateList = feedings.Where(x => ids.Contains(x.Id)).ToList();
         var insertList = feedings.Where(x => !ids.Contains(x.Id)).ToList();
 

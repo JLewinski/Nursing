@@ -1,0 +1,28 @@
+﻿<div class="modal fade show d-block" tabindex="-1" role="dialog">
+    <div class="modal-backdrop fade show" @onclick="Close"></div>
+    <div class="modal-dialog" style="z-index: 1050">
+        <!-- Pop it above the backdrop -->
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Modal title</h5>
+                <button type="button" class="btn-close" aria-label="Close" data-bs-dismiss="modal" @onclick="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>@Message</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" @onclick="Close">Close</button>
+                <button type="button" class="btn btn-primary" @onclick="Confirm">Confirm</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [CascadingParameter] BlazoredModalInstance Modal { get; set; } = default!;
+    
+    [Parameter] public string Message { get; set; } = default!;
+
+    private async Task Close() => await Modal.CloseAsync(ModalResult.Cancel());
+    private async Task Confirm() => await Modal.CloseAsync(ModalResult.Ok());
+}

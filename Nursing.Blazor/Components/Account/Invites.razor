@@ -1,0 +1,66 @@
+﻿@using Nursing.Core.Models
+@inject Nursing.Blazor.Services.SyncService Sync
+@inject IJSRuntime JSRuntime
+@inject IToastService toastService
+
+<div class="container my-3">
+    <form @onsubmit="Invite">
+        <div class="row">
+            <div class="col">
+                <label class="form-label">Username</label>
+            </div>
+            <div class="col">
+                <input class="form-control" @bind="InviteUsername" />
+            </div>
+        </div>
+        <button type="submit" class="btn btn-primary">Invite</button>
+    </form>
+    <table class="table table-responsive">
+        <tbody>
+            @foreach (var invite in invites)
+            {
+                <tr>
+                    <td>@string.Join(", ", invite.Users)</td>
+                    <td><button type="button" @onclick="() => Accept(invite.Id)" class="btn btn-success">Accept</button></td>
+                    <td><button type="button" @onclick="() => Decline(invite.Id)" class="btn btn-danger">Decline</button></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<InviteViewModel> invites = [];
+    private string InviteUsername = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        invites = await Sync.GetInvites();
+    }
+
+    private async Task Invite()
+    {
+        var result = await JSRuntime.ShowLoadingModal(async () => await Sync.SendInvite(InviteUsername));
+        toastService.ShowToast(result.message, result.success);
+    }
+
+    private async Task Accept(Guid id)
+    {
+        var result = await JSRuntime.ShowLoadingModal(async () => await Sync.AcceptInvite(id));
+        toastService.ShowToast(result.message, result.success);
+        if (result.success)
+        {
+            invites = await Sync.GetInvites();
+        }
+    }
+
+    private async Task Decline(Guid id)
+    {
+        var result = await JSRuntime.ShowLoadingModal(async () => await Sync.DeclineInvite(id));
+        toastService.ShowToast(result.message, result.success);
+        if (result.success)
+        {
+            invites = await Sync.GetInvites();
+        }
+    }
+}

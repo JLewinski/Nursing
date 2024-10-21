@@ -24,6 +24,7 @@ namespace Nursing.Core.Models.DTO
             Finished = feeding.Finished;
             LastIsLeft = feeding.LastIsLeft;
             LastUpdated = feeding.LastUpdated;
+            Deleted = feeding.Deleted;
         }
 
         public FeedingDto(OldFeeding feeding)
@@ -41,6 +42,7 @@ namespace Nursing.Core.Models.DTO
             LastIsLeft = maxLeft > maxRight;
 
             LastUpdated = DateTime.UtcNow;
+            Deleted = null;
         }
 
         [Key]
@@ -52,6 +54,7 @@ namespace Nursing.Core.Models.DTO
         public DateTime? Finished { get; set; }
         public bool LastIsLeft { get; set; }
         public DateTime LastUpdated { get; set; }
+        public DateTime? Deleted { get; set; } = null;
 
         public FeedingDto ToDto()
         {

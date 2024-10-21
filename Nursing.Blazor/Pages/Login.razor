@@ -1,0 +1,59 @@
+@page "/login"
+@using Nursing.Blazor.Components
+@using Nursing.Blazor.Services
+@inject NavigationManager Navigation
+@inject SyncService Sync
+@inject IJSRuntime JSRuntime
+@inject IToastService toastService
+
+
+<form class="container" @onsubmit="LoginUser">
+    <h1>Login</h1>
+    <div class="mb-3">
+        <label class="form-label" for="username">Username</label>
+        <input type="text" class="form-control" @bind="username" placeholder="Username" />
+    </div>
+    <div class="mb-3">
+        <label class="form-label" for="password">Password</label>
+        <input type="password" class="form-control" @bind="password" placeholder="Password" />
+    </div>
+    <div class="mb-3">
+        <div class="form-check-inline">
+            <input class="form-check-input" type="checkbox" id="rememberMe" @bind="rememberMe" />
+            <label class="form-check-label" for="rememberMe">Remember Me</label>
+        </div>
+        <button class="btn btn-primary" type="submit">Log In</button>
+    </div>
+</form>
+
+@code {
+    private string username = string.Empty;
+    private string password = string.Empty;
+    private bool rememberMe = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (await Sync.IsLoggedIn())
+        {
+            Navigation.NavigateTo("/account");
+        }
+    }
+
+    private async Task LoginUser()
+    {
+        await JSRuntime.ShowLoadingModal("Logging In");
+        var result = await Sync.Login(username, password, rememberMe);
+        password = "";
+        await Task.Delay(1000);
+        await JSRuntime.HideLoadingModal();
+        if (result.success)
+        {
+            toastService.ShowSuccess("Logged In");
+            Navigation.NavigateTo("/account");
+        }
+        else
+        {
+            toastService.ShowError(result.message);
+        }
+    }
+}

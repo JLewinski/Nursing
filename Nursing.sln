@@ -5,11 +5,9 @@ VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nursing.Core", "Nursing.Core\Nursing.Core.csproj", "{7AA913A8-BFE5-4CBD-878B-31C8D13E8890}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nursing.Mobile", "Nursing.Mobile\Nursing.Mobile.csproj", "{C9F77843-4093-4AA3-86DE-62057624F5FF}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nursing.Sqlite", "Nursing.Sqlite\Nursing.Sqlite.csproj", "{78CBB183-04D0-47B9-AEA0-80C6041982B1}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nursing.API", "Nursing.API\Nursing.API.csproj", "{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nursing.Blazor", "Nursing.Blazor\Nursing.Blazor.csproj", "{11FAC116-3F08-4CC1-8EA1-E9B57296A866}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,19 +19,14 @@ Global
 		{7AA913A8-BFE5-4CBD-878B-31C8D13E8890}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7AA913A8-BFE5-4CBD-878B-31C8D13E8890}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7AA913A8-BFE5-4CBD-878B-31C8D13E8890}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C9F77843-4093-4AA3-86DE-62057624F5FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9F77843-4093-4AA3-86DE-62057624F5FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C9F77843-4093-4AA3-86DE-62057624F5FF}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
-		{C9F77843-4093-4AA3-86DE-62057624F5FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C9F77843-4093-4AA3-86DE-62057624F5FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{78CBB183-04D0-47B9-AEA0-80C6041982B1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{78CBB183-04D0-47B9-AEA0-80C6041982B1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{78CBB183-04D0-47B9-AEA0-80C6041982B1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{78CBB183-04D0-47B9-AEA0-80C6041982B1}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11FAC116-3F08-4CC1-8EA1-E9B57296A866}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11FAC116-3F08-4CC1-8EA1-E9B57296A866}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11FAC116-3F08-4CC1-8EA1-E9B57296A866}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11FAC116-3F08-4CC1-8EA1-E9B57296A866}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

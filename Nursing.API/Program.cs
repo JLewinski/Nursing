@@ -4,49 +4,63 @@ using Microsoft.IdentityModel.Tokens;
 using Nursing.API.Models;
 using Nursing.API.Services;
 using System.Text;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.AspNetCore.Authentication.JwtBearer; // Add this using directive
-
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-var token = builder.Configuration.GetSection("Token").Get<TokenManagement>() ?? throw new InvalidOperationException("TokenManagement section is missing");
-
-builder.Services.AddAuthentication(x =>
-{
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-}).AddJwtBearer(x =>
-{
-    x.RequireHttpsMetadata = false;
-    x.SaveToken = true;
-    x.TokenValidationParameters = new TokenValidationParameters
-    {
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(token.Secret)),
-        ValidIssuer = token.Issuer,
-        ValidAudience = token.Audience,
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true
-    };
-});
-
-builder.Services.AddAuthorization();
-
-builder.Services.AddDbContext<SqlContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+builder.Services.AddDbContext<PostgresContext>(options =>
+    options.UseNpgsql(connectionString));
 
 builder.Services.AddIdentity<NursingUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<SqlContext>();
+    .AddEntityFrameworkStores<PostgresContext>();
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(policy =>
+    {
+        policy.AddDefaultPolicy(builder =>
+        {
+            builder.AllowAnyOrigin()
+                .AllowAnyMethod()
+                .AllowAnyHeader();
+        });
+    });
+}
+
+var token = builder.Configuration.GetSection("Token").Get<TokenManagement>() ?? throw new InvalidOperationException("TokenManagement section is missing");
+
+builder.Services
+    .AddAuthentication(x =>
+    {
+        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
+    {
+        x.TokenValidationParameters = new TokenValidationParameters
+        {
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(token.Secret)),
+            ValidIssuer = token.Issuer,
+            ValidAudience = token.Audience,
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true
+        };
+    });
+
+builder.Services.AddAuthorization(x =>
+{
+    x.AddPolicy("Admin", p => p.RequireRole("Admin"));
+});
 
 var app = builder.Build();
 
@@ -57,7 +71,9 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+    app.UseCors();
 }
+
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

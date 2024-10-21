@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,15 +18,21 @@ using NursingSigninResult = Nursing.Core.Models.SignInResult;
 namespace Nursing.API.Controllers;
 
 [ApiController]
-[Route("[controller]")]
+[Route("api/[controller]")]
 public class AccountController : ControllerBase
 {
     private readonly UserManager<NursingUser> _userManager;
     private readonly SignInManager<NursingUser> _signInManager;
     private readonly IConfiguration _configuration;
-    private readonly SqlContext _context;
+    private readonly PostgresContext _context;
 
-    public AccountController(IConfiguration configuration, UserManager<NursingUser> userManager, SignInManager<NursingUser> signInManager, SqlContext context)
+    private Guid GetUserId()
+    {
+        var idClaim = User.Claims.First(c => c.Type == ClaimTypes.Sid);
+        return Guid.Parse(idClaim.Value);
+    }
+
+    public AccountController(IConfiguration configuration, UserManager<NursingUser> userManager, SignInManager<NursingUser> signInManager, PostgresContext context)
     {
         _configuration = configuration;
         _userManager = userManager;
@@ -34,21 +41,9 @@ public class AccountController : ControllerBase
     }
 
     [HttpPost("register")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
     public async Task<IActionResult> Register([FromBody] RegisterModel model)
     {
-        var initialAdmin = _configuration.GetSection("InitialAdmin").GetValue<string>("User");
-        if (User.Identity?.IsAuthenticated != true || !User.IsInRole("Admin"))
-        {
-            if (model.Username != initialAdmin)
-            {
-                return Unauthorized("User is not " + initialAdmin);
-            }
-            if (await _userManager.FindByNameAsync(initialAdmin) != null)
-            {
-                return BadRequest("Initial Admin already exists");
-            }
-        }
-
         var username = model.Username;
         var password = model.Password;
 
@@ -56,23 +51,22 @@ public class AccountController : ControllerBase
         {
             UserName = username,
             Email = username,
-            GroupId = Guid.NewGuid()
+            GroupId = Guid.NewGuid(),
+            RefreshTokens = []
         };
 
         var result = await _userManager.CreateAsync(user, password);
 
-        if (result.Succeeded)
-        {
-            if (model.IsAdmin || username == initialAdmin)
-            {
-                await _userManager.AddToRoleAsync(user, "Admin");
-            }
-            return Ok();
-        }
-        else
+        if (!result.Succeeded)
         {
             return BadRequest(result.Errors);
         }
+
+        if (model.IsAdmin)
+        {
+            await _userManager.AddToRoleAsync(user, "Admin");
+        }
+        return Ok();
     }
 
     [HttpPost("login")]
@@ -106,24 +100,7 @@ public class AccountController : ControllerBase
         {
             await _userManager.ResetAccessFailedCountAsync(user);
 
-            var claims = await _userManager.GetClaimsAsync(user);
-            var roles = await _userManager.GetRolesAsync(user);
-
-            foreach (var role in roles)
-            {
-                claims.Add(new Claim(ClaimTypes.Role, role));
-            }
-
-            var token = GetToken(username, claims, rememberMe);
-            var refreshToken = GenerateRefreshToken();
-            user.RefreshTokens ??= [];
-            user.RefreshTokens.Add(refreshToken);
-            _context.Update(user);
-            await _context.SaveChangesAsync();
-
-            await _signInManager.SignInAsync(user, rememberMe);
-
-            return Ok(new NursingSigninResult { AuthToken = token, RefreshToken = refreshToken.Token });
+            return await SignInResult(user, rememberMe);
         }
         else
         {
@@ -139,23 +116,92 @@ public class AccountController : ControllerBase
         }
     }
 
-    [HttpDelete("delete")]
-    [Authorize(Roles = "Admin")]
+    [HttpGet("users")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme, Roles = "Admin")]
+    [ProducesResponseType<List<SimpleUser>>(200)]
+    public async Task<IActionResult> GetUsers()
+    {
+        var users = await _context.Users
+            .Select(x => new SimpleUser
+            {
+                Username = x.UserName ?? x.Email ?? x.Id.ToString(),
+                GroupId = x.GroupId
+            })
+            .ToListAsync();
+
+        return Ok(users);
+    }
+
+    [HttpGet("logout")]
+    public async Task<IActionResult> Logout()
+    {
+        var tokens = await _context.Users
+            .Where(x => x.Id == GetUserId())
+            .SelectMany(x => x.RefreshTokens.Where(y => y.IsActive))
+            .ToListAsync();
+
+        foreach (var token in tokens)
+        {
+            token.Revoked = DateTime.UtcNow;
+        }
+
+        await _context.SaveChangesAsync();
+
+        await _signInManager.SignOutAsync();
+        return Ok();
+    }
+
+    [HttpDelete("delete/{username}")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    [ProducesResponseType(200)]
+    [ProducesResponseType(400)]
+    [ProducesResponseType(401)]
     public async Task<IActionResult> DeleteAccount(string username)
     {
+        if (User.Identity?.Name != username && !User.IsInRole("Admin"))
+        {
+            return Unauthorized("You do not have permission to delete this user.");
+        }
+
         var user = await _userManager.FindByEmailAsync(username);
         if (user == null)
         {
             return BadRequest("Invalid User");
         }
 
+        var usernames = await _context.Users
+            .Where(x => x.GroupId == user.GroupId && x.Id != user.Id)
+            .Select(x => x.UserName)
+            .ToListAsync();
+
+        if (usernames.Count == 0)
+        {
+            await _context.Feedings.Where(x => x.GroupId == user.GroupId).ExecuteDeleteAsync();
+            await _userManager.DeleteAsync(user);
+            return Ok($"{username} and all data belonging to {username} were deleted");
+        }
+
         await _userManager.DeleteAsync(user);
 
-        return Ok();
+        if (User.Identity!.Name == username)
+        {
+            await _signInManager.SignOutAsync();
+        }
+        return Ok($"{username} was deleted. Data still in database attached to the following users: {string.Join(", ", usernames)}");
+    }
+
+    [HttpPost("changePassword")]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+    public async Task<IActionResult> ChangePassword(ChangePasswordModel model)
+    {
+        var user = await _userManager.FindByEmailAsync(User.Identity!.Name!);
+
+        var result = await _userManager.ChangePasswordAsync(user!, model.CurrentPassword, model.NewPassword);
+        return result.Succeeded ? Ok() : BadRequest(result.Errors);
     }
 
     [HttpGet("IsAdmin")]
-    [Authorize]
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ProducesResponseType<bool>(200)]
     public IActionResult IsAdmin()
     {
@@ -164,7 +210,7 @@ public class AccountController : ControllerBase
 
     [HttpPost("refreshToken")]
     [ProducesResponseType<NursingSigninResult>(200)]
-    public async Task<IActionResult> RefreshToken([FromBody] string clientToken)
+    public async Task<IActionResult> RefreshUserToken([FromBody] string clientToken)
     {
         var user = await _context.Users
             .Where(u => u.RefreshTokens.Any(t => t.Token == clientToken))
@@ -187,26 +233,9 @@ public class AccountController : ControllerBase
             return BadRequest("Token Expired");
         }
 
+        var clientIp = GetClientIp();
 
-        var newRefreshToken = GenerateRefreshToken();
-
-        refreshToken.Revoked = DateTime.UtcNow;
-        refreshToken.RevokedByIp = GetClientIp();
-        refreshToken.ReplacedByToken = newRefreshToken.Token;
-
-        user.RefreshTokens.Add(newRefreshToken);
-        await _context.SaveChangesAsync();
-
-        var claims = await _userManager.GetClaimsAsync(user);
-        var roles = await _userManager.GetRolesAsync(user);
-        foreach (var role in roles)
-        {
-            claims.Add(new Claim(ClaimTypes.Role, role));
-        }
-        var token = GetToken(user.UserName, claims, false);
-        await _signInManager.SignInAsync(user, false);
-
-        return Ok(new NursingSigninResult { AuthToken = token, RefreshToken = newRefreshToken.Token });
+        return await SignInResult(user, true, refreshToken);
     }
 
     private string GetClientIp()
@@ -219,33 +248,16 @@ public class AccountController : ControllerBase
         return ip ?? "NA";
     }
 
-    private RefreshToken GenerateRefreshToken()
+    private string GetToken(NursingUser user, IEnumerable<Claim> claims, bool rememberMe)
     {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return new RefreshToken
-        {
-            Token = Convert.ToBase64String(randomNumber),
-            Expires = DateTime.UtcNow.AddDays(7),
-            Created = DateTime.UtcNow,
-            CreatedByIp = GetClientIp()
-        };
-    }
-
-    private string GetToken(string username, IEnumerable<Claim> claims, bool rememberMe)
-    {
-        var tokenManagement = _configuration.GetSection("Token").Get<TokenManagement>();
-
-        if (tokenManagement == null)
-        {
-            throw new ArgumentException("Token management is missing");
-        }
-
+        var tokenManagement = _configuration.GetSection("Token").Get<TokenManagement>() ?? throw new ArgumentException("Token management is missing");
         var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(tokenManagement.Secret));
         var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claimsList = claims.Append(new Claim(ClaimTypes.Name, username)).ToList();
+        var claimsList = claims
+            .Append(new (ClaimTypes.Name, user.UserName!))
+            .Append(new(ClaimTypes.Sid, user.Id.ToString()))
+            .ToList();
 
         var jwtToken = new JwtSecurityToken(
             tokenManagement.Issuer,
@@ -258,5 +270,35 @@ public class AccountController : ControllerBase
         return new JwtSecurityTokenHandler().WriteToken(jwtToken);
     }
 
-    
+    private async Task<IActionResult> SignInResult(NursingUser user, bool rememberMe, RefreshToken? oldRefreshToken = null)
+    {
+        var claims = await _userManager.GetClaimsAsync(user);
+        var roles = await _userManager.GetRolesAsync(user);
+
+        foreach (var role in roles)
+        {
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        var token = GetToken(user, claims, rememberMe);
+        var clientIp = GetClientIp();
+        var refreshToken = RefreshToken.Generate(user, clientIp);
+        user.RefreshTokens ??= [];
+        user.RefreshTokens.Add(refreshToken);
+        _context.Update(user);
+
+        if (oldRefreshToken != null)
+        {
+            oldRefreshToken.Revoked = DateTime.UtcNow;
+            oldRefreshToken.RevokedByIp = clientIp;
+            oldRefreshToken.ReplacedByToken = refreshToken.Token;
+        }
+
+        await _context.SaveChangesAsync();
+
+        await _signInManager.SignInAsync(user, rememberMe);
+
+        return Ok(new NursingSigninResult { AuthToken = token, RefreshToken = refreshToken.Token, IsAdmin = await _userManager.IsInRoleAsync(user, "Admin") });
+    }
+
 }
