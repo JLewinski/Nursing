@@ -6,8 +6,8 @@
 @inject Nursing.Blazor.Services.CacheService Cache
 @inject Nursing.Blazor.Services.SyncService SyncService
 
-<div class="container text-center">
-    <div class="row">
+<div id="home-grid">
+    <div>
         @if (startTime.HasValue)
         {
             <div class="col-12">
@@ -67,7 +67,7 @@
             }
         </div>
     </div>
-    <div class="row mb-3">
+    <div class="row">
         <div class="col-6">
             <BoobTimer ViewModel="feeding" IsLeft="true" OnToggle="Save" OnUpdate="ManualUpdate" />
         </div>
@@ -75,67 +75,67 @@
             <BoobTimer ViewModel="feeding" IsLeft="false" OnToggle="Save" OnUpdate="ManualUpdate" />
         </div>
     </div>
-</div>
 
-@if (startTime.HasValue)
-{
-    <div class="container">
-        <div class="row">
-            <div class="d-grid gap-2 col-6 mx-auto">
-                <button class="btn btn-primary" @onclick="Reset">Reset</button>
+    @if (startTime.HasValue)
+    {
+        <div class="container">
+            <div class="row">
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <button class="btn btn-primary" @onclick="Reset">Reset</button>
+                </div>
+                <div class="d-grid gap-2 col-6 mx-auto">
+                    <button class="btn btn-primary" @onclick=Finish>Finish</button>
+                </div>
             </div>
-            <div class="d-grid gap-2 col-6 mx-auto">
-                <button class="btn btn-primary" @onclick=Finish>Finish</button>
-            </div>
-        </div>
-        <div class="mt-5 row">
-            <table class="table table-borderless table-striped table-responsive align-middle d-none d-md-table">
-                <thead>
-                    <tr>
-                        <th>Left Start</th>
-                        <th>Left End</th>
-                        <th>Right Start</th>
-                        <th>Right End</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @{
-                        var leftIndex = feeding.LeftBreast.Count;
-                        var rightIndex = feeding.RightBreast.Count;
-                    }
-                    @while (leftIndex > 0 || rightIndex > 0)
-                    {
+            <div class="mt-5 row">
+                <table class="table table-borderless table-striped table-responsive align-middle d-none d-md-table">
+                    <thead>
                         <tr>
-                            @if (--leftIndex >= 0)
-                            {
-                                var startFinish = feeding.LeftBreast[leftIndex];
-                                <td>@LocalTimeString(startFinish.StartTime)</td>
-                                <td>@LocalTimeString(startFinish.EndTime)</td>
-                            }
-                            else
-                            {
-                                <td></td>
-                                <td></td>
-                            }
-                            @if (--rightIndex >= 0)
-                            {
-                                var startFinish = feeding.RightBreast[rightIndex];
-                                <td>@LocalTimeString(startFinish.StartTime)</td>
-                                <td>@LocalTimeString(startFinish.EndTime)</td>
-                            }
-                            else
-                            {
-                                <td></td>
-                                <td></td>
-                            }
+                            <th>Left Start</th>
+                            <th>Left End</th>
+                            <th>Right Start</th>
+                            <th>Right End</th>
                         </tr>
-                    }
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @{
+                            var leftIndex = feeding.LeftBreast.Count;
+                            var rightIndex = feeding.RightBreast.Count;
+                        }
+                        @while (leftIndex > 0 || rightIndex > 0)
+                        {
+                            <tr>
+                                @if (--leftIndex >= 0)
+                                {
+                                    var startFinish = feeding.LeftBreast[leftIndex];
+                                    <td>@LocalTimeString(startFinish.StartTime)</td>
+                                    <td>@LocalTimeString(startFinish.EndTime)</td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                    <td></td>
+                                }
+                                @if (--rightIndex >= 0)
+                                {
+                                    var startFinish = feeding.RightBreast[rightIndex];
+                                    <td>@LocalTimeString(startFinish.StartTime)</td>
+                                    <td>@LocalTimeString(startFinish.EndTime)</td>
+                                }
+                                else
+                                {
+                                    <td></td>
+                                    <td></td>
+                                }
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-}
+    }
 
+</div>
 @code {
 
     private DurationCount totalDuration = null!;

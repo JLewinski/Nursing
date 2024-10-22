@@ -1,0 +1,12 @@
+#home-grid{
+    display: grid;
+    grid-gap: 1rem;
+    padding: 1rem;
+    grid-template-rows: 100px 50px auto auto;
+    grid-template-columns: auto;
+    text-align: center;
+}
+
+#home-grid > div {
+    text-align: center;
+}
