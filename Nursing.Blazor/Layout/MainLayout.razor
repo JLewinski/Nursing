@@ -4,18 +4,10 @@
 <BlazoredToasts Position="Blazored.Toast.Configuration.ToastPosition.BottomRight" SuccessClass="bg-body text-body"
     ErrorClass="bg-body text-body" InfoClass="bg-body text-body" WarningClass="bg-body text-body" />
 <div class="page">
-    <main class="@MainClass">
+    <main>
         <article class="content px-4">
             @Body
         </article>
     </main>
     <NavMenu />
 </div>
-
-@code {
-    // Example: Set this based on the current page or some condition
-    private string MainClass => ShouldCenterContent == true ? "centered" : string.Empty;
-
-    [CascadingParameter]
-    public bool? ShouldCenterContent { get; set; }
-}
