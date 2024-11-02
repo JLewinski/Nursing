@@ -4,7 +4,7 @@ version: '3.4'
 
 services:
   nursingapi:
-    image: nursingapi
+    image: jdlewinski/nursing.api
     build:
       context: .
       dockerfile: Nursing.API/Dockerfile

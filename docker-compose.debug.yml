@@ -2,7 +2,7 @@
 
 services:
   nursingapi:
-    image: nursingapi
+    image: jdlewinski/nursing.api
     build:
       context: .
       dockerfile: Nursing.API/Dockerfile
@@ -10,7 +10,7 @@ services:
         - configuration=Debug
     container_name: nursingapi
     ports:
-      - 5006:5006
+      - 5006:8080
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
       - ConnectionStrings__DefaultConnection=Host=nursingdb;Database=nursing;Username=root;Password=Password
