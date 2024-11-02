@@ -1,0 +1,32 @@
+# Please refer https://aka.ms/HTTPSinContainer on how to setup an https developer certificate for your ASP.NET Core service.
+
+services:
+  nursingapi:
+    image: nursingapi
+    build:
+      context: .
+      dockerfile: Nursing.API/Dockerfile
+      args:
+        - configuration=Debug
+    container_name: nursingapi
+    ports:
+      - 5006:5006
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=nursingdb;Database=nursing;Username=root;Password=Password
+    volumes:
+      - ~/.vsdbg:\remote_debugger:rw
+    depends_on:
+      - nursingdb
+    restart: unless-stopped
+  nursingdb:
+    container_name: nursingdb
+    image: "postgres:latest"
+    environment:
+      POSTGRES_USER: "root"
+      POSTGRES_PASSWORD: "Password"
+      POSTGRES_DB: "nursing"
+networks:
+  default:
+    name: nursing
+    external: true
