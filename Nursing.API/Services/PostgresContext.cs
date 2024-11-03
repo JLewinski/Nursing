@@ -16,6 +16,6 @@ public class PostgresContext : IdentityDbContext<NursingUser, IdentityRole<Guid>
         Database.Migrate();
     }
 
-    public DbSet<Feeding> Feedings { get; set; }
-    public DbSet<Invite> Invites { get; set; }
+    public DbSet<Feeding> Feedings { get; set; } = null!;
+    public DbSet<Invite> Invites { get; set; } = null!;
 }

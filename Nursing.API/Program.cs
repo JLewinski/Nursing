@@ -18,6 +18,9 @@ builder.Services.AddDbContext<PostgresContext>(options =>
 builder.Services.AddIdentity<NursingUser, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<PostgresContext>();
 
+builder.Services.AddScoped<ISyncService, SyncService>();
+builder.Services.AddScoped<IInviteService, InviteService>();
+
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
