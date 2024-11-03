@@ -7,6 +7,7 @@
   "background_color": "#000000",
   "theme_color": "#ffd59a",
   "prefer_related_applications": false,
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-512.png",
@@ -17,6 +18,19 @@
       "src": "icon-192.png",
       "type": "image/png",
       "sizes": "192x192"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "android.png",
+      "sizes": "357x752",
+      "type": "image/png"
+    },
+    {
+      "src": "pc.png",
+      "sizes": "1836x976",
+      "type": "image/png",
+      "form_factor": "wide"
     }
   ]
 }

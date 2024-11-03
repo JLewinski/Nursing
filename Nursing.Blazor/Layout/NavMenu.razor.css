@@ -33,7 +33,7 @@
 }
 
 .nav-dock {
-    
+    background-color: rgb(33, 37, 41);
     border-top: 1px solid #ffd59a;
     display: flex;
     justify-content: space-around;
