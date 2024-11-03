@@ -31,16 +31,20 @@ public class SyncService : ISyncService
 
         var ids = sync.Feedings.Select(x => x.Id).ToList();
 
-        var existing = await _context.Feedings.Where(f => ids.Contains(f.Id))
+        var existing = await _context.Feedings
+            .Where(f => ids.Contains(f.Id))
             .Select(x => new { x.Id, x.GroupId, x.Deleted })
             .ToListAsync();
+
+        var existingIds = existing
+            .Where(x => x.GroupId == currentUser.GroupId && x.Deleted == null)
+            .Select(x => x.Id)
+            .ToList();
 
         var badIds = existing
             .Where(x => x.GroupId != currentUser.GroupId || x.Deleted != null)
             .Select(x => x.Id)
             .ToList();
-
-        var existingIds = existing.Where(x => x.GroupId == currentUser.GroupId).Select(x => x.Id).ToList();
 
         var updateList = sync.Feedings
             .Where(x => existingIds.Contains(x.Id))
@@ -51,6 +55,11 @@ public class SyncService : ISyncService
             .Where(x => !existingIds.Contains(x.Id) && !badIds.Contains(x.Id) && x.Deleted == null)
             .Select(x => new Feeding(x, currentUser.GroupId))
             .ToList();
+
+        badIds.AddRange(sync.Feedings
+            .Where(x => x.Deleted != null && !existingIds.Contains(x.Id))
+            .Select(x => x.Id)
+            .ToList());
 
         _context.ChangeTracker.Clear();
         _context.Feedings.UpdateRange(updateList);
