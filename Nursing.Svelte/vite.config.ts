@@ -8,4 +8,5 @@ export default defineConfig({
       strict: false,
     },
   },
+  // TODO: Add PWA plugin configuration
 })
