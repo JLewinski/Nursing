@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
     let { side } = $props<{ side: 'left' | 'right' }>();
     import { timerStore } from '$lib/stores/timerStore';
     
