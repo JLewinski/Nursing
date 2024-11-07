@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Database } from '$lib/db';
+    import { Database } from '$lib/db/mod';
     import type { Session } from '$lib/types';
     import { onMount } from 'svelte';
     

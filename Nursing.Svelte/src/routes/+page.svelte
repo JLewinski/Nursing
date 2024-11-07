@@ -1,25 +1,24 @@
 <script lang="ts">
-  // let count = $state(1);
   import Timer from '$lib/components/Timer.svelte';
   import { timerStore } from '$lib/stores/timerStore';
 </script>
-<!-- 
-<button
-  onclick={() => {
-    count++
-  }}>need hug right now {"🤗".repeat(count)}</button
-> -->
 
 <div class="timer-container">
-    <!-- TODO: Implement dual timer interface -->
     <Timer side="left" />
     <Timer side="right" />
+    {#if $timerStore.activeTimer !== undefined}
+        <button on:click={() => timerStore.reset()}>Reset</button>
+        <button on:click={() => timerStore.reset()}>Finish</button>
+    {/if}
 </div>
+
+
 
 <style>
     .timer-container {
         display: grid;
         grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
         gap: 1rem;
         padding: 1rem;
     }

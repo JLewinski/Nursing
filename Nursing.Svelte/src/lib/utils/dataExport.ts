@@ -1,5 +1,5 @@
 import type { Session } from '$lib/types';
-import { Database } from '$lib/db';
+import { Database } from '$lib/db/mod';
 
 interface ExportData {
     version: string;

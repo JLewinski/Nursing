@@ -15,10 +15,10 @@
 		"svelte-adapter-deno": "npm:svelte-adapter-deno@^0.9.1",
 		"svelte-check": "npm:svelte-check@^4.0.0",
 		"typescript": "npm:typescript@^5.0.0",
-		"vite": "npm:vite@^5.0.3"
+		"vite": "npm:vite@^5.0.3",
+		"$lib/": "./src/lib/"
   },
   "compilerOptions": {
-    "allowJs": true,
     "checkJs": true,
     "strict": true
   }

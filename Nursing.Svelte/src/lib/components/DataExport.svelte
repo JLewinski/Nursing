@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { Database } from '$lib/db';
+    import { Database } from '$lib/db/mod';
     
     async function exportData() {
         const db = new Database();
@@ -17,7 +17,7 @@
         type="file" 
         accept=".json"
         on:change={(e) => {
-            const file = e.target?.files?.[0];
+            const file = (e.target as HTMLInputElement)?.files?.[0];
             if (file) importData(file);
         }}
     >

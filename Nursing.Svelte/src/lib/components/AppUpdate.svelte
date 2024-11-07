@@ -1,7 +1,7 @@
 <script lang="ts">
     import { onMount } from 'svelte';
     let updateAvailable = false;
-    let registration: ServiceWorkerRegistration | null = null;
+    let registration: ServiceWorkerRegistration | undefined = undefined;
 
     async function checkForUpdates() {
         if (!registration) return;

@@ -1,25 +1,27 @@
-import { DB_CONFIG } from '$lib/config/constants';
+import { migrateFromLocalStorage } from "$lib/db/migration-old.ts";
 
 export const migrations = [
     {
         version: 1,
-        migrate: async (db: IDBDatabase) => {
+        migrate: (db: IDBDatabase) => {
             const sessionStore = db.createObjectStore('sessions', { keyPath: 'id' });
             sessionStore.createIndex('startTime', 'startTime');
             sessionStore.createIndex('lastUpdated', 'lastUpdated');
-            sessionStore.createIndex('deleted', 'deleted');
+            sessionStore.createIndex('deleted', 'deleted', { unique: false }); // Modified index for datetime
 
-            const settingsStore = db.createObjectStore('settings', { keyPath: 'id' });
-            const syncStateStore = db.createObjectStore('syncState', { keyPath: 'id' });
+            db.createObjectStore('settings', { keyPath: 'id' });
+            db.createObjectStore('syncState', { keyPath: 'id' });
+
+            migrateFromLocalStorage(db);
         }
     }
     // Future migrations will be added here
 ];
 
-export async function applyMigrations(db: IDBDatabase, oldVersion: number): Promise<void> {
+export function applyMigrations(db: IDBDatabase, oldVersion: number) {
     for (const migration of migrations) {
         if (migration.version > oldVersion) {
-            await migration.migrate(db);
+            migration.migrate(db);
         }
     }
 }

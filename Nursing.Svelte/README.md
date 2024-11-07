@@ -1,6 +1,6 @@
 # Nursing with the Saints
 
-This application is build using Sveltekit and deno.
+This application is build using Svelte 5 and deno.
 It is a front end application for time tracking. It will be mostly used on mobile devices.
 It has a navigation bar at the bottom with links to different pages.
 

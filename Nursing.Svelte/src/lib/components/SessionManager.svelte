@@ -2,9 +2,14 @@
     import { onMount } from 'svelte';
     import { timerStore } from '$lib/stores/timerStore';
     import type { Session, TimerEvent } from '$lib/types';
-    import { Database } from '$lib/db';
+    import { Database } from '$lib/db/mod';
+    interface Props {
+        children?: import('svelte').Snippet<[any]>;
+    }
+
+    let { children }: Props = $props();
     
-    let currentSession: Session | null = null;
+    let currentSession: Session | null = $state(null);
     const db = new Database();
 
     async function createSession() {
@@ -38,10 +43,13 @@
 
     onMount(async () => {
         // Resume active session if exists
-        currentSession = await db.getActiveSession();
+        const activeSession = await db.getActiveSession();
+        if (activeSession) {
+            currentSession = activeSession as Session;
+        }
     });
 </script>
 
 {#if currentSession}
-    <slot session={currentSession} />
+    {@render children?.({ session: currentSession, })}
 {/if}

@@ -1,5 +1,5 @@
 import type { Session, SyncState } from '$lib/types';
-import { Database } from '$lib/db';
+import { Database } from '$lib/db/mod';
 
 export class SyncManager {
     private db: Database;

@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount, onDestroy } from 'svelte';
-    import { Database } from '$lib/db';
+    import { Database } from '$lib/db/mod';
     import { settings } from '$lib/stores/settingsStore';
     
     let backupInterval: number;
@@ -9,7 +9,7 @@
     async function performBackup() {
         try {
             const db = new Database();
-            const data = await db.getAllData();
+            const data = await db.getAllSessions();
             localStorage.setItem('nursing-backup', JSON.stringify({
                 timestamp: new Date().toISOString(),
                 data
