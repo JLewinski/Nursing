@@ -1,8 +1,7 @@
 <script lang="ts">
     import { settings } from '$lib/stores/settingsStore';
     import { NotificationManager } from '$lib/utils/notifications';
-    
-    // TODO: Implement settings UI and logic
+    import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 </script>
 
 <div class="settings-container">
@@ -10,7 +9,7 @@
     
     <section>
         <h2>Theme</h2>
-        <!-- TODO: Theme settings -->
+        <ThemeToggle />
     </section>
     
     <section>

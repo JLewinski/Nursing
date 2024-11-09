@@ -1,7 +1,7 @@
 <script lang="ts">
     import '../app.css';
     import './nav.css';
-    import Installation from '$lib/components/installation.svelte';
+    import Installation from '$lib/components/Installation.svelte';
     interface Props {
         children?: import('svelte').Snippet;
     }

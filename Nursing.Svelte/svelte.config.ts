@@ -6,6 +6,9 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter(),
+    files: {
+      serviceWorker: 'static/service-worker'
+    }
   },
   compilerOptions: {
     runes: true,

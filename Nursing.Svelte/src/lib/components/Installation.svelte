@@ -1,16 +1,22 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+
     type BeforeInstallPromptEvent = Event & {
         prompt: () => Promise<void>;
         userChoice: Promise<{ outcome: 'accepted' | 'dismissed' }>;
     };
 
     let deferredPrompt: BeforeInstallPromptEvent | null = null;
-    let showPrompt = false;
+    let showPrompt = $state(false);
 
-    window.addEventListener('beforeinstallprompt', (e) => {
-        e.preventDefault();
-        deferredPrompt = e as BeforeInstallPromptEvent;
-        showPrompt = true;
+    onMount(() => {
+        if (typeof window !== 'undefined') {
+            window.addEventListener('beforeinstallprompt', (e) => {
+                e.preventDefault();
+                deferredPrompt = e as BeforeInstallPromptEvent;
+                showPrompt = true;
+            });
+        }
     });
 
     async function handleInstall() {
@@ -28,7 +34,7 @@
 
 {#if showPrompt}
     <div class="install-prompt">
-        <button on:click={handleInstall} class="install-button">
+        <button onclick={handleInstall} class="install-button">
             <span class="bi bi-download"></span>
             Install App
         </button>
