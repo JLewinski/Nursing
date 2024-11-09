@@ -1,6 +1,7 @@
 <script lang="ts">
     import '../app.css';
     import './nav.css';
+    import Installation from '$lib/components/installation.svelte';
     interface Props {
         children?: import('svelte').Snippet;
     }
@@ -9,6 +10,7 @@
     // TODO: Import navigation components
 </script>
 
+<Installation />
 <main class="main-content">
     {@render children?.()}
 </main>

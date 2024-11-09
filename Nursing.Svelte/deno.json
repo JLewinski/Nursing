@@ -9,6 +9,7 @@
 	},
 	"imports": {
 		"@sveltejs/adapter-auto": "npm:@sveltejs/adapter-auto@^3.0.0",
+		"@sveltejs/adapter-static": "npm:@sveltejs/adapter-static@^3.0.6",
 		"@sveltejs/kit": "npm:@sveltejs/kit@^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^4.0.0",
 		"svelte": "npm:svelte@^5.0.0",
