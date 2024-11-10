@@ -1,13 +1,12 @@
 <script lang="ts">
     import { settings } from '$lib/stores/settingsStore';
-    let selectedTheme = $derived.by(() => {
-        if (settings.theme === 'system') {
-            return 'dark'; //todo: check system theme
-        }
-        return system.theme;
-    });
-</script>
+    import type { Snippet } from 'svelte';
 
-<div data-theme="{selectedTheme">
-    {$props.children}
-</div>
+    $effect(() => {
+        let theme = $settings.theme;
+        if (theme === 'system'){
+            theme = globalThis.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        document.documentElement.setAttribute('data-theme', theme);
+    })
+</script>

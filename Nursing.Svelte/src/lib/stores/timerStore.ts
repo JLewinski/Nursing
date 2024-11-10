@@ -85,12 +85,12 @@ function createTimerStore() {
             localStorage.removeItem('timerStore');
             set({ events: [], activeTimer: undefined });
         },
-        getDuration: (timer: 'left' | 'right') => derived({ subscribe }, ($state) => {
+        getDuration: (timer: 'left' | 'right' | 'total') => derived({ subscribe }, ($state) => {
             let duration = 0;
             let lastStart: string | null = null;
 
             for (const event of $state.events) {
-                if (event.timer === timer) {
+                if (timer === 'total' || event.timer === timer) {
                     if (event.type === 'start') {
                         lastStart = event.timestamp;
                     } else if (event.type === 'stop' && lastStart) {
@@ -100,8 +100,7 @@ function createTimerStore() {
                 }
             }
 
-            // Add current running time if timer is active
-            if (lastStart && $state.activeTimer === timer) {
+            if (lastStart) {
                 duration += new Date().getTime() - new Date(lastStart).getTime();
             }
 
