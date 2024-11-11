@@ -105,6 +105,9 @@ function createTimerStore() {
             }
 
             return duration;
+        }),
+        getStartTime: () => derived({ subscribe }, ($state) => {
+            return $state.events.length ? $state.events[0] : null;
         })
     };
 }

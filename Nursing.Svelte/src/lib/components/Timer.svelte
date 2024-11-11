@@ -1,7 +1,7 @@
 <script lang="ts">
     import { timerStore } from '$lib/stores/timerStore';
     import { formatDuration } from '$lib/utils/timeCalculations';
-    import { lastSession } from '$lib/stores/lastSessionStore.svelte';
+    import { lastSession } from '$lib/stores/lastSessionStore';
     
     interface Props {
         side: 'left' | 'right';
@@ -11,14 +11,13 @@
     
     let isActive = $derived($timerStore.activeTimer === side);
     const durationStore = timerStore.getDuration(side);
-    console.log(lastSession);
     function handleClick() {
         timerStore.toggleTimer(side);
     }
 </script>
 
 <div class="timer-container">
-    {#if lastSession.lastSide === side}
+    {#if $lastSession.side === side}
         <span class="badge">Last used</span>
     {:else}
         <span></span>
