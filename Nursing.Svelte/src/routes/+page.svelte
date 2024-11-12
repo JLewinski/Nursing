@@ -1,28 +1,37 @@
 <script lang="ts">
     import Timer from "$lib/components/Timer.svelte";
-    import { timerStore, calculateDuration } from "$lib/stores/timerStore.svelte";
+    import { getTimerState } from "$lib/stores/timerStore.svelte";
     import { formatDuration } from "$lib/utils/timeCalculations";
     import { lastSession } from "$lib/stores/lastSessionStore";
     import { settings } from "$lib/stores/settingsStore";
     import { Database } from "$lib/db/mod";
     import { v4 } from "uuid";
+    import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
 
     const db = new Database();
-    
-    let startEvent = $derived.by(() => timerStore.events.length ? timerStore.events[0] : null);
 
-    function reset(){
-        timerStore.activeTimer = undefined;
-        timerStore.events = [];
+    const timerState = getTimerState();
+
+    console.log(timerState);
+    let startEvent = $derived.by(() =>
+        timerState.events.length ? timerState.events[0] : null,
+    );
+
+    function reset() {
+        dialog.showConfirmation('Reset', 'Are you sure you want to reset this feeding?', 'Reset').then((confirmed) => {
+            if (confirmed) {
+                timerState.reset();
+            }
+        });
     }
 
     function finishSession() {
         if (!startEvent) return;
 
-        const lastSide = timerStore.events[timerStore.events.length - 1].timer;
+        const lastSide = timerState.events[timerState.events.length - 1].timer;
 
         lastSession.update({
-            startTime: new Date(timerStore.events[0].timestamp),
+            startTime: new Date(timerState.events[0].timestamp),
             side: lastSide,
         });
 
@@ -33,20 +42,20 @@
             endTime: now,
             lastSide: lastSide,
             lastUpdated: now,
-            leftDuration: formatDuration(
-                calculateDuration(timerStore.events, "left"),
-            ),
+            leftDuration: formatDuration(timerState.calculateDuration("left")),
             rightDuration: formatDuration(
-                calculateDuration(timerStore.events, "right"),
+                timerState.calculateDuration("right"),
             ),
             id: v4(),
         };
 
         db.saveSession(session).then(reset);
     }
+    let dialog: ConfirmDialog;
 </script>
+
 <div class="timer-container">
-    {#if timerStore.activeTimer === undefined && $lastSession.startTime}
+    {#if timerState.activeTimer === undefined && $lastSession.startTime}
         <div>
             <div>Last</div>
             <div>
@@ -73,11 +82,13 @@
     {/if}
     <Timer side="left" />
     <Timer side="right" />
-    {#if timerStore.activeTimer !== undefined}
-        <button onclick={reset}>Reset</button>
-        <button onclick={finishSession}>Finish</button>
+    {#if timerState.activeTimer !== undefined}
+        <button class="primary" onclick={reset}>Reset</button>
+        <button class="primary" onclick={finishSession}>Finish</button>
     {/if}
 </div>
+
+<ConfirmDialog bind:this={dialog}/>
 
 <style>
     .timer-container {

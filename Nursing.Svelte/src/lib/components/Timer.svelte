@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { timerStore } from '$lib/stores/timerStore.svelte';
+    import { getTimerState } from '$lib/stores/timerStore.svelte';
     import { lastSession } from '$lib/stores/lastSessionStore';
     import Duration from './Duration.svelte';
     
@@ -8,31 +8,10 @@
     }
 
     let { side }: Props = $props();
-    
-    let isActive = $derived(timerStore.activeTimer === side);
-    
-    function handleClick() {
-        const now = new Date().toISOString();
-        if (timerStore.activeTimer) {
-            timerStore.events.push({
-                timer: timerStore.activeTimer,
-                timestamp: now,
-                type: 'stop',
-            });
-        }
 
-        if(timerStore.activeTimer === side) {
-            timerStore.activeTimer = null;
-            return;
-        }
-
-        timerStore.activeTimer = side;
-        timerStore.events.push({
-            timer: side,
-            timestamp: new Date().toISOString(),
-            type: 'start',
-        });
-    }
+    const timerState = getTimerState();
+    
+    let isActive = $derived(timerState.activeTimer === side);
 </script>
 
 <div class="timer-container">
@@ -44,7 +23,7 @@
     <span class="label">{side}</span>
     <button 
         class="timer-circle {isActive ? 'active' : ''}"
-        onclick={handleClick}
+        onclick={() => timerState.toggle(side)}
         aria-label="{isActive ? 'Stop' : 'Start'} {side} timer"
     >
         <Duration {side} />

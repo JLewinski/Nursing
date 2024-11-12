@@ -39,4 +39,88 @@ body {
     color: var(--text-color);
 }
 
+dialog {
+    padding-top: 0;
+    border: none;
+    border-radius: 0;
+    background-color: var(--surface-color);
+    color: var(--text-color);
+}
+
+dialog>.dialog-content {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 480px;
+}
+
+dialog>.dialog-content>.dialog-header {
+    padding: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+dialog>.dialog-content>.dialog-body {
+    padding: 1rem;
+    flex: 1 1 auto;
+    position: relative;
+}
+
+dialog>.dialog-content>.dialog-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-shrink: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+::backdrop {
+    background-color: var(--surface-3);
+    opacity: 0.75;
+}
+
+/* Button styles */
+button {
+    padding: 0.5rem 1rem;
+    font-size: 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+}
+
+/* Primary button */
+button.primary {
+    background-color: var(--primary-color);
+    color: #fff;
+}
+
+button.primary:hover {
+    background-color: var(--primary-dark);
+}
+
+/* Secondary button */
+button.secondary {
+    background-color: var(--surface-3);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+}
+
+button.secondary:hover {
+    background-color: var(--surface-2);
+}
+
+/* Danger button */
+button.danger {
+    background-color: var(--error-color);
+    color: #fff;
+}
+
+button.danger:hover {
+    background-color: var(--error-light);
+}
+
 /* TODO: Add more global styles */

@@ -3,12 +3,15 @@
     import './nav.css';
     import Installation from '$lib/components/Installation.svelte';
     import ThemeSetter from '$lib/components/ThemeSetter.svelte';
+    import { setTimerState } from '$lib/stores/timerStore.svelte';
     
     interface Props {
         children?: import('svelte').Snippet;
     }
 
     let { children }: Props = $props();
+
+    setTimerState();
 </script>
 
 <ThemeSetter>

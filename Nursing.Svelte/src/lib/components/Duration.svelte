@@ -1,7 +1,9 @@
 <script lang="ts">
-    import { timerStore, calculateDuration } from '$lib/stores/timerStore.svelte';
+    import { getTimerState } from '$lib/stores/timerStore.svelte';
     import { formatDuration } from '$lib/utils/timeCalculations';
+    import { onDestroy } from 'svelte';
 
+    const timerState = getTimerState();
     interface Props {
         side: 'left' | 'right' | 'total';
     }
@@ -9,9 +11,13 @@
     let { side }: Props = $props();
 
     let duration = $state(0);
-    setInterval(() => {
-        duration = calculateDuration(timerStore.events, side);
+    const intervalKey = setInterval(() => {
+        duration = timerState.calculateDuration(side);
     }, 100);
+
+    onDestroy(() => {
+        clearInterval(intervalKey);
+    });
 
 </script>
 

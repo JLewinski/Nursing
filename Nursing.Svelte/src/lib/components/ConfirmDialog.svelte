@@ -1,54 +1,49 @@
 <script lang="ts">
-    import { createEventDispatcher } from 'svelte';
-    
-    export let title = 'Confirm';
-    export let message = '';
-    export let show = false;
-    
-    const dispatch = createEventDispatcher();
-</script>
-
-{#if show}
-    <div class="dialog-overlay">
-        <div class="dialog">
-            <h3>{title}</h3>
-            <p>{message}</p>
-            <div class="actions">
-                <button 
-                    class="secondary"
-                    on:click={() => dispatch('cancel')}
-                >
-                    Cancel
-                </button>
-                <button 
-                    class="primary"
-                    on:click={() => dispatch('confirm')}
-                >
-                    Confirm
-                </button>
-            </div>
-        </div>
-    </div>
-{/if}
-
-<style>
-    .dialog-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background: rgba(0, 0, 0, 0.5);
-        display: grid;
-        place-items: center;
-        z-index: 1000;
+    interface Props {
+        children: import("svelte").Snippet;
     }
 
-    .dialog {
-        background: var(--surface-color);
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        max-width: 90vw;
-        width: 400px;
+    let dialog: HTMLDialogElement;
+
+    let resolve: (value: boolean) => void;
+
+    let titleText = $state('');
+    let confirmText = $state('Confirm');
+    let messageText = $state('');
+
+    export function showConfirmation(title: string, message: string, confirm = 'Confirm') {
+        titleText = title;
+        confirmText = confirm;
+        messageText = message;
+        dialog.showModal();
+        return new Promise<boolean>((res) => {
+            resolve = res;
+        });
+    }
+
+    function confirm() {
+        resolve(true);
+        dialog.close();
+    }
+</script>
+
+<dialog bind:this={dialog} onclose={() => resolve(false)}>
+    <div class="dialog-content">
+        <div class="dialog-header">
+            <h2>{titleText}</h2>
+        </div>
+        <div class="dialog-body">
+            {messageText}
+        </div>
+        <div class="dialog-footer">
+            <button class="secondary" onclick={() => dialog.close()}>Cancel</button>
+            <button class="primary" onclick={confirm}>{confirmText}</button>
+        </div>
+    </div>
+</dialog>
+
+<style>
+    .dialog-footer > button:first-child {
+        margin-right: 1rem;
     }
 </style>
