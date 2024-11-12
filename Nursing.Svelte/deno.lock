@@ -9,6 +9,7 @@
     "npm:svelte-check@4": "4.0.5_svelte@5.1.4__acorn@8.14.0_typescript@5.6.3",
     "npm:svelte@5": "5.1.4_acorn@8.14.0",
     "npm:typescript@5": "5.6.3",
+    "npm:uuid@^11.0.3": "11.0.3",
     "npm:vite@*": "5.4.10",
     "npm:vite@^5.0.3": "5.4.10"
   },
@@ -607,6 +608,9 @@
     "typescript@5.6.3": {
       "integrity": "sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw=="
     },
+    "uuid@11.0.3": {
+      "integrity": "sha512-d0z310fCWv5dJwnX1Y/MncBAqGMKEzlBb1AOf7z9K8ALnd0utBX/msg/fA0+sbyN1ihbMsLhrBlnl1ak7Wa0rg=="
+    },
     "vite@5.4.10": {
       "integrity": "sha512-1hvaPshuPUtxeQ0hsVH3Mud0ZanOLwVTneA1EgbAM5LhaZEqyPWGRQ7BtaMvUrTDeEaC8pxtj6a6jku3x4z6SQ==",
       "dependencies": [
@@ -629,6 +633,24 @@
       "integrity": "sha512-rAbqEGa8ovJy4pyBxZM70hg4pE6gDgaQ0Sl9M3enG3I0d6H4XSAM3GeNGLKnsBpuijUow064sf7ww1nutC5/3w=="
     }
   },
+  "redirects": {
+    "https://deno.land/std/uuid/mod.ts": "https://deno.land/std@0.224.0/uuid/mod.ts"
+  },
+  "remote": {
+    "https://deno.land/std@0.224.0/assert/assert.ts": "09d30564c09de846855b7b071e62b5974b001bb72a4b797958fe0660e7849834",
+    "https://deno.land/std@0.224.0/assert/assertion_error.ts": "ba8752bd27ebc51f723702fac2f54d3e94447598f54264a6653d6413738a8917",
+    "https://deno.land/std@0.224.0/bytes/concat.ts": "86161274b5546a02bdb3154652418efe7af8c9310e8d54107a68aaa148e0f5ed",
+    "https://deno.land/std@0.224.0/crypto/_wasm/lib/deno_std_wasm_crypto.generated.mjs": "7cd490ae1553c97459bd02de4c3f0a552768a85621949b2366003f3cf84b99d7",
+    "https://deno.land/std@0.224.0/crypto/_wasm/mod.ts": "e89fbbc3c4722602ff975dd85f18273c7741ec766a9b68f6de4fd1d9876409f8",
+    "https://deno.land/std@0.224.0/crypto/crypto.ts": "e58d78f3db111a499261dbab037ec78cc89da0516a50e1f0205665980a3417e3",
+    "https://deno.land/std@0.224.0/uuid/_common.ts": "05c787c5735776c4e48e30294878332c39cb7738f50b209df4eb9f2b0facce4d",
+    "https://deno.land/std@0.224.0/uuid/constants.ts": "eb6c96871e968adf3355507d7ae79adce71525fd6c1ca55c51d32ace0196d64e",
+    "https://deno.land/std@0.224.0/uuid/mod.ts": "cefc8e2f77d9e493739c8dc4ec141b12b855414bf757e778bf9b00f783506b76",
+    "https://deno.land/std@0.224.0/uuid/v1.ts": "cc45e7eb1d463d7d38b21a3c6e4de55ff98598ca442309321575fe841b323a54",
+    "https://deno.land/std@0.224.0/uuid/v3.ts": "689f2d64a9460a75877a2eed94662d9cb31bedb890d72fce0d161ef47d66cc26",
+    "https://deno.land/std@0.224.0/uuid/v4.ts": "1319a2eeff7259adda416ec5f7997ded80d3165ef0787012793fc8621c18c493",
+    "https://deno.land/std@0.224.0/uuid/v5.ts": "75f76d9e53583572fe3d4893168530986222d439b1545b56d4493c6d5d1cd81d"
+  },
   "workspace": {
     "dependencies": [
       "npm:@sveltejs/adapter-auto@3",
@@ -639,6 +661,7 @@
       "npm:svelte-check@4",
       "npm:svelte@5",
       "npm:typescript@5",
+      "npm:uuid@^11.0.3",
       "npm:vite@^5.0.3"
     ]
   }

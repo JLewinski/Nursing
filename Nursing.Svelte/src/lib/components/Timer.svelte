@@ -1,7 +1,7 @@
 <script lang="ts">
-    import { timerStore } from '$lib/stores/timerStore';
-    import { formatDuration } from '$lib/utils/timeCalculations';
+    import { timerStore } from '$lib/stores/timerStore.svelte';
     import { lastSession } from '$lib/stores/lastSessionStore';
+    import Duration from './Duration.svelte';
     
     interface Props {
         side: 'left' | 'right';
@@ -9,10 +9,29 @@
 
     let { side }: Props = $props();
     
-    let isActive = $derived($timerStore.activeTimer === side);
-    const durationStore = timerStore.getDuration(side);
+    let isActive = $derived(timerStore.activeTimer === side);
+    
     function handleClick() {
-        timerStore.toggleTimer(side);
+        const now = new Date().toISOString();
+        if (timerStore.activeTimer) {
+            timerStore.events.push({
+                timer: timerStore.activeTimer,
+                timestamp: now,
+                type: 'stop',
+            });
+        }
+
+        if(timerStore.activeTimer === side) {
+            timerStore.activeTimer = null;
+            return;
+        }
+
+        timerStore.activeTimer = side;
+        timerStore.events.push({
+            timer: side,
+            timestamp: new Date().toISOString(),
+            type: 'start',
+        });
     }
 </script>
 
@@ -28,13 +47,7 @@
         onclick={handleClick}
         aria-label="{isActive ? 'Stop' : 'Start'} {side} timer"
     >
-        <div class="timer-display">
-            {#if $durationStore}
-                {formatDuration($durationStore)}
-            {:else}
-                0:00
-            {/if}
-        </div>
+        <Duration {side} />
     </button>
 </div>
 
@@ -83,12 +96,6 @@
         background: var(--primary-light);
         color: white;
         animation: pulse 2s infinite;
-    }
-
-    .timer-display {
-        font-size: 2rem;
-        font-weight: bold;
-        font-family: monospace;
     }
 
     @keyframes pulse {

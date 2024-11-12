@@ -9,10 +9,7 @@ export const migrations = [
             sessionStore.createIndex('lastUpdated', 'lastUpdated');
             sessionStore.createIndex('deleted', 'deleted', { unique: false }); // Modified index for datetime
 
-            db.createObjectStore('settings', { keyPath: 'id' });
-            db.createObjectStore('syncState', { keyPath: 'id' });
-
-            migrateFromLocalStorage(db);
+            migrateFromLocalStorage(sessionStore);
         }
     }
     // Future migrations will be added here

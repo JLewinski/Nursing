@@ -16,11 +16,13 @@
 		"svelte-adapter-deno": "npm:svelte-adapter-deno@^0.9.1",
 		"svelte-check": "npm:svelte-check@^4.0.0",
 		"typescript": "npm:typescript@^5.0.0",
+		"uuid": "npm:uuid@^11.0.3",
 		"vite": "npm:vite@^5.0.3",
 		"$lib/": "./src/lib/"
   },
   "compilerOptions": {
     "checkJs": true,
     "strict": true
-  }
+  },
+  "nodeModulesDir": "auto"
 }

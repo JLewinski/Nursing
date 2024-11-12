@@ -19,7 +19,7 @@ interface Session {
     lastUpdated: Date;
 }
 
-export function migrateFromLocalStorage(db: IDBDatabase) {
+export function migrateFromLocalStorage(store: IDBObjectStore) {
     // Check if data was already migrated
     const migrationKey = 'nursing-data-migrated';
     if (localStorage.getItem(migrationKey)) {
@@ -40,8 +40,6 @@ export function migrateFromLocalStorage(db: IDBDatabase) {
     }
 
     // Convert and save to IndexedDB
-    const transaction = db.transaction(['sessions'], 'readwrite');
-    const store = transaction.objectStore('sessions');
 
     for (const feeding of allFeedings) {
         const session: Session = {

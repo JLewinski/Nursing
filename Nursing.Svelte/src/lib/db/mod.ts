@@ -3,25 +3,14 @@ import { applyMigrations } from './migrations.ts';
 interface DBSchema {
     sessions: {
         id: string;
-        timerEvents: Array<{
-            type: 'start' | 'stop';
-            timer: 'left' | 'right';
-            timestamp: string;
-        }>;
         startTime: string;
         endTime: string;
+        lastSide: 'left' | 'right';
+        leftDuration: string;
+        rightDuration: string;
         lastUpdated: string;
         created: string;
         deleted?: string;
-    };
-    settings: {
-        id: string;
-        theme?: string;
-        estimatedInterval?: number;
-        notificationPreferences?: {
-            enabled: boolean;
-            timing: number;
-        };
     };
     syncState: {
         id: string;
@@ -76,16 +65,6 @@ export class Database {
         await this.ensureInit();
         const sessions = await this.getAll('sessions');
         return sessions.find(session => !session.endTime && !session.deleted);
-    }
-
-    async saveSettings(settings: DBSchema['settings']): Promise<void> {
-        await this.ensureInit();
-        return this.put('settings', settings);
-    }
-
-    async getSettings(id: string): Promise<DBSchema['settings'] | undefined> {
-        await this.ensureInit();
-        return this.get('settings', id);
     }
 
     async saveSyncState(state: DBSchema['syncState']): Promise<void> {
