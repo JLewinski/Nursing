@@ -1,6 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
-    import { syncStore } from '$lib/stores/syncStore';
+    import { syncStore } from '$lib/stores/syncStore.svelte';
     import { SyncManager } from '$lib/utils/syncManager';
     import LoadingSpinner from './LoadingSpinner.svelte';
 
@@ -20,10 +20,10 @@
 </script>
 
 <div class="sync-status">
-    {#if $syncStore.status === 'syncing'}
+    {#if syncStore.status === 'syncing'}
         <LoadingSpinner size="1rem" />
         <span>Syncing...</span>
-    {:else if $syncStore.status === 'error'}
+    {:else if syncStore.status === 'error'}
         <span class="error">Sync failed</span>
         <button on:click={triggerSync}>Retry</button>
     {:else}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { settings } from '$lib/stores/settingsStore';
+    import { settings } from '$lib/stores/settingsStore.svelte';
     import { NotificationManager } from '$lib/utils/notifications';
     import ThemeToggle from '$lib/components/ThemeToggle.svelte';
 </script>

@@ -1,6 +1,5 @@
-import type { Session } from '$lib/types';
-import { Database } from '$lib/db/mod';
-import { syncState } from '$lib/stores/syncStore';
+import { Database } from "$lib/db/mod.ts";
+import { syncStore } from "$lib/stores/syncStore.svelte.ts";
 
 export class SyncManager {
     private db: Database;
@@ -11,38 +10,21 @@ export class SyncManager {
     }
 
     async registerSyncTask(): Promise<void> {
-        if ('serviceWorker' in navigator && 'sync' in registration) {
+        if ("serviceWorker" in navigator) {
+            
             const registration = await navigator.serviceWorker.ready;
-            try {
-                await registration.sync.register('sync-sessions');
-            } catch (error) {
-                console.error('Background sync registration failed:', error);
+            if ("sync" in registration) {
+                try {
+                    await registration.sync.register("sync-sessions");
+                } catch (error) {
+                    console.error("Background sync registration failed:", error);
+                }
             }
         }
     }
 
     async syncData(): Promise<void> {
         if (this.syncInProgress) return;
-
-        this.syncInProgress = true;
-        syncState.set({ lastSync: null, status: 'syncing' });
-
-        try {
-            const sessions = await this.db.getUnsynced();
-            // TODO: Implement sync with backend
-            
-            syncState.set({
-                lastSync: new Date().toISOString(),
-                status: 'idle'
-            });
-        } catch (error) {
-            syncState.set({
-                lastSync: null,
-                status: 'error',
-                error: error.message
-            });
-        } finally {
-            this.syncInProgress = false;
-        }
+        await syncStore.syncData();
     }
 }

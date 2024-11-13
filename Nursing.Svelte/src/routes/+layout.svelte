@@ -14,8 +14,7 @@
     setTimerState();
 </script>
 
-<ThemeSetter>
-</ThemeSetter>
+<ThemeSetter/>
 <div>
     <Installation />
     <main class="main-content">

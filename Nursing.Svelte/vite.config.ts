@@ -7,6 +7,9 @@ export default defineConfig({
     fs: {
       strict: false,
     },
+    proxy: {
+      '/api': 'http://localhost:5173',
+    }
   },
   // TODO: Add PWA plugin configuration
 })

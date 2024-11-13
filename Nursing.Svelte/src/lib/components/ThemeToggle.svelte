@@ -1,15 +1,16 @@
 <script lang="ts">
-    import { settings } from '$lib/stores/settingsStore';
+    import { settings } from '$lib/stores/settingsStore.svelte';
     
     function toggleTheme(newTheme: 'light' | 'dark' | 'system') {
-        settings.update({theme: newTheme});
+        settings.theme = newTheme;
+        settings.save();
     }
 </script>
 
 <div class="theme-toggle">
     {#each ['light', 'dark', 'system'] as mode}
         <button 
-            class:active={$settings.theme === mode}
+            class:active={settings.theme === mode}
             onclick={() => toggleTheme(mode as 'light' | 'dark' | 'system')}>
             {mode}
         </button>

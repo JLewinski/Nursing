@@ -15,7 +15,7 @@
 </script>
 
 <div class="timer-container">
-    {#if $lastSession.side === side}
+    {#if lastSession.side === side}
         <span class="badge">Last used</span>
     {:else}
         <span></span>

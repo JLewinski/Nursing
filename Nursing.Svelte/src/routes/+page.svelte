@@ -3,7 +3,7 @@
     import { getTimerState } from "$lib/stores/timerStore.svelte";
     import { formatDuration } from "$lib/utils/timeCalculations";
     import { lastSession } from "$lib/stores/lastSessionStore";
-    import { settings } from "$lib/stores/settingsStore";
+    import { settings } from "$lib/stores/settingsStore.svelte";
     import { Database } from "$lib/db/mod";
     import { v4 } from "uuid";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
@@ -30,10 +30,8 @@
 
         const lastSide = timerState.events[timerState.events.length - 1].timer;
 
-        lastSession.update({
-            startTime: new Date(timerState.events[0].timestamp),
-            side: lastSide,
-        });
+        lastSession.startTime = new Date(timerState.events[0].timestamp);
+        lastSession.side = lastSide;
 
         const now = new Date().toISOString();
         const session = {
@@ -55,11 +53,11 @@
 </script>
 
 <div class="timer-container">
-    {#if timerState.activeTimer === undefined && $lastSession.startTime}
+    {#if timerState.activeTimer === undefined && lastSession.startTime}
         <div>
             <div>Last</div>
             <div>
-                {$lastSession.startTime.toLocaleTimeString([], {
+                {lastSession.startTime.toLocaleTimeString([], {
                     hour: "numeric",
                     minute: "2-digit",
                 })}
@@ -69,8 +67,8 @@
             <div>Next</div>
             <div>
                 {new Date(
-                    $lastSession.startTime.getTime() +
-                        $settings.estimatedInterval * 60 * 1000,
+                    lastSession.startTime.getTime() +
+                        settings.estimatedInterval * 60 * 1000,
                 ).toLocaleTimeString([], {
                     hour: "numeric",
                     minute: "2-digit",
