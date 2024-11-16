@@ -2,7 +2,7 @@
     import Timer from "$lib/components/Timer.svelte";
     import { getTimerState } from "$lib/stores/timerStore.svelte";
     import { formatDuration } from "$lib/utils/timeCalculations";
-    import { lastSession } from "$lib/stores/lastSessionStore";
+    import { lastSession } from "$lib/stores/lastSessionStore.svelte";
     import { settings } from "$lib/stores/settingsStore.svelte";
     import { Database } from "$lib/db/mod";
     import { v4 } from "uuid";

@@ -12,6 +12,8 @@
 		"@sveltejs/adapter-static": "npm:@sveltejs/adapter-static@^3.0.6",
 		"@sveltejs/kit": "npm:@sveltejs/kit@^2.0.0",
 		"@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^4.0.0",
+		"bootstrap": "npm:bootstrap@^5.3.3",
+		"scss": "npm:scss@^0.2.4",
 		"svelte": "npm:svelte@^5.0.0",
 		"svelte-adapter-deno": "npm:svelte-adapter-deno@^0.9.1",
 		"svelte-check": "npm:svelte-check@^4.0.0",

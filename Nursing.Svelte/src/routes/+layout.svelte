@@ -1,5 +1,5 @@
 <script lang="ts">
-    import '../app.css';
+    import '../app.scss';
     import './nav.css';
     import Installation from '$lib/components/Installation.svelte';
     import ThemeSetter from '$lib/components/ThemeSetter.svelte';

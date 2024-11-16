@@ -1,6 +1,6 @@
 <script lang="ts">
     import { getTimerState } from '$lib/stores/timerStore.svelte';
-    import { lastSession } from '$lib/stores/lastSessionStore';
+    import { lastSession } from '$lib/stores/lastSessionStore.svelte';
     import Duration from './Duration.svelte';
     
     interface Props {

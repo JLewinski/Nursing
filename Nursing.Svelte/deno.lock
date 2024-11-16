@@ -5,6 +5,8 @@
     "npm:@sveltejs/adapter-static@^3.0.6": "3.0.6_@sveltejs+kit@2.7.3__@sveltejs+vite-plugin-svelte@4.0.0___svelte@5.1.4____acorn@8.14.0___vite@5.4.10__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@sveltejs/kit@2": "2.7.3_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@sveltejs/vite-plugin-svelte@4": "4.0.0_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
+    "npm:bootstrap@^5.3.3": "5.3.3_@popperjs+core@2.11.8",
+    "npm:scss@~0.2.4": "0.2.4",
     "npm:svelte-adapter-deno@~0.9.1": "0.9.1_@sveltejs+kit@2.7.3__@sveltejs+vite-plugin-svelte@4.0.0___svelte@5.1.4____acorn@8.14.0___vite@5.4.10__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_rollup@3.29.5_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:svelte-check@4": "4.0.5_svelte@5.1.4__acorn@8.14.0_typescript@5.6.3",
     "npm:svelte@5": "5.1.4_acorn@8.14.0",
@@ -116,6 +118,9 @@
     },
     "@polka/url@1.0.0-next.28": {
       "integrity": "sha512-8LduaNlMZGwdZ6qWrKlfa+2M4gahzFkprZiAt2TF8uS0qQgBizKXpXURqvTJ4WtmupWxaLqjRb2UCTe72mu+Aw=="
+    },
+    "@popperjs/core@2.11.8": {
+      "integrity": "sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A=="
     },
     "@rollup/plugin-commonjs@24.1.0_rollup@3.29.5": {
       "integrity": "sha512-eSL45hjhCWI0jCCXcNtLVqM5N1JlBGvlFfY0m6oOYnLCJ6N0qEXoZql4sY2MOUArzhH4SA/qBpTxvvZp2Sc+DQ==",
@@ -292,6 +297,12 @@
     "balanced-match@1.0.2": {
       "integrity": "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw=="
     },
+    "bootstrap@5.3.3_@popperjs+core@2.11.8": {
+      "integrity": "sha512-8HLCdWgyoMguSO9o+aH+iuZ+aht+mzW0u3HIMzVu7Srrpv7EBBxTnrFlSCskwdY1+EOFQSm7uMJhNQHkdPcmjg==",
+      "dependencies": [
+        "@popperjs/core"
+      ]
+    },
     "brace-expansion@2.0.1": {
       "integrity": "sha512-XnAIvQ8eM+kC6aULx6wuQiwVsnzsi9d3WxzV3FpWTGA19F621kwdbsAcFKXgKUHZWsy+mY6iL1sHTxWEFCytDA==",
       "dependencies": [
@@ -467,6 +478,9 @@
     "nanoid@3.3.7": {
       "integrity": "sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g=="
     },
+    "ometa@0.2.2": {
+      "integrity": "sha512-LZuoK/yjU3FvrxPjUXUlZ1bavCfBPqauA7fsNdwi+AVhRdyk2IzgP3JRnevvjzQ6fKHdUw8YISshf53FmpHrng=="
+    },
     "once@1.4.0": {
       "integrity": "sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==",
       "dependencies": [
@@ -536,6 +550,12 @@
       "integrity": "sha512-xal3CZX1Xlo/k4ApwCFrHVACi9fBqJ7V+mwhBsuf/1IOKbBy098Fex+Wa/5QMubw09pSZ/u8EY8PWgevJsXp1A==",
       "dependencies": [
         "mri"
+      ]
+    },
+    "scss@0.2.4": {
+      "integrity": "sha512-4u8V87F+Q/upVhUmhPnB4C1R11xojkRkWjExL2v0CX2EXTg18VrKd+9JWoeyCp2VEMdSpJsyAvVU+rVjogh51A==",
+      "dependencies": [
+        "ometa"
       ]
     },
     "set-cookie-parser@2.7.1": {
@@ -657,6 +677,8 @@
       "npm:@sveltejs/adapter-static@^3.0.6",
       "npm:@sveltejs/kit@2",
       "npm:@sveltejs/vite-plugin-svelte@4",
+      "npm:bootstrap@^5.3.3",
+      "npm:scss@~0.2.4",
       "npm:svelte-adapter-deno@~0.9.1",
       "npm:svelte-check@4",
       "npm:svelte@5",
