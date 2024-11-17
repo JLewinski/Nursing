@@ -81,8 +81,8 @@
     <Timer side="left" />
     <Timer side="right" />
     {#if timerState.activeTimer !== undefined}
-        <button class="primary" onclick={reset}>Reset</button>
-        <button class="primary" onclick={finishSession}>Finish</button>
+        <button class="btn btn-primary" onclick={reset}>Reset</button>
+        <button class="btn btn-primary" onclick={finishSession}>Finish</button>
     {/if}
 </div>
 

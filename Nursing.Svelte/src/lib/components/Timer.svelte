@@ -12,17 +12,18 @@
     const timerState = getTimerState();
     
     let isActive = $derived(timerState.activeTimer === side);
+    let color = $derived(isActive ? 'info' : 'primary');
 </script>
 
 <div class="timer-container">
     {#if lastSession.side === side}
-        <span class="badge">Last used</span>
+        <span class="badge rounded-pill text-bg-info px-3">Last used</span>
     {:else}
         <span></span>
     {/if}
     <span class="label">{side}</span>
     <button 
-        class="timer-circle {isActive ? 'active' : ''}"
+        class="timer-circle btn btn-{color}"
         onclick={() => timerState.toggle(side)}
         aria-label="{isActive ? 'Stop' : 'Start'} {side} timer"
     >
@@ -38,16 +39,6 @@
         gap: 1rem;
     }
 
-    .badge {
-        font-size: 1rem;
-        font-weight: 500;
-        border: none;
-        border-radius: 20%;
-        padding: 1%;
-        background-color: var(--primary-dark);
-        height: min-content;
-    }
-
     .label {
         text-transform: capitalize;
         font-size: 1.2rem;
@@ -59,7 +50,6 @@
         height: 150px;
         border-radius: 50%;
         border: none;
-        background: var(--primary-dark);
         display: grid;
         place-items: center;
         cursor: pointer;
@@ -72,8 +62,6 @@
     }
 
     .timer-circle.active {
-        background: var(--primary-light);
-        color: white;
         animation: pulse 2s infinite;
     }
 

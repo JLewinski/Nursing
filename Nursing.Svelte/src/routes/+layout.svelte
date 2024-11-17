@@ -2,7 +2,6 @@
     import '../app.scss';
     import './nav.css';
     import Installation from '$lib/components/Installation.svelte';
-    import ThemeSetter from '$lib/components/ThemeSetter.svelte';
     import { setTimerState } from '$lib/stores/timerStore.svelte';
     
     interface Props {
@@ -14,7 +13,6 @@
     setTimerState();
 </script>
 
-<ThemeSetter/>
 <div>
     <Installation />
     <main class="main-content">

@@ -1,4 +1,5 @@
 <script lang="ts">
+    
     interface Props {
         children: import("svelte").Snippet;
     }
@@ -36,14 +37,8 @@
             {messageText}
         </div>
         <div class="dialog-footer">
-            <button class="secondary" onclick={() => dialog.close()}>Cancel</button>
-            <button class="primary" onclick={confirm}>{confirmText}</button>
+            <button class="btn btn-secondary mr-2" onclick={() => dialog.close()}>Cancel</button>
+            <button class="btn btn-primary" onclick={confirm}>{confirmText}</button>
         </div>
     </div>
 </dialog>
-
-<style>
-    .dialog-footer > button:first-child {
-        margin-right: 1rem;
-    }
-</style>

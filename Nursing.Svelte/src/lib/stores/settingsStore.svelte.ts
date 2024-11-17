@@ -1,7 +1,6 @@
 const STORAGE_KEY = "nursing-settings";
 
 export class SettingsState implements ISettings {
-    theme: "light" | "dark" | "system" = $state("system");
     estimatedInterval: number = $state(180);
     notifications: {
         enabled: boolean;
@@ -14,7 +13,6 @@ export class SettingsState implements ISettings {
 
     save() {
         const data: ISettings = {
-            theme: this.theme,
             estimatedInterval: this.estimatedInterval,
             notifications: this.notifications,
         };
@@ -25,7 +23,6 @@ export class SettingsState implements ISettings {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
             const data = JSON.parse(stored) as ISettings;
-            this.theme = data.theme;
             this.estimatedInterval = data.estimatedInterval;
             this.notifications = data.notifications;
         }
@@ -33,7 +30,6 @@ export class SettingsState implements ISettings {
 }
 
 interface ISettings {
-    theme: "light" | "dark" | "system";
     estimatedInterval: number; // in minutes
     notifications: {
         enabled: boolean;
