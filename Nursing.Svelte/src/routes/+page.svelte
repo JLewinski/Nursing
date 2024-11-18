@@ -12,7 +12,6 @@
 
     const timerState = getTimerState();
 
-    console.log(timerState);
     let startEvent = $derived.by(() =>
         timerState.events.length ? timerState.events[0] : null,
     );
@@ -32,6 +31,7 @@
 
         lastSession.startTime = new Date(timerState.events[0].timestamp);
         lastSession.side = lastSide;
+        lastSession.save();
 
         const now = new Date().toISOString();
         const session = {
@@ -47,7 +47,10 @@
             id: v4(),
         };
 
-        db.saveSession(session).then(reset);
+        db.saveSession(session).then(() => {
+            timerState.reset();
+
+        });
     }
     let dialog: ConfirmDialog;
 </script>
