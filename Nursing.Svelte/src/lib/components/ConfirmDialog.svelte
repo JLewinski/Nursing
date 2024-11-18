@@ -18,8 +18,6 @@
         });
     }
 
-    
-
     function confirm() {
         resolve(true);
         dialog.close();

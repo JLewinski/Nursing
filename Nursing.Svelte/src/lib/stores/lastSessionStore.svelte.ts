@@ -24,9 +24,12 @@ export class LastSessionState{
     load() {
         const stored = localStorage.getItem(STORAGE_KEY);
         if (stored) {
-            const data = JSON.parse(stored) as ILastSession;
+            const data = JSON.parse(stored) as {
+                side: "left" | "right" | null | undefined;
+                startTime: string;
+            };
             this.side = data.side;
-            this.startTime = data.startTime;
+            this.startTime = new Date(data.startTime);
         }
     }
 }
