@@ -22,11 +22,11 @@
     <nav class="nav-dock">
         <div class="nav-row">
             <a href="/" class="nav-link">
-                <span class="bi bi-clock-history"></span>
+                <span class="bi bi-house"></span>
                 <span class="nav-text">Home</span>
             </a>
             <a href="/history" class="nav-link">
-                <span class="bi bi-list-nested-nav-menu"></span>
+                <span class="bi bi-clock-history"></span>
                 <span class="nav-text">History</span>
             </a>
             <a href="/settings" class="nav-link">

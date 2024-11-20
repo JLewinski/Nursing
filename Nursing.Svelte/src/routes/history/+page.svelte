@@ -44,9 +44,10 @@
             new Chart(ctx, {
                 type: "line",
                 data: {
-                    labels: sessions.map((s) =>
-                        new Date(s.startTime).toLocaleDateString(),
-                    ),
+                    labels: sessions.map((s) =>{
+                        const date = new Date(s.startTime);
+                        return date.toLocaleString();
+                    }),
                     datasets: [
                         {
                             label: "Left Duration",

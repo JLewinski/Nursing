@@ -8,6 +8,7 @@
     "npm:@sveltejs/kit@2": "2.7.3_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@sveltejs/vite-plugin-svelte@4": "4.0.0_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@types/bootstrap@^5.2.10": "5.2.10",
+    "npm:bootstrap-icons@^1.11.3": "1.11.3",
     "npm:bootstrap@^5.3.3": "5.3.3_@popperjs+core@2.11.8",
     "npm:chart.js@^4.4.6": "4.4.6",
     "npm:gridjs-svelte@^2.1.1": "2.1.1_gridjs@6.2.0_svelte@5.1.4__acorn@8.14.0",
@@ -383,6 +384,9 @@
     },
     "balanced-match@1.0.2": {
       "integrity": "sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw=="
+    },
+    "bootstrap-icons@1.11.3": {
+      "integrity": "sha512-+3lpHrCw/it2/7lBL15VR0HEumaBss0+f/Lb6ZvHISn1mlK83jjFpooTLsMWbIjJMDjDjOExMsTxnXSIT4k4ww=="
     },
     "bootstrap@5.3.3_@popperjs+core@2.11.8": {
       "integrity": "sha512-8HLCdWgyoMguSO9o+aH+iuZ+aht+mzW0u3HIMzVu7Srrpv7EBBxTnrFlSCskwdY1+EOFQSm7uMJhNQHkdPcmjg==",
@@ -836,6 +840,7 @@
       "npm:@sveltejs/kit@2",
       "npm:@sveltejs/vite-plugin-svelte@4",
       "npm:@types/bootstrap@^5.2.10",
+      "npm:bootstrap-icons@^1.11.3",
       "npm:bootstrap@^5.3.3",
       "npm:chart.js@^4.4.6",
       "npm:gridjs-svelte@^2.1.1",

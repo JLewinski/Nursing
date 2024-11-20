@@ -1,6 +1,9 @@
 $color-mode-type: media-query;
 
+$info: #ffd59a;
+
 @import "bootstrap/scss/bootstrap";
+@import "bootstrap-icons/font/bootstrap-icons.css";
 
 dialog {
     border-width: $modal-content-border-width;
@@ -29,7 +32,7 @@ dialog {
     --#{$prefix}modal-footer-border-color: #{$modal-footer-border-color};
     --#{$prefix}modal-footer-border-width: #{$modal-footer-border-width};
     // scss-docs-end modal-css-vars
-  
+
     z-index: var(--#{$prefix}modal-zindex);
     overflow-x: hidden;
     overflow-y: auto;
@@ -44,12 +47,30 @@ dialog {
 
 @include media-breakpoint-up(sm) {
     dialog {
-      --#{$prefix}modal-margin: #{$modal-dialog-margin-y-sm-up};
-      --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-sm-up};
+        --#{$prefix}modal-margin: #{$modal-dialog-margin-y-sm-up};
+        --#{$prefix}modal-box-shadow: #{$modal-content-box-shadow-sm-up};
     }
 }
 
 dialog::backdrop {
     background-color: $modal-backdrop-bg;
     opacity: $modal-backdrop-opacity;
+}
+
+.nav-dock {
+    border-top: 1px solid;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 3.5rem;
+    position: fixed;
+    bottom: 0;
+    z-index: 1;
+    width: 100%;
+
+    @include color-scheme(dark) {
+        border-color: #ffd59a;
+        color: #ffd59a;
+    }
+
 }

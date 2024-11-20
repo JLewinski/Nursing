@@ -1,5 +1,6 @@
 <script lang="ts">
     import { onMount } from 'svelte';
+    
 
     type BeforeInstallPromptEvent = Event & {
         prompt: () => Promise<void>;
