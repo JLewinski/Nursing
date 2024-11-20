@@ -1,17 +1,19 @@
-import { migrateFromLocalStorage } from "$lib/db/migration-old.ts";
+import { migrateOldData } from "$lib/db/migration_old.ts";
 
 export const migrations = [
     {
         version: 1,
         migrate: (db: IDBDatabase) => {
-            const sessionStore = db.createObjectStore('sessions', { keyPath: 'id' });
-            sessionStore.createIndex('startTime', 'startTime');
-            sessionStore.createIndex('lastUpdated', 'lastUpdated');
-            sessionStore.createIndex('deleted', 'deleted', { unique: false }); // Modified index for datetime
+            const sessionStore = db.createObjectStore("sessions", {
+                keyPath: "id",
+            });
+            sessionStore.createIndex("startTime", "startTime");
+            sessionStore.createIndex("lastUpdated", "lastUpdated");
+            sessionStore.createIndex("deleted", "deleted", { unique: false }); // Modified index for datetime
 
-            migrateFromLocalStorage(sessionStore);
-        }
-    }
+            migrateOldData().forEach((session) => sessionStore.add(session));
+        },
+    },
     // Future migrations will be added here
 ];
 

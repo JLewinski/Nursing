@@ -1,12 +1,17 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@std/assert@*": "1.0.8",
+    "jsr:@std/internal@^1.0.5": "1.0.5",
     "npm:@sveltejs/adapter-auto@3": "3.3.1_@sveltejs+kit@2.7.3__@sveltejs+vite-plugin-svelte@4.0.0___svelte@5.1.4____acorn@8.14.0___vite@5.4.10__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@sveltejs/adapter-static@^3.0.6": "3.0.6_@sveltejs+kit@2.7.3__@sveltejs+vite-plugin-svelte@4.0.0___svelte@5.1.4____acorn@8.14.0___vite@5.4.10__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@sveltejs/kit@2": "2.7.3_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@sveltejs/vite-plugin-svelte@4": "4.0.0_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:@types/bootstrap@^5.2.10": "5.2.10",
     "npm:bootstrap@^5.3.3": "5.3.3_@popperjs+core@2.11.8",
+    "npm:chart.js@^4.4.6": "4.4.6",
+    "npm:gridjs-svelte@^2.1.1": "2.1.1_gridjs@6.2.0_svelte@5.1.4__acorn@8.14.0",
+    "npm:gridjs@^6.2.0": "6.2.0",
     "npm:sass@^1.81.0": "1.81.0",
     "npm:svelte-adapter-deno@~0.9.1": "0.9.1_@sveltejs+kit@2.7.3__@sveltejs+vite-plugin-svelte@4.0.0___svelte@5.1.4____acorn@8.14.0___vite@5.4.10__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_rollup@3.29.5_@sveltejs+vite-plugin-svelte@4.0.0__svelte@5.1.4___acorn@8.14.0__vite@5.4.10_svelte@5.1.4__acorn@8.14.0_vite@5.4.10",
     "npm:svelte-check@4": "4.0.5_svelte@5.1.4__acorn@8.14.0_typescript@5.6.3",
@@ -15,6 +20,17 @@
     "npm:uuid@^11.0.3": "11.0.3",
     "npm:vite@*": "5.4.10",
     "npm:vite@^5.0.3": "5.4.10"
+  },
+  "jsr": {
+    "@std/assert@1.0.8": {
+      "integrity": "ebe0bd7eb488ee39686f77003992f389a06c3da1bbd8022184804852b2fa641b",
+      "dependencies": [
+        "jsr:@std/internal"
+      ]
+    },
+    "@std/internal@1.0.5": {
+      "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
+    }
   },
   "npm": {
     "@ampproject/remapping@2.3.0": {
@@ -116,6 +132,9 @@
         "@jridgewell/resolve-uri",
         "@jridgewell/sourcemap-codec"
       ]
+    },
+    "@kurkle/color@0.3.2": {
+      "integrity": "sha512-fuscdXJ9G1qb7W8VdHi+IwRqij3lBkosAm4ydQtEmbY58OzHXqQhvlxqEkoz0yssNVn38bcpRWgA9PP+OGoisw=="
     },
     "@parcel/watcher-android-arm64@2.5.0": {
       "integrity": "sha512-qlX4eS28bUcQCdribHkg/herLe+0A9RyYC+mm2PXpncit8z5b3nSqGVzMNR3CmtAOgRutiZ02eIJJgP/b1iEFQ=="
@@ -383,6 +402,12 @@
         "fill-range"
       ]
     },
+    "chart.js@4.4.6": {
+      "integrity": "sha512-8Y406zevUPbbIBA/HRk33khEmQPk5+cxeflWE/2rx1NJsjVWMPw/9mSP9rxHP5eqi6LNoPBVMfZHxbwLSgldYA==",
+      "dependencies": [
+        "@kurkle/color"
+      ]
+    },
     "chokidar@4.0.1": {
       "integrity": "sha512-n8enUVCED/KVRQlab1hr3MVpcVMvxtZjmEa956u+4YijlmQED223XMSYj2tLuKvr4jcCTzNNMpQDUer72MMmzA==",
       "dependencies": [
@@ -484,6 +509,19 @@
     },
     "globrex@0.1.2": {
       "integrity": "sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg=="
+    },
+    "gridjs-svelte@2.1.1_gridjs@6.2.0_svelte@5.1.4__acorn@8.14.0": {
+      "integrity": "sha512-tYkgdqNKSnfmAYYc8EP4axn/Xlugp7VLwAlpNkP4SBLHHYD/ejD2DJ+FMatDNqcJ1Z1kuMnJWO+VBcAOirEByw==",
+      "dependencies": [
+        "gridjs",
+        "svelte"
+      ]
+    },
+    "gridjs@6.2.0": {
+      "integrity": "sha512-EAGGfHjyEXWh12Txs6DjTGnWTo226wbowtMrLI+yNZQaJpvs0m7yDcyM7r+D4RA7rZQVj/cfmwEaRz/rlxg8LA==",
+      "dependencies": [
+        "preact"
+      ]
     },
     "hasown@2.0.2": {
       "integrity": "sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==",
@@ -611,6 +649,9 @@
         "picocolors",
         "source-map-js"
       ]
+    },
+    "preact@10.24.3": {
+      "integrity": "sha512-Z2dPnBnMUfyQfSQ+GBdsGa16hz35YmLmtTLhM169uW944hYL6xzTYkJjC07j+Wosz733pMWx0fgON3JNw1jJQA=="
     },
     "readdirp@4.0.2": {
       "integrity": "sha512-yDMz9g+VaZkqBYS/ozoBJwaBhTbZo3UNYQHNRw1D3UFQB8oHB4uS/tAODO+ZLjGWmUbKnIlOWO+aaIiAxrUWHA=="
@@ -796,6 +837,9 @@
       "npm:@sveltejs/vite-plugin-svelte@4",
       "npm:@types/bootstrap@^5.2.10",
       "npm:bootstrap@^5.3.3",
+      "npm:chart.js@^4.4.6",
+      "npm:gridjs-svelte@^2.1.1",
+      "npm:gridjs@^6.2.0",
       "npm:sass@^1.81.0",
       "npm:svelte-adapter-deno@~0.9.1",
       "npm:svelte-check@4",
