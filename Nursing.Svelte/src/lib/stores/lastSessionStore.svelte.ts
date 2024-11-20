@@ -5,7 +5,7 @@ interface ILastSession {
     startTime: Date | null;
 }
 
-export class LastSessionState{
+class LastSessionState{
     side: "left" | "right" | null | undefined = $state(undefined);
     startTime: Date | null = $state(null);
 

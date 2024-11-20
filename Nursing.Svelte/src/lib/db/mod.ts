@@ -46,6 +46,39 @@ export class Database {
         });
     }
 
+    async deleteSession(id: string): Promise<void> {
+        await this.ensureInit();
+        const session = await this.getSession(id);
+        if (!session) return;
+
+        session.deleted = new Date().toISOString();
+        return this.put('sessions', session);
+    }
+
+    async removeSession(id: string): Promise<void> {
+        await this.ensureInit();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db!.transaction('sessions', 'readwrite');
+            const objectStore = transaction.objectStore('sessions');
+            const request = objectStore.delete(id);
+
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+        });
+    }
+
+    async clearSessions(): Promise<void> {
+        await this.ensureInit();
+        return new Promise((resolve, reject) => {
+            const transaction = this.db!.transaction('sessions', 'readwrite');
+            const objectStore = transaction.objectStore('sessions');
+            const request = objectStore.clear();
+
+            request.onerror = () => reject(request.error);
+            request.onsuccess = () => resolve();
+        });
+    }
+
     async saveSession(session: DBSchema['sessions']): Promise<void> {
         await this.ensureInit();
         return this.put('sessions', session);

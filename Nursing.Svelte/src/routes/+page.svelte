@@ -1,12 +1,16 @@
 <script lang="ts">
     import Timer from "$lib/components/Timer.svelte";
     import { getTimerState } from "$lib/stores/timerStore.svelte";
-    import { formatDuration } from "$lib/utils/timeCalculations";
+    import {
+        formatDuration,
+        formatLongDuration,
+    } from "$lib/utils/timeCalculations";
     import { lastSession } from "$lib/stores/lastSessionStore.svelte";
     import { settings } from "$lib/stores/settingsStore.svelte";
     import { Database } from "$lib/db/mod";
     import { v4 } from "uuid";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
+    import { onDestroy } from "svelte";
 
     const db = new Database();
 
@@ -16,12 +20,45 @@
         timerState.events.length ? timerState.events[0] : null,
     );
 
+    let nextStartTime = $derived.by(() => {
+        if (!lastSession.startTime) return null;
+
+        return new Date(
+            lastSession.startTime.getTime() +
+                settings.estimatedInterval * 60 * 1000,
+        );
+    });
+
+    let durationStart = $state("");
+    let durationNext = $state("");
+
+    function setDurations(){
+        if (lastSession.startTime && nextStartTime) {
+            const now = Date.now();
+            durationStart = formatLongDuration(
+                now - lastSession.startTime.getTime(),
+            );
+            durationNext = formatLongDuration(nextStartTime.getTime() - now);
+        }
+    }
+    setDurations();
+
+    const intervalKey = setInterval(() => {
+        setDurations();
+    }, 5000);
+
     function reset() {
-        dialog.showConfirmation('Reset', 'Are you sure you want to reset this feeding?', 'Reset').then((confirmed) => {
-            if (confirmed) {
-                timerState.reset();
-            }
-        });
+        dialog
+            .showConfirmation(
+                "Reset",
+                "Are you sure you want to reset this feeding?",
+                "Reset",
+            )
+            .then((confirmed) => {
+                if (confirmed) {
+                    timerState.reset();
+                }
+            });
     }
 
     function finishSession() {
@@ -49,33 +86,39 @@
 
         db.saveSession(session).then(() => {
             timerState.reset();
-
         });
     }
     let dialog: ConfirmDialog;
+
+    onDestroy(() => {
+        clearInterval(intervalKey);
+    });
 </script>
 
 <div class="timer-container">
-    {#if timerState.activeTimer === undefined && lastSession.startTime}
-        <div>
-            <div>Last</div>
-            <div>
+    {#if timerState.activeTimer === undefined && lastSession.startTime && nextStartTime}
+        <div class="h4">
+            <div class="p-2">Last</div>
+            <div class="bg-body-secondary p-2">
                 {lastSession.startTime.toLocaleTimeString([], {
                     hour: "numeric",
                     minute: "2-digit",
                 })}
             </div>
+            <div class="bg-body-tertiary p-2">
+                {durationStart}
+            </div>
         </div>
-        <div>
-            <div>Next</div>
-            <div>
-                {new Date(
-                    lastSession.startTime.getTime() +
-                        settings.estimatedInterval * 60 * 1000,
-                ).toLocaleTimeString([], {
+        <div class="h4">
+            <div class="p-2">Next</div>
+            <div class="bg-body-secondary p-2">
+                {nextStartTime.toLocaleTimeString([], {
                     hour: "numeric",
                     minute: "2-digit",
                 })}
+            </div>
+            <div class="bg-body-tertiary p-2">
+                {durationNext}
             </div>
         </div>
     {:else}
@@ -89,7 +132,7 @@
     {/if}
 </div>
 
-<ConfirmDialog bind:this={dialog}/>
+<ConfirmDialog bind:this={dialog} />
 
 <style>
     .timer-container {
