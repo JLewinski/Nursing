@@ -6,10 +6,14 @@ export default defineConfig({
   server: {
     fs: {
       strict: false,
-    },
-    proxy: {
-      '/api': 'http://localhost:5173',
     }
   },
+  css:{
+    preprocessorOptions: {
+      scss: {
+        quietDeps: true,
+      }
+    }
+  }
   // TODO: Add PWA plugin configuration
 })

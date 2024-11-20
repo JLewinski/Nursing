@@ -1,13 +1,14 @@
 {
 	"tasks": {
-		"dev": "deno run -A --node-modules-dir npm:vite dev",
-		"build": "deno run -A --node-modules-dir npm:vite build",
-		"preview": "deno run -A --node-modules-dir npm:vite preview",
-		"prod": "PORT=6969 deno run --allow-env --allow-read --allow-net build/index.js",
-		"docker_build": "docker build -t web .",
-		"docker_run": "docker run --publish=6969:6969 web"
+		"dev": "vite dev",
+		"build": "vite build",
+		"preview": "vite preview",
+		"prod": "PORT=6969 deno run --allow-env --allow-read --allow-net build/server/index.js",
+		"docker_build": "docker build --no-cache -t nursing-app .",
+		"docker_run": "docker run -p 6969:6969 nursing-app"
 	},
 	"imports": {
+		"@deno/vite-plugin": "npm:@deno/vite-plugin@^1.0.0",
 		"@sveltejs/adapter-auto": "npm:@sveltejs/adapter-auto@^3.0.0",
 		"@sveltejs/adapter-static": "npm:@sveltejs/adapter-static@^3.0.6",
 		"@sveltejs/kit": "npm:@sveltejs/kit@^2.0.0",
@@ -24,8 +25,8 @@
 		"svelte-check": "npm:svelte-check@^4.0.0",
 		"typescript": "npm:typescript@^5.0.0",
 		"uuid": "npm:uuid@^11.0.3",
-		"vite": "npm:vite@^5.0.3",
-		"$lib/": "./src/lib/"
+		"$lib/": "./src/lib/",
+		"vite": "npm:vite@^5.4.11"
   },
   "compilerOptions": {
     "checkJs": true,

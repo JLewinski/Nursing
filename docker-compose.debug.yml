@@ -26,6 +26,16 @@ services:
       POSTGRES_USER: "root"
       POSTGRES_PASSWORD: "Password"
       POSTGRES_DB: "nursing"
+  nursingweb:
+    image: jdlewinski/nursingweb
+    build:
+      context: .
+      dockerfile: Nursing.Web/Dockerfile
+      args:
+        - configuration=Debug
+    container_name: nursingweb 
+    ports:
+      - 6969:6969
 networks:
   default:
     name: nursing
