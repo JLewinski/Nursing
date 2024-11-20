@@ -3,6 +3,7 @@
     import './nav.css';
     import Installation from '$lib/components/Installation.svelte';
     import { setTimerState } from '$lib/stores/timerStore.svelte';
+    import AppUpdate from '$lib/components/AppUpdate.svelte';
     
     interface Props {
         children?: import('svelte').Snippet;
@@ -15,6 +16,7 @@
 
 <div>
     <Installation />
+    <AppUpdate />
     <main class="main-content">
         {@render children?.()}
     </main>

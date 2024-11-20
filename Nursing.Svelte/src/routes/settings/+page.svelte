@@ -1,6 +1,6 @@
 <script lang="ts">
     import { settings } from "$lib/stores/settingsStore.svelte";
-    import { NotificationManager } from "$lib/utils/notifications";
+    // import { NotificationManager } from "$lib/utils/notifications";
     import { Database } from "$lib/db/mod";
     import { lastSession } from "$lib/stores/lastSessionStore.svelte";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
@@ -19,16 +19,30 @@
         lastSession.startTime = null;
         lastSession.save();
     }
+
+    let hours = $state(settings.estimatedInterval / 60);
+    $effect(() => {
+        settings.estimatedInterval = hours * 60;
+        settings.save();
+    });
 </script>
 
 <ConfirmDialog bind:this={dialog} />
 
-<div class="settings-container">
+<div class="container">
     <h1>Settings</h1>
 
-    <section>
+    <!-- <section>
         <h2>Notifications</h2>
-        <!-- TODO: Notification settings -->
+    </section> -->
+
+    <section>
+        <h2>Sessions</h2>
+        <div class="row mt-3 mb-3">
+            <div class="col-6">
+                <input bind:value={hours} type="number" step="0.5" class="form-control" />
+            </div>
+        </div>
     </section>
 
     <section>

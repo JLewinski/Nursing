@@ -35,7 +35,7 @@
 
 {#if showPrompt}
     <div class="install-prompt">
-        <button onclick={handleInstall} class="install-button">
+        <button onclick={handleInstall} class="btn btn-primary">
             <span class="bi bi-download"></span>
             Install App
         </button>
@@ -48,27 +48,9 @@
         bottom: 70px;
         left: 50%;
         transform: translateX(-50%);
-        background: var(--surface-color, #fff);
         padding: 0.5rem 1rem;
         border-radius: 8px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         z-index: 1000;
-    }
-
-    .install-button {
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-        padding: 0.5rem 1rem;
-        border: none;
-        border-radius: 4px;
-        background: var(--primary-color, #007bff);
-        color: white;
-        cursor: pointer;
-        font-weight: 500;
-    }
-
-    .install-button:hover {
-        background: var(--primary-color-dark, #0056b3);
     }
 </style>

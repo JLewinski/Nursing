@@ -16,12 +16,7 @@
 </script>
 
 <div class="timer-container">
-    {#if lastSession.side === side}
-        <span class="badge rounded-pill text-bg-info px-3">Last used</span>
-    {:else}
-        <span></span>
-    {/if}
-    <span class="label">{side}</span>
+    <span class="label" class:active={lastSession.side === side}>{side}</span>
     <button 
         class="timer-circle btn btn-{color}"
         onclick={() => timerState.toggle(side)}
@@ -34,15 +29,22 @@
 <style>
     .timer-container {
         display: grid;
-        grid-template-rows: 1.5rem auto auto;
+        grid-template-rows: auto auto;
         justify-items: center;
         gap: 1rem;
     }
 
     .label {
         text-transform: capitalize;
-        font-size: 1.2rem;
+        font-size: 2rem;
         font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 30px;
+    }
+
+    .label.active {
+        background-color: #ffd59a;
+        color: black;
     }
 
     .timer-circle {
@@ -61,13 +63,13 @@
         transform: scale(1.05);
     }
 
-    .timer-circle.active {
+    .timer-circle.btn-info {
         animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
         0% { transform: scale(1); }
-        50% { transform: scale(1.05); }
+        50% { transform: scale(1.10); }
         100% { transform: scale(1); }
     }
 </style>

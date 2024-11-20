@@ -20,6 +20,9 @@ export function calculateDuration(events: TimerEvent[]): number {
 }
 
 export function formatLongDuration(milliseconds: number) {
+    if (milliseconds < 0){
+        return "0 hrs 00 mins";
+    }
     const totalMinues = Math.floor(milliseconds / 60000);
     const hours = Math.floor(totalMinues / 60);
     const minutes = totalMinues % 60;

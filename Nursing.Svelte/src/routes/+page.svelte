@@ -11,6 +11,7 @@
     import { v4 } from "uuid";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
     import { onDestroy } from "svelte";
+    import Duration from "$lib/components/Duration.svelte";
 
     const db = new Database();
 
@@ -32,7 +33,7 @@
     let durationStart = $state("");
     let durationNext = $state("");
 
-    function setDurations(){
+    function setDurations() {
         if (lastSession.startTime && nextStartTime) {
             const now = Date.now();
             durationStart = formatLongDuration(
@@ -69,6 +70,7 @@
         lastSession.startTime = new Date(timerState.events[0].timestamp);
         lastSession.side = lastSide;
         lastSession.save();
+        setDurations();
 
         const now = new Date().toISOString();
         const session = {
@@ -121,6 +123,12 @@
                 {durationNext}
             </div>
         </div>
+    {:else if timerState.activeTimer !== undefined}
+    <span class="grid-item-centered">Started: {lastSession.startTime?.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit",
+    })}</span>
+    <span class="grid-item-centered"><Duration side="total"></Duration></span>
     {:else}
         <span class="grid-item-centered"></span>
     {/if}
