@@ -10,4 +10,10 @@ RUN deno install
 RUN deno task build
 
 
+FROM denoland/deno
+
+WORKDIR /app
+
+COPY --from=installer /app/build ./build
+
 CMD ["task", "prod"]
