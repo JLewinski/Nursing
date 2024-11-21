@@ -82,11 +82,96 @@ export class TimerState implements ITimerState {
 
     private load() {
         const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-        const data = localData
-            ? JSON.parse(localData) as ITimerState
-            : defaultTimerState;
+        let data: ITimerState;
+        if (localData) {
+            data = JSON.parse(localData) as ITimerState;
+        } else if (!this.loadOld()) {
+            data = defaultTimerState;
+        } else {
+            return;
+        }
+
         this.events = data.events;
         this.activeTimer = data.activeTimer;
+    }
+
+    private loadOld() {
+        const old = localStorage.getItem("NursingCache");
+        if (!old) {
+            return false;
+        }
+
+        const data = JSON.parse(old) as {
+            CurrentFeeding: {
+                LeftBreast: {
+                    StartTime: string;
+                    EndTime: string | null;
+                }[]; // Array type can be more specific if needed
+                RightBreast: {
+                    StartTime: string;
+                    EndTime: string | null;
+                }[]; // Array type can be more specific if needed
+                IsStarted: boolean;
+                IsFinished: boolean;
+                Id: string;
+                LeftBreastTotal: string;
+                RightBreastTotal: string;
+                TotalTime: string;
+                Started: string;
+                Finished: string | null;
+                LastIsLeft: boolean;
+                LastUpdated: string;
+                Deleted: string | null;
+            };
+            LastStart: string;
+            LastWasLeft: boolean;
+        };
+
+        if (!data.CurrentFeeding.IsStarted || data.CurrentFeeding.IsFinished) {
+            return false;
+        }
+
+        const leftEvents = data.CurrentFeeding.LeftBreast.map((item) => ({
+            timer: "left" as "left" | "right",
+            start: item.StartTime,
+            end: item.EndTime,
+        }));
+
+        const rightEvents = data.CurrentFeeding.RightBreast.map((item) => ({
+            timer: "right" as "left" | "right",
+            start: item.StartTime,
+            end: item.EndTime,
+        }));
+
+        const oldEvents = leftEvents.concat(rightEvents);
+        oldEvents.sort((a, b) =>
+            new Date(a.start).getTime() - new Date(b.start).getTime()
+        );
+
+        for (const event of oldEvents) {
+            this.events.push({
+                timer: event.timer,
+                type: "start",
+                timestamp: event.start,
+            });
+            if (event.end) {
+                this.events.push({
+                    timer: event.timer,
+                    type: "stop",
+                    timestamp: event.end,
+                });
+            }
+        }
+
+        if (this.events[this.events.length - 1].type === "start") {
+            this.activeTimer = this.events[this.events.length - 1].timer;
+        } else {
+            this.activeTimer = null;
+        }
+
+        this.save();
+
+        return true;
     }
 
     private save() {
