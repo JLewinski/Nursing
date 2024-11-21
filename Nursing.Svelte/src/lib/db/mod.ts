@@ -6,8 +6,8 @@ interface DBSchema {
         startTime: string;
         endTime: string;
         lastSide: 'left' | 'right';
-        leftDuration: string;
-        rightDuration: string;
+        leftDuration: number;
+        rightDuration: number;
         lastUpdated: string;
         created: string;
         deleted?: string;

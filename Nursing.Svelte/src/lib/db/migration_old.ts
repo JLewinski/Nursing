@@ -1,21 +1,13 @@
 interface FeedingDto {
     Id: string;
-    Started: string;
-    TotalTime: string;
-    RightBreastTotal: string;
     LeftBreastTotal: string;
-    Deleted: string | null;
+    RightBreastTotal: string;
+    TotalTime: string;
+    Started: string;
+    Finished: string;
+    LastIsLeft: boolean;
     LastUpdated: string;
-}
-
-interface Session {
-    id: string;
-    startTime: Date;
-    duration: number;
-    rightDuration: number;
-    leftDuration: number;
-    deleted?: Date;
-    lastUpdated: Date;
+    Deleted: string | null;
 }
 
 export function migrateOldData() {
@@ -59,15 +51,15 @@ function migrateArray(data: FeedingDto[]) {
 }
 
 export function migrateData(feeding: FeedingDto) {
-    const session: Session = {
+    return {
         id: feeding.Id,
-        startTime: new Date(feeding.Started),
-        duration: parseTimeSpan(feeding.TotalTime),
+        startTime: feeding.Started,
+        endTime: feeding.Finished,
+        lastSide: feeding.LastIsLeft ? "left" : "right",
+        created: new Date().toISOString(),
         rightDuration: parseTimeSpan(feeding.RightBreastTotal),
         leftDuration: parseTimeSpan(feeding.LeftBreastTotal),
-        deleted: feeding.Deleted ? new Date(feeding.Deleted) : undefined,
-        lastUpdated: new Date(feeding.LastUpdated),
+        deleted: feeding.Deleted ? feeding.Deleted : undefined,
+        lastUpdated: feeding.LastUpdated,
     };
-
-    return session;
 }

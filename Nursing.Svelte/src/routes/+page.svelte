@@ -79,10 +79,8 @@
             endTime: now,
             lastSide: lastSide,
             lastUpdated: now,
-            leftDuration: formatDuration(timerState.calculateDuration("left")),
-            rightDuration: formatDuration(
-                timerState.calculateDuration("right"),
-            ),
+            leftDuration: timerState.calculateDuration("left"),
+            rightDuration: timerState.calculateDuration("right"),
             id: v4(),
         };
 
@@ -124,11 +122,15 @@
             </div>
         </div>
     {:else if timerState.activeTimer !== undefined}
-    <span class="grid-item-centered">Started: {lastSession.startTime?.toLocaleTimeString([], {
-        hour: "numeric",
-        minute: "2-digit",
-    })}</span>
-    <span class="grid-item-centered"><Duration side="total"></Duration></span>
+        <span class="grid-item-centered"
+            >Started: {lastSession.startTime?.toLocaleTimeString([], {
+                hour: "numeric",
+                minute: "2-digit",
+            })}</span
+        >
+        <span class="grid-item-centered"
+            ><Duration side="total"></Duration></span
+        >
     {:else}
         <span class="grid-item-centered"></span>
     {/if}
