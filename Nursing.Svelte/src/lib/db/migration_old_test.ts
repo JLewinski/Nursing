@@ -16,11 +16,11 @@ const feeding = {
 Deno.test("migrateData", () => {
     const session = migrateData(feeding);
     assertEquals(session.id, "d44a89a8-578d-4d05-a1bb-6c96b17cb9c1");
-    assertEquals(session.startTime, new Date("2024-11-18T20:28:05.03Z"));
-    assertEquals(session.duration, 3076); // 3.076 seconds in milliseconds
+    assertEquals(session.startTime, "2024-11-18T20:28:05.03Z");
+    assertEquals(session.endTime, "2024-11-18T20:28:08.106Z");
     assertEquals(session.rightDuration, 1486); // 1.486 seconds in milliseconds
     assertEquals(session.leftDuration, 1590); // 1.59 seconds in milliseconds
-    assertEquals(session.lastUpdated, new Date("2024-11-18T20:28:08.12Z"));
+    assertEquals(session.lastUpdated, "2024-11-18T20:28:08.12Z");
 });
 
 Deno.test("parseTimeSpan", () => {

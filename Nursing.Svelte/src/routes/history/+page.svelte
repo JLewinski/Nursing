@@ -4,6 +4,7 @@
     import { Grid } from "gridjs";
     import { Chart, type ChartConfiguration } from "chart.js/auto";
     import "./grid.css";
+    import { formatDuration } from "$lib/utils/timeCalculations";
 
     let sessions: DBSession[] = [];
     let lineCanvas: HTMLCanvasElement;
@@ -30,13 +31,13 @@
             ],
             data: sessions.map((s) => [
                 new Date(s.startTime).toLocaleDateString(),
-                new Date(s.startTime).toLocaleTimeString(),
-                new Date(s.endTime).toLocaleTimeString(),
-                s.leftDuration,
-                s.rightDuration,
+                new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                new Date(s.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                formatDuration(s.leftDuration),
+                formatDuration(s.rightDuration),
             ]),
             sort: true,
-            autoWidth: true
+            autoWidth: true,
         }).render(gridElement);
 
         const ctx = lineCanvas.getContext("2d");
@@ -44,31 +45,25 @@
             new Chart(ctx, {
                 type: "line",
                 data: {
-                    labels: sessions.map((s) =>{
+                    labels: sessions.map((s) => {
                         const date = new Date(s.startTime);
-                        return date.toLocaleString();
+                        return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
                     }),
                     datasets: [
                         {
                             label: "Left Duration",
-                            data: sessions.map((s) =>
-                                parseDuration(s.leftDuration),
-                            ),
+                            data: sessions.map((s) => s.leftDuration),
                             borderColor: "rgb(75, 192, 192)",
                         },
                         {
                             label: "Right Duration",
-                            data: sessions.map((s) =>
-                                parseDuration(s.rightDuration),
-                            ),
+                            data: sessions.map((s) => s.rightDuration),
                             borderColor: "rgb(255, 99, 132)",
                         },
                         {
                             label: "Total Duration",
                             data: sessions.map(
-                                (s) =>
-                                    parseDuration(s.leftDuration) +
-                                    parseDuration(s.rightDuration),
+                                (s) => s.leftDuration + s.rightDuration,
                             ),
                             borderColor: "rgb(54, 162, 235)",
                         },
@@ -95,20 +90,25 @@
                         {
                             data: [
                                 sessions.reduce(
-                                    (acc, s) => acc + parseDuration(s.leftDuration),
+                                    (acc, s) =>
+                                        acc + s.leftDuration,
                                     0,
                                 ),
                                 sessions.reduce(
-                                    (acc, s) => acc + parseDuration(s.rightDuration),
+                                    (acc, s) =>
+                                        acc + s.rightDuration,
                                     0,
                                 ),
                             ],
-                            backgroundColor: ["rgb(75, 192, 192)", "rgb(255, 99, 132)"],
+                            backgroundColor: [
+                                "rgb(75, 192, 192)",
+                                "rgb(255, 99, 132)",
+                            ],
                         },
                     ],
                 },
                 options: {
-                    responsive: true
+                    responsive: true,
                 },
             });
         }
