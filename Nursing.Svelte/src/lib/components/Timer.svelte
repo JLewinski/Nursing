@@ -64,12 +64,12 @@
     }
 
     .timer-circle.btn-info {
-        animation: pulse 2s infinite;
+        animation: pulse 5s infinite;
     }
 
     @keyframes pulse {
-        0% { transform: scale(1); }
-        50% { transform: scale(1.10); }
-        100% { transform: scale(1); }
+        0% { transform: scale(.975); }
+        50% { transform: scale(1.025); }
+        100% { transform: scale(.975); }
     }
 </style>

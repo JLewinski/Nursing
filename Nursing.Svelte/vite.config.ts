@@ -5,9 +5,6 @@ export default defineConfig({
   plugins: [
     sveltekit(),
   ],
-  build: {
-    sourcemap: true,
-  },
   server: {
     fs: {
       strict: false,

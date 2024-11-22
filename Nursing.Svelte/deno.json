@@ -18,7 +18,6 @@
     "bootstrap-icons": "npm:bootstrap-icons@^1.11.3",
     "chart.js": "npm:chart.js@^4.4.6",
     "gridjs": "npm:gridjs@^6.2.0",
-    "gridjs-svelte": "npm:gridjs-svelte@^2.1.1",
     "sass": "npm:sass@^1.81.0",
     "svelte": "npm:svelte@^5.0.0",
     "svelte-adapter-deno": "npm:svelte-adapter-deno@^0.9.1",

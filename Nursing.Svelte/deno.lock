@@ -10,7 +10,6 @@
     "npm:bootstrap-icons@^1.11.3": "1.11.3",
     "npm:bootstrap@^5.3.3": "5.3.3_@popperjs+core@2.11.8",
     "npm:chart.js@^4.4.6": "4.4.6",
-    "npm:gridjs-svelte@^2.1.1": "2.1.1_gridjs@6.2.0_svelte@5.2.2__acorn@8.14.0",
     "npm:gridjs@^6.2.0": "6.2.0",
     "npm:sass@^1.81.0": "1.81.0",
     "npm:svelte-adapter-deno@~0.9.1": "0.9.1_@sveltejs+kit@2.8.1__@sveltejs+vite-plugin-svelte@4.0.1___svelte@5.2.2____acorn@8.14.0___vite@5.4.11____sass@1.81.0___sass@1.81.0__svelte@5.2.2___acorn@8.14.0__vite@5.4.11___sass@1.81.0__sass@1.81.0_rollup@3.29.5_@sveltejs+vite-plugin-svelte@4.0.1__svelte@5.2.2___acorn@8.14.0__vite@5.4.11___sass@1.81.0__sass@1.81.0_svelte@5.2.2__acorn@8.14.0_vite@5.4.11__sass@1.81.0_sass@1.81.0",
@@ -555,13 +554,6 @@
     "globrex@0.1.2": {
       "integrity": "sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg=="
     },
-    "gridjs-svelte@2.1.1_gridjs@6.2.0_svelte@5.2.2__acorn@8.14.0": {
-      "integrity": "sha512-tYkgdqNKSnfmAYYc8EP4axn/Xlugp7VLwAlpNkP4SBLHHYD/ejD2DJ+FMatDNqcJ1Z1kuMnJWO+VBcAOirEByw==",
-      "dependencies": [
-        "gridjs",
-        "svelte"
-      ]
-    },
     "gridjs@6.2.0": {
       "integrity": "sha512-EAGGfHjyEXWh12Txs6DjTGnWTo226wbowtMrLI+yNZQaJpvs0m7yDcyM7r+D4RA7rZQVj/cfmwEaRz/rlxg8LA==",
       "dependencies": [
@@ -868,7 +860,6 @@
       "npm:bootstrap-icons@^1.11.3",
       "npm:bootstrap@^5.3.3",
       "npm:chart.js@^4.4.6",
-      "npm:gridjs-svelte@^2.1.1",
       "npm:gridjs@^6.2.0",
       "npm:sass@^1.81.0",
       "npm:svelte-adapter-deno@~0.9.1",
@@ -877,6 +868,27 @@
       "npm:typescript@5",
       "npm:uuid@^11.0.3",
       "npm:vite@^5.4.11"
-    ]
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:@sveltejs/adapter-auto@3",
+        "npm:@sveltejs/adapter-node@^5.2.9",
+        "npm:@sveltejs/adapter-static@^3.0.6",
+        "npm:@sveltejs/kit@2",
+        "npm:@sveltejs/vite-plugin-svelte@4",
+        "npm:@types/bootstrap@^5.2.10",
+        "npm:bootstrap-icons@^1.11.3",
+        "npm:bootstrap@^5.3.3",
+        "npm:chart.js@^4.4.6",
+        "npm:gridjs@^6.2.0",
+        "npm:sass@^1.81.0",
+        "npm:svelte-adapter-deno@~0.9.1",
+        "npm:svelte-check@4",
+        "npm:svelte@5",
+        "npm:typescript@5",
+        "npm:uuid@^11.0.3",
+        "npm:vite@^5.4.11"
+      ]
+    }
   }
 }

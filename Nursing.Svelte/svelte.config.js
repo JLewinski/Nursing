@@ -7,11 +7,8 @@ const config = {
   preprocess: vitePreprocess(),
   kit: {
     adapter: adapter({
-      fallback: 'index.html'
+      fallback: '/index.html'
     }),
-    files: {
-      serviceWorker: 'static/service-worker'
-    },
   }
 };
 
