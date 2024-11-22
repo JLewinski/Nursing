@@ -1,19 +1,24 @@
-import { sveltekit } from "@sveltejs/kit/vite"
-import { defineConfig } from "vite"
+import { sveltekit } from "@sveltejs/kit/vite";
+import { defineConfig } from "vite";
 
 export default defineConfig({
-  plugins: [sveltekit()],
+  plugins: [
+    sveltekit(),
+  ],
+  build: {
+    sourcemap: true,
+  },
   server: {
     fs: {
       strict: false,
-    }
+    },
   },
-  css:{
+  css: {
     preprocessorOptions: {
       scss: {
         quietDeps: true,
-      }
-    }
-  }
+      },
+    },
+  },
   // TODO: Add PWA plugin configuration
-})
+});

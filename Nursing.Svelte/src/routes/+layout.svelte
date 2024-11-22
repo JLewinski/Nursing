@@ -1,23 +1,17 @@
 <script lang="ts">
-    import '../app.scss';
-    import './nav.css';
-    import Installation from '$lib/components/Installation.svelte';
-    import { setTimerState } from '$lib/stores/timerStore.svelte';
-    
+    import "../app.scss";
+    import "./nav.css";
+    import Installation from "$lib/components/Installation.svelte";
+    import { setTimerState } from "$lib/stores/timerStore.svelte";
+
     interface Props {
-        children?: import('svelte').Snippet;
+        children?: import("svelte").Snippet;
     }
 
     let { children }: Props = $props();
 
     setTimerState();
-
-    let webManifestLink = $derived(pwaInfo ? pwaInfo.webManifestLink.linkTag : '');
 </script>
-
-<svelte:head>
-    {@html webManifestLink}
-</svelte:head>
 
 <div>
     <Installation />
