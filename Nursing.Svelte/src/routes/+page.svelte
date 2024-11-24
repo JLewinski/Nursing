@@ -121,9 +121,9 @@
                 {durationNext}
             </div>
         </div>
-    {:else if timerState.activeTimer !== undefined}
+    {:else if timerState.activeTimer !== undefined && startEvent}
         <span class="grid-item-centered"
-            >Started: {lastSession.startTime?.toLocaleTimeString([], {
+            >Started: {new Date(startEvent.timestamp).toLocaleTimeString([], {
                 hour: "numeric",
                 minute: "2-digit",
             })}</span
