@@ -5,6 +5,7 @@
     import { Chart, type ChartConfiguration } from "chart.js/auto";
     import "./grid.css";
     import { formatDuration } from "$lib/utils/timeCalculations";
+    import Tabs from "$lib/components/bootstrap/tabs/tabs.svelte";
 
     let sessions: DBSession[] = [];
     let lineCanvas: HTMLCanvasElement;
@@ -31,8 +32,14 @@
             ],
             data: sessions.map((s) => [
                 new Date(s.startTime).toLocaleDateString(),
-                new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-                new Date(s.endTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                new Date(s.startTime).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                }),
+                new Date(s.endTime).toLocaleTimeString([], {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                }),
                 formatDuration(s.leftDuration),
                 formatDuration(s.rightDuration),
             ]),
@@ -47,7 +54,7 @@
                 data: {
                     labels: sessions.map((s) => {
                         const date = new Date(s.startTime);
-                        return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                        return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
                     }),
                     datasets: [
                         {
@@ -90,13 +97,11 @@
                         {
                             data: [
                                 sessions.reduce(
-                                    (acc, s) =>
-                                        acc + s.leftDuration,
+                                    (acc, s) => acc + s.leftDuration,
                                     0,
                                 ),
                                 sessions.reduce(
-                                    (acc, s) =>
-                                        acc + s.rightDuration,
+                                    (acc, s) => acc + s.rightDuration,
                                     0,
                                 ),
                             ],
@@ -117,15 +122,22 @@
 
 <div class="history-page">
     <h1>Nursing History</h1>
-    <div class="row">
-        <div class="col-md-6 chart-container">
-            <canvas bind:this={lineCanvas}></canvas>
-        </div>
-        <div class="col-md-6 chart-container">
-            <canvas bind:this={pieContainer}></canvas>
-        </div>
-    </div>
-    <div class="grid-container" bind:this={gridElement}></div>
+
+    <Tabs tabs={['Grid', 'Line', 'Pie']}>
+        {#snippet gridTab()}
+            <div class="grid-container" bind:this={gridElement}></div>
+        {/snippet}
+        {#snippet lineTab()}
+            <div class="chart-container">
+                <canvas bind:this={lineCanvas}></canvas>
+            </div>
+        {/snippet}
+        {#snippet pieTab()}
+            <div class="chart-container">
+                <canvas bind:this={pieContainer}></canvas>
+            </div>
+        {/snippet}
+    </Tabs>
 </div>
 
 <style>
