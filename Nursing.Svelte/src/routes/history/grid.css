@@ -355,8 +355,6 @@ th.gridjs-th:last-child {
     background-color: #9bc2f7;
 }
 
-/*# sourceMappingURL=mermaid.css.map */
-
 @media (prefers-color-scheme: dark) {
     .gridjs-head button, .gridjs-footer button {
         cursor: pointer;

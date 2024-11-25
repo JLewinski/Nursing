@@ -24,24 +24,42 @@
         // Initialize Grid.js
         new Grid({
             columns: [
-                "Date",
-                "Start Time",
-                "End Time",
-                "Left Duration",
-                "Right Duration",
+                {
+                    name: "Date",
+                    formatter: (cell) =>
+                        (cell as Date).toLocaleDateString(),
+                },
+                {
+                    name: "Start Time",
+                    formatter: (cell) =>
+                        (cell as Date).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        }),
+                },
+                {
+                    name: "End Time",
+                    formatter: (cell) =>
+                        (cell as Date).toLocaleTimeString([], {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                        }),
+                },
+                {
+                    name: "Left Duration",
+                    formatter: (cell) => formatDuration(cell as number),
+                },
+                {
+                    name: "Right Duration",
+                    formatter: (cell) => formatDuration(cell as number),
+                }
             ],
             data: sessions.map((s) => [
-                new Date(s.startTime).toLocaleDateString(),
-                new Date(s.startTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                }),
-                new Date(s.endTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                }),
-                formatDuration(s.leftDuration),
-                formatDuration(s.rightDuration),
+                new Date(s.startTime),
+                new Date(s.startTime),
+                new Date(s.endTime),
+                s.leftDuration,
+                s.rightDuration,
             ]),
             sort: true,
             autoWidth: true,
@@ -123,7 +141,7 @@
 <div class="history-page">
     <h1>Nursing History</h1>
 
-    <Tabs tabs={['Grid', 'Line', 'Pie']}>
+    <Tabs tabs={["Grid", "Line", "Pie"]}>
         {#snippet gridTab()}
             <div class="grid-container" bind:this={gridElement}></div>
         {/snippet}
