@@ -1,78 +1,62 @@
 <script lang="ts">
-    import { db, type DBSession } from "$lib/db/mod";
-    import { onMount } from "svelte";
-    import { Grid } from "gridjs";
+    import { db } from "$lib/db/mod";
+    import Grid from "$lib/components/Grid.svelte";
+    import { Grid as GridJs } from "gridjs";
     import { Chart } from "chart.js/auto";
     import "./grid.css";
     import { formatDuration } from "$lib/utils/timeCalculations";
     import Tabs from "$lib/components/bootstrap/tabs/tabs.svelte";
     import { liveQuery } from "dexie";
 
-    let beginDate = $state(
+    function parseDateString(dateString: string): Date {
+        const [year, month, day] = dateString
+            .split("-")
+            .map((x) => Number.parseInt(x));
+        return new Date(year, month - 1, day);
+    }
+
+    let startDateString = $state(
         (() => {
             const date = new Date();
             date.setDate(date.getDate() - 7);
-            return date;
+            date.setHours(0, 0, 0, 0);
+            return date.toISOString().split("T")[0];
         })(),
     );
+
     let endDate = $state(new Date());
 
-    let sessions = liveQuery(() =>
-        db.sessions.where("startTime").between(beginDate, endDate).toArray(),
-    );
-    
+    function getSessions(startDate: Date) {
+        return liveQuery(() => {
+            return db.sessions
+                .orderBy("startTime")
+                .filter(
+                    (s) => s.startTime >= startDate && s.startTime <= endDate,
+                )
+                .toArray();
+        });
+    }
+
+    let sessions = $derived(getSessions(parseDateString(startDateString)));
+
     let lineCanvas: HTMLCanvasElement;
     let pieContainer: HTMLCanvasElement;
-    let gridElement: HTMLDivElement;
 
-    $effect(() => {
-        if (!$sessions) return;
-
-        const grid = new Grid({
-            columns: [
-                {
-                    name: "Date",
-                    formatter: (cell) => (cell as Date).toLocaleDateString(),
-                },
-                {
-                    name: "Start Time",
-                    formatter: (cell) =>
-                        (cell as Date).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        }),
-                },
-                {
-                    name: "End Time",
-                    formatter: (cell) =>
-                        (cell as Date).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                        }),
-                },
-                {
-                    name: "Left Duration",
-                    formatter: (cell) => formatDuration(cell as number),
-                },
-                {
-                    name: "Right Duration",
-                    formatter: (cell) => formatDuration(cell as number),
-                },
-            ],
-            data: $sessions?.map((s) => [
-                new Date(s.startTime),
-                new Date(s.startTime),
-                new Date(s.endTime),
+    let gridData = $derived(
+        $sessions
+            ?.map((s) => [
+                s.startTime,
+                s.startTime,
+                s.endTime,
                 s.leftDuration,
                 s.rightDuration,
-            ]),
-            sort: true,
-            autoWidth: true,
-        }).render(gridElement);
-    });
+            ])
+            .reverse() ?? [],
+    );
 
     $effect(() => {
         if (!$sessions) return;
+        console.log('line')
 
         const ctx = lineCanvas.getContext("2d");
         if (ctx) {
@@ -154,9 +138,58 @@
 <div class="history-page">
     <h1>Nursing History</h1>
 
+    <div class="row">
+        <div class="col">
+            <label for="startDate" class="form-label">Start Date</label>
+            <input
+                type="date"
+                class="form-control"
+                bind:value={startDateString}
+            />
+        </div>
+        <div class="col">
+            <label for="endDate" class="form-label">End Date</label>
+            <input type="date" class="form-control" bind:value={endDate} />
+        </div>
+    </div>
+
     <Tabs tabs={["Grid", "Line", "Pie"]}>
         {#snippet gridTab()}
-            <div class="grid-container" bind:this={gridElement}></div>
+            <Grid
+                data={gridData}
+                columns={[
+                    {
+                        name: "Date",
+                        formatter: (cell: Date) => cell.toLocaleDateString(),
+                    },
+                    {
+                        name: "Start Time",
+                        formatter: (cell: Date) =>
+                            cell.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            }),
+                    },
+                    {
+                        name: "End Time",
+                        formatter: (cell: Date) =>
+                            cell.toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                            }),
+                    },
+                    {
+                        name: "Left Duration",
+                        formatter: (cell: number) => formatDuration(cell),
+                    },
+                    {
+                        name: "Right Duration",
+                        formatter: (cell: number) => formatDuration(cell),
+                    },
+                ]}
+                sort={true}
+                autoWidth={true}
+            />
         {/snippet}
         {#snippet lineTab()}
             <div class="chart-container">
@@ -178,8 +211,5 @@
     .chart-container {
         margin: 2rem 0;
         height: 300px;
-    }
-    .grid-container {
-        margin: 2rem 0;
     }
 </style>
