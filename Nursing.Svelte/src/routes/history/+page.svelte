@@ -1,33 +1,38 @@
 <script lang="ts">
-    import { Database, type DBSession } from "$lib/db/mod";
+    import { db, type DBSession } from "$lib/db/mod";
     import { onMount } from "svelte";
     import { Grid } from "gridjs";
-    import { Chart, type ChartConfiguration } from "chart.js/auto";
+    import { Chart } from "chart.js/auto";
     import "./grid.css";
     import { formatDuration } from "$lib/utils/timeCalculations";
     import Tabs from "$lib/components/bootstrap/tabs/tabs.svelte";
+    import { liveQuery } from "dexie";
 
-    let sessions: DBSession[] = [];
+    let beginDate = $state(
+        (() => {
+            const date = new Date();
+            date.setDate(date.getDate() - 7);
+            return date;
+        })(),
+    );
+    let endDate = $state(new Date());
+
+    let sessions = liveQuery(() =>
+        db.sessions.where("startTime").between(beginDate, endDate).toArray(),
+    );
+    
     let lineCanvas: HTMLCanvasElement;
     let pieContainer: HTMLCanvasElement;
     let gridElement: HTMLDivElement;
 
-    function parseDuration(duration: string): number {
-        const [minutes, seconds] = duration.split(":").map(Number);
-        return minutes * 60 + seconds;
-    }
+    $effect(() => {
+        if (!$sessions) return;
 
-    onMount(async () => {
-        const db = new Database();
-        sessions = await db.getAllSessions();
-
-        // Initialize Grid.js
-        new Grid({
+        const grid = new Grid({
             columns: [
                 {
                     name: "Date",
-                    formatter: (cell) =>
-                        (cell as Date).toLocaleDateString(),
+                    formatter: (cell) => (cell as Date).toLocaleDateString(),
                 },
                 {
                     name: "Start Time",
@@ -52,9 +57,9 @@
                 {
                     name: "Right Duration",
                     formatter: (cell) => formatDuration(cell as number),
-                }
+                },
             ],
-            data: sessions.map((s) => [
+            data: $sessions?.map((s) => [
                 new Date(s.startTime),
                 new Date(s.startTime),
                 new Date(s.endTime),
@@ -64,30 +69,34 @@
             sort: true,
             autoWidth: true,
         }).render(gridElement);
+    });
+
+    $effect(() => {
+        if (!$sessions) return;
 
         const ctx = lineCanvas.getContext("2d");
         if (ctx) {
             new Chart(ctx, {
                 type: "line",
                 data: {
-                    labels: sessions.map((s) => {
+                    labels: $sessions?.map((s) => {
                         const date = new Date(s.startTime);
                         return `${date.toLocaleDateString()} ${date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}`;
                     }),
                     datasets: [
                         {
                             label: "Left Duration",
-                            data: sessions.map((s) => s.leftDuration),
+                            data: $sessions?.map((s) => s.leftDuration),
                             borderColor: "rgb(75, 192, 192)",
                         },
                         {
                             label: "Right Duration",
-                            data: sessions.map((s) => s.rightDuration),
+                            data: $sessions?.map((s) => s.rightDuration),
                             borderColor: "rgb(255, 99, 132)",
                         },
                         {
                             label: "Total Duration",
-                            data: sessions.map(
+                            data: $sessions?.map(
                                 (s) => s.leftDuration + s.rightDuration,
                             ),
                             borderColor: "rgb(54, 162, 235)",
@@ -104,6 +113,10 @@
                 },
             });
         }
+    });
+
+    $effect(() => {
+        if (!$sessions) return;
 
         const pieCtx = pieContainer.getContext("2d");
         if (pieCtx) {
@@ -114,11 +127,11 @@
                     datasets: [
                         {
                             data: [
-                                sessions.reduce(
+                                $sessions?.reduce(
                                     (acc, s) => acc + s.leftDuration,
                                     0,
                                 ),
-                                sessions.reduce(
+                                $sessions?.reduce(
                                     (acc, s) => acc + s.rightDuration,
                                     0,
                                 ),

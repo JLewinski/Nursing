@@ -7,13 +7,11 @@
     } from "$lib/utils/timeCalculations";
     import { lastSession } from "$lib/stores/lastSessionStore.svelte";
     import { settings } from "$lib/stores/settingsStore.svelte";
-    import { Database } from "$lib/db/mod";
+    import { db } from "$lib/db/mod";
     import { v4 } from "uuid";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
     import { onDestroy } from "svelte";
     import Duration from "$lib/components/Duration.svelte";
-
-    const db = new Database();
 
     const timerState = getTimerState();
 
@@ -72,10 +70,10 @@
         lastSession.save();
         setDurations();
 
-        const now = new Date().toISOString();
+        const now = new Date();
         const session = {
-            created: startEvent.timestamp,
-            startTime: startEvent.timestamp,
+            created: new Date(startEvent.timestamp),
+            startTime: new Date(startEvent.timestamp),
             endTime: now,
             lastSide: lastSide,
             lastUpdated: now,
@@ -84,7 +82,7 @@
             id: v4(),
         };
 
-        db.saveSession(session).then(() => {
+        db.sessions.add(session).then(() =>{
             timerState.reset();
         });
     }

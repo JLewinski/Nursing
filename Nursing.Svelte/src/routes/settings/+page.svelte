@@ -1,7 +1,7 @@
 <script lang="ts">
     import { settings } from "$lib/stores/settingsStore.svelte";
     // import { NotificationManager } from "$lib/utils/notifications";
-    import { Database } from "$lib/db/mod";
+    import { db } from "$lib/db/mod";
     import { lastSession } from "$lib/stores/lastSessionStore.svelte";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
 
@@ -14,7 +14,7 @@
         );
         if (!confirmed) return;
 
-        await new Database().clearSessions();
+        await db.sessions.clear();
         lastSession.side = undefined;
         lastSession.startTime = null;
         lastSession.save();
