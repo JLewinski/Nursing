@@ -5,11 +5,6 @@ export default defineConfig({
   plugins: [
     sveltekit(),
   ],
-  server: {
-    fs: {
-      strict: false,
-    },
-  },
   css: {
     preprocessorOptions: {
       scss: {
@@ -17,5 +12,4 @@ export default defineConfig({
       },
     },
   },
-  // TODO: Add PWA plugin configuration
 });

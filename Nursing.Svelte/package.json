@@ -8,8 +8,10 @@
     "build": "vite build",
     "preview": "vite preview",
     "prod": "node build/index.js",
-    "docker_build": "docker build --no-cache -t nursing-app .",
-    "docker_run": "docker run -p 6969:6969 nursing-app"
+    "db:start": "docker compose up",
+    "db:push": "drizzle-kit push",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",
@@ -18,17 +20,25 @@
     "@sveltejs/kit": "^2.0.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "@types/bootstrap": "^5.2.10",
+    "@types/node": "^22.10.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.6",
     "dexie": "^4.0.10",
+    "drizzle-kit": "^0.28.1",
     "gridjs": "^6.2.0",
     "sass": "^1.81.0",
     "svelte": "^5.0.0",
-    "svelte-adapter-deno": "^0.9.1",
     "svelte-check": "^4.0.0",
     "typescript": "^5.0.0",
     "uuid": "^11.0.3",
     "vite": "^5.4.11"
+  },
+  "dependencies": {
+    "@node-rs/argon2": "^2.0.0",
+    "@oslojs/crypto": "^1.0.1",
+    "@oslojs/encoding": "^1.1.0",
+    "drizzle-orm": "^0.36.4",
+    "postgres": "^3.4.5"
   }
 }
