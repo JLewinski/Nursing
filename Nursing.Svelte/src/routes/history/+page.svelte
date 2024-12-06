@@ -6,6 +6,7 @@
     import "./grid.css";
     import { formatDuration } from "$lib/utils/timeCalculations";
     import Tabs from "$lib/components/bootstrap/tabs/tabs.svelte";
+    import TabContent from "$lib/components/bootstrap/tabs/tabContent.svelte";
     import { liveQuery } from "dexie";
 
     function parseDateString(dateString: string): Date {
@@ -153,8 +154,8 @@
         </div>
     </div>
 
-    <Tabs tabs={["Grid", "Line", "Pie"]}>
-        {#snippet gridTab()}
+    <Tabs>
+        <TabContent title="Grid">
             <Grid
                 data={gridData}
                 columns={[
@@ -190,17 +191,17 @@
                 sort={true}
                 autoWidth={true}
             />
-        {/snippet}
-        {#snippet lineTab()}
+        </TabContent>
+        <TabContent title="Line">
             <div class="chart-container">
                 <canvas bind:this={lineCanvas}></canvas>
             </div>
-        {/snippet}
-        {#snippet pieTab()}
+        </TabContent>
+        <TabContent title="Pie">
             <div class="chart-container">
                 <canvas bind:this={pieContainer}></canvas>
             </div>
-        {/snippet}
+        </TabContent>
     </Tabs>
 </div>
 

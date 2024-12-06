@@ -1,13 +1,30 @@
 <script lang="ts">
     import type { Snippet } from "svelte";
-    import TabContent from "./tabContent.svelte";
+    import { setContext } from "svelte";
 
-    let { tabs, ...children } = $props();
+    interface Props {
+        children: Snippet;
+    }
 
-    let tabTitles = tabs as string[];
+    let tabTitles = $state([]) as string[];
+    let selectedTab = $state("");
+    let context = {
+        addTitle,
+        get selectedTab() {
+            return selectedTab;
+        },
+    };
+    setContext("tab", context);
 
-    let selectedTab = $state(tabTitles[0]);
-    let tabContent = Object.keys(children).map(key => children[key] as Snippet);
+    function addTitle(title: string) {
+        if (tabTitles.length === 0) {
+            selectedTab = title;
+        }
+
+        tabTitles.push(title);
+    }
+
+    let { children }: Props = $props();
 </script>
 
 <ul class="nav nav-tabs" id="HistoryTabs" role="tablist">
@@ -29,9 +46,5 @@
     {/each}
 </ul>
 <div class="tab-content">
-    {#each tabContent as tab, index}
-        <TabContent title={tabTitles[index]} {selectedTab}>
-            {@render tab()}
-        </TabContent>
-    {/each}
+    {@render children()}
 </div>

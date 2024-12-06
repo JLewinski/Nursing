@@ -1,21 +1,23 @@
 <script lang="ts">
-    import type { Snippet } from "svelte";
+    import { getContext, type Snippet } from "svelte";
 
-    interface Props{ 
-        selectedTab: string; 
-        title: string; 
-        children: Snippet; 
+    interface Props {
+        title: string;
+        children: Snippet;
     }
 
-    let {
-        selectedTab,
-        title,
-        children,
-    }: Props = $props();
+    let { title, children }: Props = $props();
 
-    let active = $derived(selectedTab == title);
+    let context = getContext<{
+        addTitle: (title: string) => void;
+        readonly selectedTab: string;
+    }>("tab");
+
+    context.addTitle(title);
+
+    let active = $derived(context.selectedTab == title);
+
 </script>
-
 <div class="tab-pane" class:active role="tabpanel">
     {@render children()}
 </div>
