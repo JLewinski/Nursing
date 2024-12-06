@@ -3,7 +3,7 @@ import type { DBSession } from '$lib/db/mod';
 import type { FeedingSession } from './db/schema';
 import * as table from './db/schema';
 import type { PgTable } from 'drizzle-orm/pg-core';
-import { getTableColumns, SQL, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, gt, or, SQL, sql } from 'drizzle-orm';
 
 function buildConflictUpdateColumns<
     T extends PgTable,
@@ -31,7 +31,7 @@ export default async function sync(syncDate: Date | null, userId: string, sessio
 
 async function updateSessions(userId: string, sessions: DBSession[]) {
 
-    if(sessions.length === 0) {
+    if (sessions.length === 0) {
         return;
     }
 
@@ -44,20 +44,34 @@ async function updateSessions(userId: string, sessions: DBSession[]) {
 }
 
 async function retrieveUpdatedSessions(syncDate: Date | null, userId: string) {
-    const result = await db.query.feedingSession.findMany({
-        where: (feedingSession, { eq, gt, and }) => {
-            if (syncDate){
-                return and(
-                    eq(feedingSession.userId, userId),
-                    gt(feedingSession.lastUpdated, syncDate)
-                );
-            }
-                
-            return eq(feedingSession.userId, userId);
-        }
-    });
+    const tempResult = await db
+        .select({
+            id: table.feedingSession.id,
+            userId: table.feedingSession.userId,
+            startTime: table.feedingSession.startTime,
+            endedTime: table.feedingSession.endedTime,
+            lastSide: table.feedingSession.lastSide,
+            leftDuration: table.feedingSession.leftDuration,
+            rightDuration: table.feedingSession.rightDuration,
+            lastUpdated: table.feedingSession.lastUpdated,
+            created: table.feedingSession.created,
+            deleted: table.feedingSession.deleted
+        })
+        .from(table.feedingSession)
+        .leftJoin(table.userGroup, eq(table.userGroup.userId, table.feedingSession.userId))
+        .leftJoin(table.group, eq(table.group.id, table.userGroup.groupId))
+        .leftJoin(table.user, eq(table.user.id, table.userGroup.userId))
+        .where(
+            and(
+                or(
+                    eq(table.user.id, userId),
+                    eq(table.feedingSession.userId, userId)
+                ),
+                syncDate ? gt(table.feedingSession.lastUpdated, syncDate) : undefined
+            )
+        );
 
-    return result.map(toModel);
+    return tempResult.map(x => toModel(x));
 }
 
 function toModel(session: FeedingSession) {

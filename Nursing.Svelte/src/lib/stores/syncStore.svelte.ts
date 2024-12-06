@@ -33,7 +33,7 @@ export class SyncState {
         }
         this.status = "syncing";
 
-        const lastSync = null;
+        const lastSync = this.lastSync;
 
         this.lastSync = new Date();
 
@@ -80,16 +80,18 @@ export class SyncState {
                     return x;
                 });
             }
+
             return data;
         })();
 
         if (resultData.status === 'ok') {
-            this.status = 'idle';
-            this.result = 'Sync complete';
             for (const session of resultData.updates) {
                 console.log('Updating session', session);
                 await db.sessions.put(session);
             }
+
+            this.status = 'idle';
+            this.result = 'Sync complete';
         } else {
             this.status = 'error';
             this.result = resultData.error;
