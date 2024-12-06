@@ -1,4 +1,4 @@
-import { db } from "../db/mod";
+import { db, type DBSession, type DBSyncState } from "../db/mod";
 
 export class SyncState {
     lastSync: Date | null = $state(null);
@@ -33,7 +33,7 @@ export class SyncState {
         }
         this.status = "syncing";
 
-        const lastSync = this.lastSync;
+        const lastSync = null;
 
         this.lastSync = new Date();
 
@@ -52,37 +52,63 @@ export class SyncState {
             data = await db.sessions.where('lastUpdated').aboveOrEqual(lastSync).toArray();
         }
 
-        const result = await fetch('/account?/sync', {
+        const result = await fetch('/sync', {
             method: 'POST',
             body: JSON.stringify({
                 syncDate: lastSync,
                 sessions: data
-            }),
+            })
         });
 
-        console.log('Sync result', await result.json());
-
-        if (result.ok) {
-            await this.syncComplete('Sync successful', true);
-        } else {
-            await this.syncComplete('Sync failed', false);
+        if (result.ok === false) {
+            this.status = 'error';
+            this.result = result.statusText;
+            await this.save();
+            return;
         }
 
+        const resultData = await (async () => {
+            const data: { status: 'ok', updates: DBSession[] } | { status: 'error', error: string } = await result.json();
+
+            if (data.status === 'ok') {
+                data.updates = data.updates.map(x => {
+                    x.startTime = new Date(x.startTime);
+                    x.endTime = new Date(x.endTime);
+                    x.lastUpdated = new Date(x.lastUpdated);
+                    x.created = new Date(x.created);
+                    x.deleted = x.deleted ? new Date(x.deleted) : undefined;
+                    return x;
+                });
+            }
+            return data;
+        })();
+
+        if (resultData.status === 'ok') {
+            this.status = 'idle';
+            this.result = 'Sync complete';
+            for (const session of resultData.updates) {
+                console.log('Updating session', session);
+                await db.sessions.put(session);
+            }
+        } else {
+            this.status = 'error';
+            this.result = resultData.error;
+        }
+
+        await this.save();
     }
 
-    async syncComplete(result: string, isSuccess: boolean): Promise<void> {
-
-        if (this.status !== "syncing" || this.id === undefined) {
+    private async save() {
+        if (this.id === undefined || this.status === 'na' || this.lastSync === null) {
             throw new Error('Sync not in progress');
         }
 
-        await db.syncState.where('id').equals(this.id).modify({
-            syncStatus: isSuccess ? 'idle' : 'error',
-            result: result
+        await db.syncState.put({
+            id: this.id,
+            lastSync: this.lastSync,
+            syncStatus: this.status,
+            result: this.result
         });
-
-        await this.load();
-
     }
 }
 

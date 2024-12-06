@@ -22,9 +22,10 @@ interface DBSchema {
 
 export type DBSession = DBSchema["sessions"];
 export type DBSyncState = DBSchema["syncState"];
+
 export const db = new Dexie("NursingDB") as Dexie & {
-    sessions: EntityTable<DBSchema["sessions"]>;
-    syncState: EntityTable<DBSchema["syncState"]>;
+    sessions: EntityTable<DBSession>;
+    syncState: EntityTable<DBSyncState>;
 };
 
 db.version(0.2).stores({

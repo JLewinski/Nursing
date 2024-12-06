@@ -57,7 +57,21 @@ async function retrieveUpdatedSessions(syncDate: Date | null, userId: string) {
         }
     });
 
-    return result;
+    return result.map(toModel);
+}
+
+function toModel(session: FeedingSession) {
+    return {
+        id: session.id,
+        startTime: session.startTime.getTime(),
+        endTime: session.endedTime.getTime(),
+        lastSide: session.lastSide ? "left" : "right",
+        leftDuration: session.leftDuration,
+        rightDuration: session.rightDuration,
+        lastUpdated: session.lastUpdated.getTime(),
+        created: session.created.getTime(),
+        deleted: session.deleted?.getTime()
+    };
 }
 
 function toDto(session: DBSession, userId: string): FeedingSession {
