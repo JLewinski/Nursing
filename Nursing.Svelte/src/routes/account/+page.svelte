@@ -39,6 +39,8 @@
 	}
 
 	let status = $derived(syncStore.status);
+
+	let groupUserName: string;
 </script>
 
 <div class="container">
@@ -53,4 +55,10 @@
 		<button class="btn btn-danger">Sign out</button>
 	</form>
 	<button class="btn btn-primary" onclick={syncData}>Sync data</button>
+
+	<!-- map to sync/group or something -->
+	<form class="py-4">
+		<input class="form-control" type="text" bind:value={groupUserName} />
+		<button class="btn btn-primary mt-4">Join Group</button>
+	</form>
 </div>
