@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import { pgTable, serial, text, integer, timestamp, boolean } from 'drizzle-orm/pg-core';
 
 export const user = pgTable('user', {
@@ -14,13 +15,16 @@ export const session = pgTable("session", {
 
 export const group = pgTable('userGroup', {
     id: text('id').primaryKey(),
-    userId: text('user_id').notNull().references(() => user.id)
+});
+
+export const userGroup = pgTable('userGroupConnection', {
+    userId: text('user_id').notNull().references(() => user.id),
+    groupId: text('group_id').notNull().references(() => group.id)
 });
 
 export const feedingSession = pgTable('feedingSession', {
     id: text('id').primaryKey(),
     userId: text('user_id').notNull().references(() => user.id),
-    groupId: text('group_id').notNull().references(() => group.id),
     startTime: timestamp('started_at', { withTimezone: true, mode: 'date' }).notNull(),
     endedTime: timestamp('ended_at', { withTimezone: true, mode: 'date' }).notNull(),
     lastSide: boolean('last_side').notNull(),
@@ -34,3 +38,7 @@ export const feedingSession = pgTable('feedingSession', {
 export type UserSession = typeof session.$inferSelect;
 
 export type User = typeof user.$inferSelect;
+
+export type FeedingSession = typeof feedingSession.$inferSelect;
+
+export type UserGroup = typeof group.$inferSelect;
