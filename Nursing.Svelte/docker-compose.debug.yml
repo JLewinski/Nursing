@@ -10,13 +10,16 @@ services:
       POSTGRES_PASSWORD: mysecretpassword
       POSTGRES_DB: local
   nursingweb:
+    container_name: nursingweb
     build:
       context: .
       dockerfile: Dockerfile
     ports:
       - "6969:6969"
     environment:
-      - DATABASE_URL=postgres://root:mysecretpassword@nursingdb:5432/local
+      - NODE_ENV=production
+    env_file:
+      - .env
     depends_on:
       - nursingdb
 networks:

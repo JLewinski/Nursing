@@ -9,7 +9,10 @@ ADD / /app
 ENV DATABASE_URL=postgres://root:mysecretpassword@localhost:5432/local
 ENV PORT=6969
 
-RUN npm install
+RUN npm ci
 RUN npm run build
+RUN rm -rf src/ static/ docker-compose.yml
 
-CMD ["npm", "run", "prod"]
+USER node:node
+
+CMD ["node", "build/index.js"]

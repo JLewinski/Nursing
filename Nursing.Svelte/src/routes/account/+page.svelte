@@ -54,7 +54,7 @@
 	</form>
 	<button class="btn btn-primary" onclick={syncData}>Sync data</button>
 
-	<form class="py-4" method="post" action="?/group">
+	<form class="py-4" method="post" action="?/group" use:enhance>
 		<input class="form-control" name="userId" type="text" />
 		<button class="btn btn-primary mt-4">Join Group</button>
 	</form>
