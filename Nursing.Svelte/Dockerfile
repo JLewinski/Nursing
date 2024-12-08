@@ -1,4 +1,4 @@
-FROM denoland/deno AS installer
+FROM node
 
 EXPOSE 6969
 
@@ -6,14 +6,10 @@ WORKDIR /app
 
 ADD / /app
 
-RUN deno install
-RUN deno task build
+ENV DATABASE_URL=postgres://root:mysecretpassword@localhost:5432/local
+ENV PORT=6969
 
+RUN npm install
+RUN npm run build
 
-FROM denoland/deno
-
-WORKDIR /app
-
-COPY --from=installer /app/build ./build
-
-CMD ["task", "prod"]
+CMD ["npm", "run", "prod"]

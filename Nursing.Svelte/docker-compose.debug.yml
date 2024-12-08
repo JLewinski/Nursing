@@ -1,0 +1,26 @@
+services:
+  nursingdb:
+    container_name: nursingdb
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment: 
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: mysecretpassword
+      POSTGRES_DB: local
+  nursingweb:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "6969:6969"
+    environment:
+      - DATABASE_URL=postgres://root:mysecretpassword@nursingdb:5432/local
+    depends_on:
+      - nursingdb
+networks:
+  default:
+    name: nursing
+    external: true
+

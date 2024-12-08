@@ -44,7 +44,7 @@ services:
       - ./Nursing.Svelte/build:/var/public
     ports:
       - 6969:80
-# networks:
-#   default:
-#     name: nursing
-#     external: true
+networks:
+  default:
+    name: nursing
+    external: true
