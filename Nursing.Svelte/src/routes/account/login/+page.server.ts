@@ -27,37 +27,31 @@ export const actions: Actions = {
 			return fail(400, { message: 'Invalid password' });
 		}
 
-		try {
+		const results = await db
+			.select()
+			.from(table.user)
+			.where(eq(table.user.username, username));
 
-			const results = await db
-				.select()
-				.from(table.user)
-				.where(eq(table.user.username, username));
-
-			const existingUser = results.at(0);
-			if (!existingUser) {
-				return fail(400, { message: 'Incorrect username or password' });
-			}
-
-			const validPassword = await verify(existingUser.passwordHash, password, {
-				memoryCost: 19456,
-				timeCost: 2,
-				outputLen: 32,
-				parallelism: 1,
-			});
-			if (!validPassword) {
-				return fail(400, { message: 'Incorrect username or password' });
-			}
-
-			const sessionToken = auth.generateSessionToken();
-			const session = await auth.createSession(sessionToken, existingUser.id);
-			auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-
-			return redirect(302, '/account');
+		const existingUser = results.at(0);
+		if (!existingUser) {
+			return fail(400, { message: 'Incorrect username or password' });
 		}
-		catch (e) {
-			return fail(500, { message: 'A connection error has occurred...' });
+
+		const validPassword = await verify(existingUser.passwordHash, password, {
+			memoryCost: 19456,
+			timeCost: 2,
+			outputLen: 32,
+			parallelism: 1,
+		});
+		if (!validPassword) {
+			return fail(400, { message: 'Incorrect username or password' });
 		}
+
+		const sessionToken = auth.generateSessionToken();
+		const session = await auth.createSession(sessionToken, existingUser.id);
+		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
+
+		return redirect(302, '/account');
 	},
 	register: async (event) => {
 		const formData = await event.request.formData();
