@@ -4,6 +4,7 @@
     import { db } from "$lib/db/mod";
     import { lastSession } from "$lib/stores/lastSessionStore.svelte";
     import ConfirmDialog from "$lib/components/ConfirmDialog.svelte";
+    import { syncStore } from "$lib/stores/syncStore.svelte";
 
     let dialog: ConfirmDialog;
     async function clear() {
@@ -15,6 +16,10 @@
         if (!confirmed) return;
 
         await db.sessions.clear();
+        await db.syncState.clear();
+        syncStore.lastSync = null;
+        syncStore.id = undefined;
+        syncStore.status = 'na';
         lastSession.side = undefined;
         lastSession.startTime = null;
         lastSession.save();
