@@ -7,8 +7,8 @@ namespace Nursing.API.Services;
 
 public interface ISyncService
 {
-    Task<SyncResult> SyncFeedings(SyncModel sync, Guid userId);
-    Task<int> DeleteFeedings(Guid[] ids, Guid userId);
+    Task<SyncResult> SyncFeedings(SyncModel sync, string userId);
+    Task<int> DeleteFeedings(Guid[] ids, string userId);
 }
 
 public class SyncService : ISyncService
@@ -20,7 +20,7 @@ public class SyncService : ISyncService
         _context = context;
     }
 
-    public async Task<SyncResult> SyncFeedings(SyncModel sync, Guid userId)
+    public async Task<SyncResult> SyncFeedings(SyncModel sync, string userId)
     {
         var currentUser = await _context.Users.FirstAsync(u => u.Id == userId);
 
@@ -70,7 +70,7 @@ public class SyncService : ISyncService
         return new SyncResult { Success = true, Feedings = toSend, BadIds = badIds, Updates = numChanged };
     }
 
-    public async Task<int> DeleteFeedings(Guid[] ids, Guid userId)
+    public async Task<int> DeleteFeedings(Guid[] ids, string userId)
     {
         var currentUser = await _context.Users.FirstAsync(u => u.Id == userId);
         return await _context.Feedings

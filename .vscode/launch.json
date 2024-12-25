@@ -9,16 +9,6 @@
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/Nursing.API/Nursing.API.csproj"
-        },
-        {
-            "name": "Docker .NET Attach (Preview)",
-            "type": "docker",
-            "request": "attach",
-            "platform": "netCore",
-            "sourceFileMap": {
-                "/src": "${workspaceFolder}"
-            }
         }
-
     ]
 }

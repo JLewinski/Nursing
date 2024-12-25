@@ -7,41 +7,31 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "prod": "drizzle-kit push --force && node build/index.js",
-    "db:start": "docker compose up",
-    "db:push": "drizzle-kit push",
-    "db:push:force": "drizzle-kit push --force",
-    "db:migrate": "drizzle-kit migrate",
-    "db:studio": "drizzle-kit studio",
-    "docker:build": "docker compose -f ./docker-compose.debug.yml up -d",
-    "docker:clean": "docker compose -f ./docker-compose.debug.yml down"
+    "generate-api": "npx swagger-typescript-api -p api.json -o src/lib/api/"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",
-    "@sveltejs/adapter-node": "^5.2.9",
-    "@sveltejs/adapter-static": "^3.0.6",
-    "@sveltejs/kit": "^2.0.0",
-    "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "@sveltejs/adapter-static": "^3.0.8",
+    "@sveltejs/kit": "^2.15.0",
+    "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.10.0",
+    "@types/node": "^22.10.2",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "chart.js": "^4.4.6",
+    "chart.js": "^4.4.7",
     "dexie": "^4.0.10",
-    "drizzle-kit": "^0.28.1",
     "gridjs": "^6.2.0",
-    "sass": "^1.81.0",
-    "svelte": "^5.0.0",
-    "svelte-check": "^4.0.0",
+    "sass": "^1.83.0",
+    "svelte": "^5.15.0",
+    "svelte-check": "^4.1.1",
     "typescript": "^5.0.0",
     "uuid": "^11.0.3",
-    "vite": "^5.4.11"
+    "vite": "^6.0.5",
+    "swagger-typescript-api": "^13.0.23"
   },
   "dependencies": {
-    "@node-rs/argon2": "^2.0.0",
+    "@node-rs/argon2": "^2.0.2",
     "@oslojs/crypto": "^1.0.1",
-    "@oslojs/encoding": "^1.1.0",
-    "drizzle-orm": "^0.36.4",
-    "postgres": "^3.4.5"
+    "@oslojs/encoding": "^1.1.0"
   }
 }

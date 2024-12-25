@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Nursing.API.Models;
@@ -24,14 +25,15 @@ public class SyncController : ControllerBase
         _inviteService = inviteService;
     }
 
-    private Guid GetUserId()
+    private string GetUserId()
     {
         var idClaim = User.Claims.First(c => c.Type == ClaimTypes.Sid);
-        return Guid.Parse(idClaim.Value);
+        return idClaim.Value;
     }
     
     [HttpPost("sync")]
     [ProducesResponseType<SyncResult>(200)]
+    [ProducesResponseType<UnauthorizedResult>(401)]
     public async Task<IActionResult> Sync([FromBody] SyncModel sync)
     {
         try

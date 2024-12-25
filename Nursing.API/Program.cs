@@ -13,17 +13,22 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<PostgresContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseSqlite("Data Source=nursing.db"));
 
-builder.Services.AddIdentity<NursingUser, IdentityRole<Guid>>()
-    .AddEntityFrameworkStores<PostgresContext>();
+builder.Services.AddAuthentication().AddJwtBearer();
+builder.Services.AddAuthorizationBuilder();
+
+builder.Services.AddIdentityCore<NursingUser>()
+    .AddEntityFrameworkStores<PostgresContext>()
+    .AddApiEndpoints();
 
 builder.Services.AddScoped<ISyncService, SyncService>();
 builder.Services.AddScoped<IInviteService, InviteService>();
 
 builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddOpenApi(options => {
+        options.AddDocumentTransformer<BearerSecuritySchemeTransformer>();
+});
 
 if (builder.Environment.IsDevelopment())
 {
@@ -41,24 +46,7 @@ if (builder.Environment.IsDevelopment())
 var token = builder.Configuration.GetSection("Token").Get<TokenManagement>() ?? throw new InvalidOperationException("TokenManagement section is missing");
 
 builder.Services
-    .AddAuthentication(x =>
-    {
-        x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, x =>
-    {
-        x.TokenValidationParameters = new TokenValidationParameters
-        {
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(token.Secret)),
-            ValidIssuer = token.Issuer,
-            ValidAudience = token.Audience,
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true
-        };
-    });
+    .AddAuthentication();
 
 builder.Services.AddAuthorization(x =>
 {
@@ -69,11 +57,15 @@ var app = builder.Build();
 
 await app.Migrate();
 
+app.MapIdentityApi<NursingUser>();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.MapOpenApi();
+    app.UseSwaggerUI(options => {
+        options.SwaggerEndpoint("/openapi/v1.json", "v1");
+    });
     app.UseCors();
 }
 

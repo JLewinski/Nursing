@@ -1,5 +1,39 @@
-import { sveltekit } from "@sveltejs/kit/vite";
 import { defineConfig } from "vite";
+import { sveltekit } from "@sveltejs/kit/vite";
+import fs from 'node:fs';
+import path from 'node:path';
+import child_process from 'node:child_process';
+import { env } from 'node:process';
+
+const baseFolder =
+  env.APPDATA !== undefined && env.APPDATA !== ''
+    ? `${env.APPDATA}/ASP.NET/https`
+    : `${env.HOME}/.aspnet/https`;
+
+const certificateName = 'Nursing.Svelte';
+const certFilePath = path.join(baseFolder, `${certificateName}.pem`);
+const keyFilePath = path.join(baseFolder, `${certificateName}.key`);
+
+if (!fs.existsSync(baseFolder)) {
+  fs.mkdirSync(baseFolder, { recursive: true });
+}
+
+if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
+  if (0 !== child_process.spawnSync('dotnet', [
+    'dev-certs',
+    'https',
+    '--export-path',
+    certFilePath,
+    '--format',
+    'Pem',
+    '--no-password',
+  ], { stdio: 'inherit' }).status) {
+    throw new Error('Failed to create certificate');
+  }
+}
+
+const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
+  env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:5001';
 
 export default defineConfig({
   plugins: [
@@ -12,4 +46,17 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    proxy: {
+      '/api': {
+        target,
+        secure: false
+      }
+    },
+    port: 50777,
+    https: {
+      key: fs.readFileSync(keyFilePath),
+      cert: fs.readFileSync(certFilePath),
+    },
+  }
 });

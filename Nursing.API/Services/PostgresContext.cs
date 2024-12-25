@@ -5,7 +5,7 @@ using Nursing.API.Models;
 
 namespace Nursing.API.Services;
 
-public class PostgresContext : IdentityDbContext<NursingUser, IdentityRole<Guid>, Guid>
+public class PostgresContext : IdentityDbContext<NursingUser>
 {
     public PostgresContext(DbContextOptions<PostgresContext> options) : base(options)
     {

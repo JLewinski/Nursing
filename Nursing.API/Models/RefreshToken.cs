@@ -21,19 +21,19 @@ public class RefreshToken
     public Guid UserId { get; set; }
     public required NursingUser User { get; set; }
 
-    public static RefreshToken Generate(NursingUser user, string ip)
-    {
-        var randomNumber = new byte[32];
-        using var rng = RandomNumberGenerator.Create();
-        rng.GetBytes(randomNumber);
-        return new RefreshToken
-        {
-            Token = Convert.ToBase64String(randomNumber),
-            Expires = DateTime.UtcNow.AddDays(7),
-            Created = DateTime.UtcNow,
-            CreatedByIp = ip,
-            User = user,
-            UserId = user.Id,
-        };
-    }
+    // public static RefreshToken Generate(NursingUser user, string ip)
+    // {
+    //     var randomNumber = new byte[32];
+    //     using var rng = RandomNumberGenerator.Create();
+    //     rng.GetBytes(randomNumber);
+    //     return new RefreshToken
+    //     {
+    //         Token = Convert.ToBase64String(randomNumber),
+    //         Expires = DateTime.UtcNow.AddDays(7),
+    //         Created = DateTime.UtcNow,
+    //         CreatedByIp = ip,
+    //         User = user,
+    //         UserId = user.Id,
+    //     };
+    // }
 }

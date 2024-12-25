@@ -1,30 +1,46 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-	<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-	<UserSecretsId>3c1fd5a2-c848-4c20-a387-51cf41342543</UserSecretsId>
-	<ContainerRepository>nursing.api</ContainerRepository>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <UserSecretsId>3c1fd5a2-c848-4c20-a387-51cf41342543</UserSecretsId>
+    <ContainerRepository>nursing.api</ContainerRepository>
+    <SpaRoot>..\Nursing.Svelte</SpaRoot>
+    <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
+    <SpaProxyServerUrl>https://localhost:50777</SpaProxyServerUrl>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OpenApiGenerateDocumentsOnBuild>true</OpenApiGenerateDocumentsOnBuild>
+    <OpenApiDocumentsDirectory>$(SpaRoot)</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocumentsOptions>--file-name api</OpenApiGenerateDocumentsOptions>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.13.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.10" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.10" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.10">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.10" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
-    <PackageReference Include="System.Formats.Asn1" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.0">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Nursing.Core\Nursing.Core.csproj" />
+    <ProjectReference Include="..\Nursing.Svelte\Nursing.Svelte.esproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
   </ItemGroup>
 
 </Project>

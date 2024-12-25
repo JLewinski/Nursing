@@ -11,14 +11,14 @@ public class SyncServiceTests : IDisposable
 {
     private readonly PostgresContext _context;
     private readonly ISyncService _syncService;
-    private readonly Guid _userId;
+    private readonly string _userId;
     private readonly Guid _groupId;
 
     public SyncServiceTests()
     {
         _context = TestDbContext.Create();
         _syncService = new SyncService(_context);
-        _userId = Guid.NewGuid();
+        _userId = Guid.NewGuid().ToString();
         _groupId = Guid.NewGuid();
 
         // Setup test user
@@ -27,7 +27,7 @@ public class SyncServiceTests : IDisposable
             Id = _userId,
             GroupId = _groupId,
             UserName = "test@test.com",
-            RefreshTokens = new List<RefreshToken>()
+            // RefreshTokens = new List<RefreshToken>()
         });
         _context.SaveChanges();
     }

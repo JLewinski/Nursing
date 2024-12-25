@@ -24,13 +24,14 @@ public static class MigrationManager
         return app;
     }
 
-    private static async Task AddRole(IServiceScope scope)
+    private static Task AddRole(IServiceScope scope)
     {
-        using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<Guid>>>();
-        if (!roleManager.Roles.Any())
-        {
-            await roleManager.CreateAsync(new IdentityRole<Guid>("Admin"));
-        }
+        // using var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        // if (!roleManager.Roles.Any())
+        // {
+        //     await roleManager.CreateAsync(new IdentityRole("Admin"));
+        // }
+        return Task.FromResult(0);
     }
 
     private static async Task AddUser(PostgresContext context, string username, string password, IServiceScope scope)
@@ -45,7 +46,7 @@ public static class MigrationManager
             UserName = username,
             Email = username,
             GroupId = Guid.NewGuid(),
-            RefreshTokens = new(),
+            // RefreshTokens = new(),
         };
 
         using var userManager = scope.ServiceProvider.GetRequiredService<UserManager<NursingUser>>();

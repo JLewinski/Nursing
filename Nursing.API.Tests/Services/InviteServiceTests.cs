@@ -21,18 +21,18 @@ public class InviteServiceTests : IDisposable
         // Setup test users
         _currentUser = new NursingUser
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             GroupId = Guid.NewGuid(),
             UserName = "current@test.com",
-            RefreshTokens = new List<RefreshToken>()
+            // RefreshTokens = new List<RefreshToken>()
         };
 
         _invitedUser = new NursingUser
         {
-            Id = Guid.NewGuid(),
+            Id = Guid.NewGuid().ToString(),
             GroupId = Guid.NewGuid(),
             UserName = "invited@test.com",
-            RefreshTokens = new List<RefreshToken>()
+            // RefreshTokens = new List<RefreshToken>()
         };
 
         _context.Users.AddRange(_currentUser, _invitedUser);
