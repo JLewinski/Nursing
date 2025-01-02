@@ -1,6 +1,7 @@
 import { db, type DBSession } from "$lib/db/mod";
 import { ResponseError, SyncApi, type FeedingDto, type SyncResult } from "$lib/api";
 import { formatDuration, parseDuration } from "$lib/utils/timeCalculations";
+import { Api } from "$lib/swaggerApi/Nursing";
 
 export class SyncState {
     lastSync: Date | undefined = $state(undefined);
@@ -55,21 +56,26 @@ export class SyncState {
         }
 
         const client = new SyncApi();
+        const tempClient = new Api().api;
+        const feedingDtos = data.map(x => ({
+            deleted: x.deleted,
+            finished: x.endTime,
+            id: x.id,
+            lastIsLeft: x.lastSide === 'left',
+            lastUpdated: x.lastUpdated,
+            leftBreastTotal: formatDuration(x.leftDuration),
+            rightBreastTotal: formatDuration(x.rightDuration),
+            started: x.startTime,
+            totalTime: formatDuration(x.leftDuration + x.rightDuration)
+        }));
+
+        const tempResult = await tempClient.sync({ lastSync: lastSync, feedings: feedingDtos });
+        const rawResult = await client.syncRaw({ syncModel: { lastSync: lastSync, feedings: feedingDtos }});
         try {
             const result = await client.sync({
                 syncModel: {
                     lastSync: this.lastSync,
-                    feedings: data.map(x => ({
-                        deleted: x.deleted,
-                        finished: x.endTime,
-                        id: x.id,
-                        lastIsLeft: x.lastSide === 'left',
-                        lastUpdated: x.lastUpdated,
-                        leftBreastTotal: formatDuration(x.leftDuration),
-                        rightBreastTotal: formatDuration(x.rightDuration),
-                        started: x.startTime,
-                        totalTime: formatDuration(x.leftDuration + x.rightDuration)
-                    } as FeedingDto))
+                    feedings: feedingDtos
                 }
             });
 
