@@ -1,7 +1,7 @@
 import { db, type DBSession } from "$lib/db/mod";
 import { ResponseError, SyncApi, type FeedingDto, type SyncResult } from "$lib/api";
 import { formatDuration, parseDuration } from "$lib/utils/timeCalculations";
-import { Api } from "$lib/swaggerApi/Nursing";
+import { Api } from "$lib/swaggerApi/Api";
 
 export class SyncState {
     lastSync: Date | undefined = $state(undefined);
@@ -56,7 +56,7 @@ export class SyncState {
         }
 
         const client = new SyncApi();
-        const tempClient = new Api().api;
+        const tempClient = new Api();
         const feedingDtos = data.map(x => ({
             deleted: x.deleted,
             finished: x.endTime,
