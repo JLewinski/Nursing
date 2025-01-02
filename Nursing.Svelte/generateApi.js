@@ -11,15 +11,15 @@ generateTemplates({
     rewrite: false,
 }).then(() => {
     return generateApi({
-        spec: {
-            openapi: "3.0.1",
-            basePath: "/",
-        },
         name: "Nursing",
         url: "./api.json",
         input: path.resolve(process.cwd(), "./api.json"),
-        output: path.resolve(process.cwd(), "./src/lib/swaggerApi/"),
+        output: path.resolve(process.cwd(), "./src/lib/api/"),
+        generateApi: true,
+        generateClient: true,
         generateResponses: true,
+        generateRouteTypes: true,
+        defaultResponseType: 'string',
         templates: path.resolve(process.cwd(), "./templates"),
         primitiveTypeConstructs: (constructs) => ({
             ...constructs,

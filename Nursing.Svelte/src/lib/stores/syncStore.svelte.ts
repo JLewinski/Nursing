@@ -1,7 +1,8 @@
 import { db, type DBSession } from "$lib/db/mod";
-import { ResponseError, SyncApi, type FeedingDto, type SyncResult } from "$lib/api";
+import { Api } from "$lib/api/Api";
 import { formatDuration, parseDuration } from "$lib/utils/timeCalculations";
-import { Api } from "$lib/swaggerApi/Api";
+import type { HttpResponse } from "$lib/api/http-client";
+import type { SyncResult } from "$lib/api/data-contracts";
 
 export class SyncState {
     lastSync: Date | undefined = $state(undefined);
@@ -55,8 +56,7 @@ export class SyncState {
             data = await db.sessions.where('lastUpdated').aboveOrEqual(lastSync).toArray();
         }
 
-        const client = new SyncApi();
-        const tempClient = new Api();
+        const client = new Api();
         const feedingDtos = data.map(x => ({
             deleted: x.deleted,
             finished: x.endTime,
@@ -69,25 +69,19 @@ export class SyncState {
             totalTime: formatDuration(x.leftDuration + x.rightDuration)
         }));
 
-        const tempResult = await tempClient.sync({ lastSync: lastSync, feedings: feedingDtos });
-        const rawResult = await client.syncRaw({ syncModel: { lastSync: lastSync, feedings: feedingDtos }});
-        try {
-            const result = await client.sync({
-                syncModel: {
-                    lastSync: this.lastSync,
-                    feedings: feedingDtos
-                }
-            });
+        const result = await client.sync({
+            lastSync: this.lastSync,
+            feedings: feedingDtos
+        });
 
-            await this.updateLocal(result);
-        }
-        catch (e) {
-            const error = e as ResponseError;
+        if (!result.ok){
             this.status = 'error';
-            this.result = await error.response.text();
+            this.result = result.error;
             await this.save();
-            return;
         }
+
+        await this.updateLocal(result.data);
+
     }
 
     private async updateLocal(result: SyncResult) {
