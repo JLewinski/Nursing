@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Nursing.Core", "Nursing.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nursing.API", "Nursing.API\Nursing.API.csproj", "{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Nursing.API.Tests", "Nursing.API.Tests\Nursing.API.Tests.csproj", "{83AC92A9-7229-4F97-98E8-410BE506D0A0}"
-EndProject
 Project("{54A90642-561A-4BB1-A94E-469ADEE60C69}") = "Nursing.Svelte", "Nursing.Svelte\Nursing.Svelte.esproj", "{9260B6EF-698E-4C80-9B09-A52522D4EBE0}"
 EndProject
 Global
@@ -25,10 +23,6 @@ Global
 		{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CFF575CE-70C8-4EA5-A350-CE20355A0CBD}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83AC92A9-7229-4F97-98E8-410BE506D0A0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83AC92A9-7229-4F97-98E8-410BE506D0A0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83AC92A9-7229-4F97-98E8-410BE506D0A0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83AC92A9-7229-4F97-98E8-410BE506D0A0}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9260B6EF-698E-4C80-9B09-A52522D4EBE0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{9260B6EF-698E-4C80-9B09-A52522D4EBE0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9260B6EF-698E-4C80-9B09-A52522D4EBE0}.Release|Any CPU.ActiveCfg = Release|Any CPU

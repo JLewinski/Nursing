@@ -31,9 +31,8 @@ public class SyncController : ControllerBase
         return idClaim.Value;
     }
     
-    [HttpPost("sync")]
+    [HttpPost("sync", Name = "Sync")]
     [ProducesResponseType<SyncResult>(200)]
-    [ProducesResponseType<UnauthorizedResult>(401)]
     public async Task<IActionResult> Sync([FromBody] SyncModel sync)
     {
         try
@@ -47,7 +46,7 @@ public class SyncController : ControllerBase
         }
     }
 
-    [HttpGet("invites")]
+    [HttpGet("invites", Name = "GetInvites")]
     [ProducesResponseType<List<InviteViewModel>>(200)]
     public async Task<IActionResult> GetInvites()
     {
@@ -55,14 +54,14 @@ public class SyncController : ControllerBase
         return Ok(invites);
     }
 
-    [HttpPost("sendInvite")]
+    [HttpPost("sendInvite", Name = "SendInvite")]
     public async Task<IActionResult> SendInvite([FromBody] string username)
     {
         await _inviteService.SendInvite(username, User.Identity!.Name!);
         return Ok();
     }
 
-    [HttpPost("acceptInvite")]
+    [HttpPost("acceptInvite", Name = "AcceptInvite")]
     public async Task<IActionResult> AcceptInvite([FromBody] Guid id)
     {
         try
@@ -76,7 +75,7 @@ public class SyncController : ControllerBase
         }
     }
 
-    [HttpPost("declineInvite")]
+    [HttpPost("declineInvite", Name = "DeclineInvite")]
     public async Task<IActionResult> DeclineInvite([FromBody] Guid id)
     {
         try
@@ -90,7 +89,7 @@ public class SyncController : ControllerBase
         }
     }
 
-    [HttpPost("delete")]
+    [HttpPost("delete", Name = "Delete")]
     public async Task<IActionResult> Delete([FromBody] Guid[] ids)
     {
         var numberUpdated = await _syncService.DeleteFeedings(ids, GetUserId());

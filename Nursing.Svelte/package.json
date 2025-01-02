@@ -7,27 +7,27 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "generate-api": "npx swagger-typescript-api -p api.json -o src/lib/api/"
+    "generate-api": "npx @openapitools/openapi-generator-cli generate -i ./api.json -g typescript-fetch -o ./src/lib/api"
   },
   "devDependencies": {
+    "@openapitools/openapi-generator-cli": "^2.15.3",
     "@sveltejs/adapter-auto": "^3.0.0",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.15.0",
+    "@sveltejs/kit": "^2.15.1",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@types/bootstrap": "^5.2.10",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.10.3",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "chart.js": "^4.4.7",
     "dexie": "^4.0.10",
     "gridjs": "^6.2.0",
     "sass": "^1.83.0",
-    "svelte": "^5.15.0",
+    "svelte": "^5.16.0",
     "svelte-check": "^4.1.1",
     "typescript": "^5.0.0",
     "uuid": "^11.0.3",
-    "vite": "^6.0.5",
-    "swagger-typescript-api": "^13.0.23"
+    "vite": "^6.0.6"
   },
   "dependencies": {
     "@node-rs/argon2": "^2.0.2",

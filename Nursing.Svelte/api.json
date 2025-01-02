@@ -1,11 +1,18 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "Nursing.API | v1",
+    "title": "Nursing API",
+    "description": "API for Nursing App",
     "version": "1.0.0"
   },
+  "servers": [
+    {
+      "url": "/",
+      "description": "Self"
+    }
+  ],
   "paths": {
-    "/register": {
+    "/auth/register": {
       "post": {
         "tags": [
           "Nursing.API"
@@ -33,11 +40,14 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/login": {
+    "/auth/login": {
       "post": {
         "tags": [
           "Nursing.API"
@@ -78,11 +88,14 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/refresh": {
+    "/auth/refresh": {
       "post": {
         "tags": [
           "Nursing.API"
@@ -107,16 +120,19 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/confirmEmail": {
+    "/auth/confirmEmail": {
       "get": {
         "tags": [
           "Nursing.API"
         ],
-        "operationId": "MapIdentityApi-/confirmEmail",
+        "operationId": "MapIdentityApi-/auth/confirmEmail",
         "parameters": [
           {
             "name": "userId",
@@ -145,11 +161,14 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/resendConfirmationEmail": {
+    "/auth/resendConfirmationEmail": {
       "post": {
         "tags": [
           "Nursing.API"
@@ -167,11 +186,14 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/forgotPassword": {
+    "/auth/forgotPassword": {
       "post": {
         "tags": [
           "Nursing.API"
@@ -199,11 +221,14 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/resetPassword": {
+    "/auth/resetPassword": {
       "post": {
         "tags": [
           "Nursing.API"
@@ -231,11 +256,14 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/manage/2fa": {
+    "/auth/manage/2fa": {
       "post": {
         "tags": [
           "Nursing.API"
@@ -273,11 +301,14 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
     },
-    "/manage/info": {
+    "/auth/manage/info": {
       "get": {
         "tags": [
           "Nursing.API"
@@ -305,6 +336,9 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       },
@@ -345,6 +379,9 @@
           },
           "404": {
             "description": "Not Found"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
         }
       }
@@ -354,6 +391,7 @@
         "tags": [
           "Sync"
         ],
+        "operationId": "Sync",
         "requestBody": {
           "content": {
             "application/json": {
@@ -396,26 +434,12 @@
             }
           },
           "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedResult"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedResult"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/UnauthorizedResult"
-                }
-              }
-            }
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          { }
+        ]
       }
     },
     "/api/Sync/invites": {
@@ -423,6 +447,7 @@
         "tags": [
           "Sync"
         ],
+        "operationId": "GetInvites",
         "responses": {
           "200": {
             "description": "OK",
@@ -452,8 +477,14 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          { }
+        ]
       }
     },
     "/api/Sync/sendInvite": {
@@ -461,6 +492,7 @@
         "tags": [
           "Sync"
         ],
+        "operationId": "SendInvite",
         "requestBody": {
           "content": {
             "application/json": {
@@ -484,8 +516,14 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          { }
+        ]
       }
     },
     "/api/Sync/acceptInvite": {
@@ -493,6 +531,7 @@
         "tags": [
           "Sync"
         ],
+        "operationId": "AcceptInvite",
         "requestBody": {
           "content": {
             "application/json": {
@@ -519,8 +558,14 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          { }
+        ]
       }
     },
     "/api/Sync/declineInvite": {
@@ -528,6 +573,7 @@
         "tags": [
           "Sync"
         ],
+        "operationId": "DeclineInvite",
         "requestBody": {
           "content": {
             "application/json": {
@@ -554,8 +600,14 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          { }
+        ]
       }
     },
     "/api/Sync/delete": {
@@ -563,6 +615,7 @@
         "tags": [
           "Sync"
         ],
+        "operationId": "Delete",
         "requestBody": {
           "content": {
             "application/json": {
@@ -598,8 +651,14 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
           }
-        }
+        },
+        "security": [
+          { }
+        ]
       }
     }
   },
@@ -942,22 +1001,14 @@
             "type": "boolean"
           }
         }
-      },
-      "UnauthorizedResult": {
-        "type": "object",
-        "properties": {
-          "statusCode": {
-            "type": "integer",
-            "format": "int32"
-          }
-        }
       }
     },
     "securitySchemes": {
-      "Bearer": {
-        "type": "http",
-        "scheme": "bearer",
-        "bearerFormat": "Json Web Token"
+      "Cookie": {
+        "type": "apiKey",
+        "description": "Cookie authorization.",
+        "name": "Authorization",
+        "in": "cookie"
       }
     }
   },
