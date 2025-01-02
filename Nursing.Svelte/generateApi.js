@@ -1,4 +1,3 @@
-import fs from "node:fs";
 import path from "node:path";
 import { generateApi, generateTemplates } from "swagger-typescript-api";
 
@@ -8,14 +7,12 @@ generateTemplates({
     httpClientType: "fetch",
     modular: true,
     silent: false,
-    rewrite: false,
 }).then(() => {
     return generateApi({
         name: "Nursing",
         url: "./api.json",
         input: path.resolve(process.cwd(), "./api.json"),
         output: path.resolve(process.cwd(), "./src/lib/api/"),
-        generateApi: true,
         generateClient: true,
         generateResponses: true,
         generateRouteTypes: true,
@@ -24,6 +21,7 @@ generateTemplates({
         primitiveTypeConstructs: (constructs) => ({
             ...constructs,
             string: {
+                $default: "string",
                 "date-time": "Date",
             },
         }),
