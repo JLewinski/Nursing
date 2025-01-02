@@ -29,12 +29,12 @@ export interface FeedingDto {
   /** @format date-time */
   started?: Date;
   /** @format date-time */
-  finished?: Date;
+  finished?: Date | null;
   lastIsLeft?: boolean;
   /** @format date-time */
   lastUpdated?: Date;
   /** @format date-time */
-  deleted?: Date;
+  deleted?: Date | null;
 }
 
 export interface ForgotPasswordRequest {
@@ -350,6 +350,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name RegisterCreate
      * @request POST:/auth/register
+     * @response `200` `void` OK
+     * @response `400` `HttpValidationProblemDetails` Bad Request
+     * @response `401` `void` Unauthorized
      */
     registerCreate: (data: RegisterRequest, params: RequestParams = {}) =>
       this.request<void, HttpValidationProblemDetails | void>({
@@ -366,6 +369,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name LoginCreate
      * @request POST:/auth/login
+     * @response `200` `AccessTokenResponse` OK
+     * @response `401` `void` Unauthorized
      */
     loginCreate: (
       data: LoginRequest,
@@ -391,6 +396,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name RefreshCreate
      * @request POST:/auth/refresh
+     * @response `200` `AccessTokenResponse` OK
+     * @response `401` `void` Unauthorized
      */
     refreshCreate: (data: RefreshRequest, params: RequestParams = {}) =>
       this.request<AccessTokenResponse, void>({
@@ -408,6 +415,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name MapIdentityApiAuthConfirmEmail
      * @request GET:/auth/confirmEmail
+     * @response `200` `void` OK
+     * @response `401` `void` Unauthorized
      */
     mapIdentityApiAuthConfirmEmail: (
       query: {
@@ -430,6 +439,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name ResendConfirmationEmailCreate
      * @request POST:/auth/resendConfirmationEmail
+     * @response `200` `void` OK
+     * @response `401` `void` Unauthorized
      */
     resendConfirmationEmailCreate: (data: ResendConfirmationEmailRequest, params: RequestParams = {}) =>
       this.request<void, void>({
@@ -446,6 +457,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name ForgotPasswordCreate
      * @request POST:/auth/forgotPassword
+     * @response `200` `void` OK
+     * @response `400` `HttpValidationProblemDetails` Bad Request
+     * @response `401` `void` Unauthorized
      */
     forgotPasswordCreate: (data: ForgotPasswordRequest, params: RequestParams = {}) =>
       this.request<void, HttpValidationProblemDetails | void>({
@@ -462,6 +476,9 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name ResetPasswordCreate
      * @request POST:/auth/resetPassword
+     * @response `200` `void` OK
+     * @response `400` `HttpValidationProblemDetails` Bad Request
+     * @response `401` `void` Unauthorized
      */
     resetPasswordCreate: (data: ResetPasswordRequest, params: RequestParams = {}) =>
       this.request<void, HttpValidationProblemDetails | void>({
@@ -478,6 +495,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name Manage2FaCreate
      * @request POST:/auth/manage/2fa
+     * @response `200` `TwoFactorResponse` OK
+     * @response `400` `HttpValidationProblemDetails` Bad Request
+     * @response `401` `void` Unauthorized
+     * @response `404` `void` Not Found
      */
     manage2FaCreate: (data: TwoFactorRequest, params: RequestParams = {}) =>
       this.request<TwoFactorResponse, HttpValidationProblemDetails | void>({
@@ -495,6 +516,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name ManageInfoList
      * @request GET:/auth/manage/info
+     * @response `200` `InfoResponse` OK
+     * @response `400` `HttpValidationProblemDetails` Bad Request
+     * @response `401` `void` Unauthorized
+     * @response `404` `void` Not Found
      */
     manageInfoList: (params: RequestParams = {}) =>
       this.request<InfoResponse, HttpValidationProblemDetails | void>({
@@ -510,6 +535,10 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @tags Nursing.API
      * @name ManageInfoCreate
      * @request POST:/auth/manage/info
+     * @response `200` `InfoResponse` OK
+     * @response `400` `HttpValidationProblemDetails` Bad Request
+     * @response `401` `void` Unauthorized
+     * @response `404` `void` Not Found
      */
     manageInfoCreate: (data: InfoRequest, params: RequestParams = {}) =>
       this.request<InfoResponse, HttpValidationProblemDetails | void>({
@@ -529,6 +558,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name Sync
      * @request POST:/api/Sync/sync
      * @secure
+     * @response `200` `SyncResult` OK
+     * @response `401` `void` Unauthorized
      */
     sync: (data: SyncModel, params: RequestParams = {}) =>
       this.request<SyncResult, void>({
@@ -548,6 +579,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name GetInvites
      * @request GET:/api/Sync/invites
      * @secure
+     * @response `200` `(InviteViewModel)[]` OK
+     * @response `401` `void` Unauthorized
      */
     getInvites: (params: RequestParams = {}) =>
       this.request<InviteViewModel[], void>({
@@ -565,6 +598,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name SendInvite
      * @request POST:/api/Sync/sendInvite
      * @secure
+     * @response `200` `void` OK
+     * @response `401` `void` Unauthorized
      */
     sendInvite: (data: string, params: RequestParams = {}) =>
       this.request<void, void>({
@@ -583,6 +618,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name AcceptInvite
      * @request POST:/api/Sync/acceptInvite
      * @secure
+     * @response `200` `void` OK
+     * @response `401` `void` Unauthorized
      */
     acceptInvite: (data: string, params: RequestParams = {}) =>
       this.request<void, void>({
@@ -601,6 +638,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name DeclineInvite
      * @request POST:/api/Sync/declineInvite
      * @secure
+     * @response `200` `void` OK
+     * @response `401` `void` Unauthorized
      */
     declineInvite: (data: string, params: RequestParams = {}) =>
       this.request<void, void>({
@@ -619,6 +658,8 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
      * @name Delete
      * @request POST:/api/Sync/delete
      * @secure
+     * @response `200` `void` OK
+     * @response `401` `void` Unauthorized
      */
     delete: (data: string[], params: RequestParams = {}) =>
       this.request<void, void>({
