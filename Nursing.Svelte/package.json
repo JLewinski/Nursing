@@ -7,7 +7,7 @@
     "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "generate-api": "node ./generateApi.js"
+    "generate-api": "dotnet run --project ../Nursing.API/Nursing.API.csproj --exportswaggerjson true && node ./generateApi.js"
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.0.0",

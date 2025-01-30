@@ -1,4 +1,5 @@
 using FastEndpoints;
+using FastEndpoints.ClientGen.Kiota;
 using FastEndpoints.Swagger;
 using Nursing.API.Models;
 
@@ -10,7 +11,8 @@ builder.Services.AddAuthentication().AddJwtBearer(x =>
 {
     x.Audience = builder.Configuration["Jwt:Audience"];
     x.Authority = builder.Configuration["Jwt:Authority"];
-    x.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents{
+    x.Events = new Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerEvents
+    {
         OnMessageReceived = context =>
         {
             if (!context.Request.Cookies.ContainsKey("CF_Authorization"))
@@ -30,16 +32,15 @@ builder.Services.AddAuthentication().AddJwtBearer(x =>
 builder.Services.AddAuthorization();
 
 builder.Services.AddFastEndpoints();
-builder.Services.SwaggerDocument(options => {
-    options.DocumentSettings = s => {
+builder.Services.SwaggerDocument(options =>
+{
+    options.DocumentSettings = s =>
+    {
         s.Title = "Nursing API";
         s.Description = "API for Nursing App";
         s.Version = "1.0";
-        s.PostProcess = async d => {
-            await File.WriteAllTextAsync("swagger.json", d.ToJson());
-        };
+        s.DocumentName = "v1";
     };
-
 });
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
@@ -70,7 +71,15 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-app.UseFastEndpoints().UseSwaggerGen();
+app.UseFastEndpoints(options =>
+{
+    options.Endpoints.RoutePrefix = "api";
+    options.Endpoints.ShortNames = true;
+});
+
+app.UseSwaggerGen();
+
+await app.ExportSwaggerJsonAndExitAsync("v1", "../Nursing.Svelte/", "api.json");
 
 using (var scope = app.Services.CreateScope())
 {

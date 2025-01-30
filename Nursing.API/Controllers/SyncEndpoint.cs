@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using Nursing.API.Models;
 
-namespace Nursing.API;
+namespace Nursing.API.Endpoints;
 
 public class SyncRequest
 {
@@ -16,12 +16,12 @@ public class SyncResponse
     public List<Feeding> Feedings { get; set; } = null!;
 }
 
-public class SyncEndpoint : Endpoint<SyncRequest, Results<Ok<SyncResponse>, BadRequest>>
+public class Sync : Endpoint<SyncRequest, Results<Ok<SyncResponse>, BadRequest>>
 {
     public INursingContext Context { get; set; } = null!;
     public override void Configure()
     {
-        Post("/api/sync");
+        Post("/sync");
 
     }
 

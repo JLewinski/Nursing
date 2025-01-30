@@ -10,11 +10,11 @@ public class UserInformationResponse
     public string Email { get; set; } = null!;
 }
 
-public class UserInformationEndpoint : EndpointWithoutRequest<Results<Ok<UserInformationResponse>, UnauthorizedHttpResult>>
+public class UserInformation : EndpointWithoutRequest<Results<Ok<UserInformationResponse>, UnauthorizedHttpResult>>
 {
     public override void Configure()
     {
-        Get("/api/userinfo");
+        Get("/userinfo");
     }
 
     public override async Task<Results<Ok<UserInformationResponse>, UnauthorizedHttpResult>> ExecuteAsync(CancellationToken ct)
