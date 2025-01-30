@@ -51,7 +51,11 @@ export default defineConfig({
       '/api': {
         target,
         secure: false
-      }
+      },
+      '/swagger': {
+        target,
+        secure: false
+      },
     },
     port: 50777,
     https: {

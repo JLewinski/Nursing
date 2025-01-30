@@ -1,10 +1,9 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Nursing.Core.Models.DTO;
 
 namespace Nursing.API.Models;
 
-public class NursingUser : IdentityUser
+public class NursingUser
 {
-    public Guid GroupId { get; set; }
-    // public required List<RefreshToken> RefreshTokens { get; set; }
+    public string Id { get; set; } = null!;
+    public ICollection<Invite> Invites { get; set; } = [];
 }

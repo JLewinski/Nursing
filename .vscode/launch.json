@@ -9,6 +9,13 @@
             "type": "dotnet",
             "request": "launch",
             "projectPath": "${workspaceFolder}/Nursing.API/Nursing.API.csproj"
+        },
+        {
+            "name": "Client",
+            "type": "msedge",
+            "address": "dev.lewinskitech.com",
+            "url": "https://dev.lewinskitech.com",
+            "request": "launch"
         }
     ]
 }

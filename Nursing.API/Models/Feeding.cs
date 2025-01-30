@@ -1,24 +1,22 @@
-﻿using Nursing.Core.Models.DTO;
-using System.ComponentModel.DataAnnotations;
+﻿namespace Nursing.API.Models;
 
-namespace Nursing.API.Models;
-
-public class Feeding : FeedingDto
+public class Feeding
 {
-    public Feeding()
-    {
-    }
+    public Guid Id { get; set; }
+    public string UserId { get; set; } = null!;
 
-    public Feeding(FeedingDto feeding, Guid groupId) : base(feeding)
-    {
-        GroupId = groupId;
-    }
-    public Guid GroupId { get; set; }
+    public TimeSpan LeftDuration { get; set; }
+    public TimeSpan RightDuration { get; set; }
+
+    public DateTime Created { get; set; }
+    public DateTime LastUpdated { get; set; }
+    public DateTime? Deleted { get; set; }
 }
 
 public class Invite
 {
-    [Key]
-    public Guid GroupId { get; set; }
-    public string UserId { get; set; } = null!;
+    public Guid Id { get; set; }
+    public string UserId1 { get; set; } = null!;
+    public string UserId2 { get; set; } = null!;
+    public bool Accepted { get; set; }
 }
