@@ -29,7 +29,18 @@ builder.Services.AddAuthentication().AddJwtBearer(x =>
 });
 builder.Services.AddAuthorization();
 
-builder.Services.AddFastEndpoints().SwaggerDocument();
+builder.Services.AddFastEndpoints();
+builder.Services.SwaggerDocument(options => {
+    options.DocumentSettings = s => {
+        s.Title = "Nursing API";
+        s.Description = "API for Nursing App";
+        s.Version = "1.0";
+        s.PostProcess = async d => {
+            await File.WriteAllTextAsync("swagger.json", d.ToJson());
+        };
+    };
+
+});
 
 builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
