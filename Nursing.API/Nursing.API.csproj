@@ -8,39 +8,38 @@
     <UserSecretsId>3c1fd5a2-c848-4c20-a387-51cf41342543</UserSecretsId>
     <ContainerRepository>nursing.api</ContainerRepository>
     <SpaRoot>..\Nursing.Svelte</SpaRoot>
-    <SpaProxyLaunchCommand>npm run dev</SpaProxyLaunchCommand>
-    <SpaProxyServerUrl>https://localhost:50777</SpaProxyServerUrl>
   </PropertyGroup>
 
   <PropertyGroup>
     <OpenApiGenerateDocumentsOnBuild>false</OpenApiGenerateDocumentsOnBuild>
     <OpenApiDocumentsDirectory>$(SpaRoot)</OpenApiDocumentsDirectory>
-    <OpenApiGenerateDocumentsOptions>--file-name api</OpenApiGenerateDocumentsOptions>
+    <OpenApiGenerateDocumentsOptions>--file-name apiOld</OpenApiGenerateDocumentsOptions>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="FastEndpoints" Version="5.33.0" />
-    <PackageReference Include="FastEndpoints.ClientGen.Kiota" Version="5.33.0" />
-    <PackageReference Include="FastEndpoints.Security" Version="5.33.0" />
-    <PackageReference Include="FastEndpoints.Swagger" Version="5.33.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.SpaProxy" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0">
+    <PackageReference Include="FastEndpoints" Version="5.34.0" />
+    <PackageReference Include="FastEndpoints.ClientGen.Kiota" Version="5.34.0" />
+    <PackageReference Include="FastEndpoints.Security" Version="5.34.0" />
+    <PackageReference Include="FastEndpoints.Swagger" Version="5.34.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="9.0.1" />
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.1" />
+    <PackageReference Include="Microsoft.OpenApi.ApiManifest" Version="0.6.0-preview" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.0">
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" Version="9.0.1">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
-    <PackageReference Include="System.Formats.Asn1" Version="9.0.0" />
+    <PackageReference Include="System.Formats.Asn1" Version="9.0.1" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Nursing.ServiceDefaults\Nursing.ServiceDefaults.csproj" />
     <ProjectReference Include="..\Nursing.Svelte\Nursing.Svelte.esproj">
       <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
     </ProjectReference>

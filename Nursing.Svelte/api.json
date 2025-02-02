@@ -7,7 +7,7 @@
     "version": "1.0"
   },
   "paths": {
-    "/api/sync": {
+    "/sync": {
       "post": {
         "tags": [
           "Sync"
@@ -51,7 +51,7 @@
         ]
       }
     },
-    "/api/userinfo": {
+    "/userinfo": {
       "get": {
         "tags": [
           "Userinfo"

@@ -5,6 +5,8 @@ using Nursing.API.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.AddServiceDefaults();
+
 builder.Services.AddDbContext<INursingContext, NursingContext>();
 
 builder.Services.AddAuthentication().AddJwtBearer(x =>
@@ -73,18 +75,21 @@ app.UseAuthorization();
 
 app.UseFastEndpoints(options =>
 {
-    options.Endpoints.RoutePrefix = "api";
     options.Endpoints.ShortNames = true;
 });
 
-app.UseSwaggerGen();
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwaggerGen();
+    app.UseSwaggerUI();
+}
 
 await app.ExportSwaggerJsonAndExitAsync("v1", "../Nursing.Svelte/", "api.json");
 
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<INursingContext>();
-    await db.Migrate();
+    await db.MigrateAsync();
 }
 
 app.Run();

@@ -5,6 +5,8 @@ import path from 'node:path';
 import child_process from 'node:child_process';
 import { env } from 'node:process';
 
+console.log(env);
+
 const baseFolder =
   env.APPDATA !== undefined && env.APPDATA !== ''
     ? `${env.APPDATA}/ASP.NET/https`
@@ -32,8 +34,7 @@ if (!fs.existsSync(certFilePath) || !fs.existsSync(keyFilePath)) {
   }
 }
 
-const target = env.ASPNETCORE_HTTPS_PORT ? `https://localhost:${env.ASPNETCORE_HTTPS_PORT}` :
-  env.ASPNETCORE_URLS ? env.ASPNETCORE_URLS.split(';')[0] : 'https://localhost:5001';
+const target = process.env.services__api__https__0 || process.env.services__api__http__0;
 
 export default defineConfig({
   plugins: [
@@ -50,14 +51,12 @@ export default defineConfig({
     proxy: {
       '/api': {
         target,
-        secure: false
-      },
-      '/swagger': {
-        target,
-        secure: false
-      },
+        secure: false,
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, '')
+      }
     },
-    port: 50777,
+    port: env.VITE_PORT ? parseInt(env.VITE_PORT) : 50777,
     https: {
       key: fs.readFileSync(keyFilePath),
       cert: fs.readFileSync(certFilePath),

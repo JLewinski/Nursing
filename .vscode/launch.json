@@ -5,17 +5,10 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "C#: Nursing.API Debug",
+            "name": "Aspire",
             "type": "dotnet",
             "request": "launch",
-            "projectPath": "${workspaceFolder}/Nursing.API/Nursing.API.csproj"
-        },
-        {
-            "name": "Client",
-            "type": "msedge",
-            "address": "dev.lewinskitech.com",
-            "url": "https://dev.lewinskitech.com",
-            "request": "launch"
+            "projectPath": "${workspaceFolder}/Nursing.Host/Nursing.Host.csproj"
         }
     ]
 }

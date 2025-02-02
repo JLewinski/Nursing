@@ -82,7 +82,7 @@
             id: v4(),
         };
 
-        db.sessions.add(session).then(() =>{
+        db.sessions.add(session).then(() => {
             timerState.reset();
         });
     }

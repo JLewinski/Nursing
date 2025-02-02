@@ -7,7 +7,7 @@ public interface INursingContext
     DbSet<Feeding> Feedings { get; set; }
     DbSet<Invite> Invites { get; set; }
 
-    Task Migrate();
+    Task MigrateAsync();
 }
 
 public class NursingContext : DbContext, INursingContext
@@ -17,7 +17,7 @@ public class NursingContext : DbContext, INursingContext
         optionsBuilder.UseSqlite("Data Source=nursing.db");
     }
 
-    public async Task Migrate()
+    public async Task MigrateAsync()
     {
         await Database.MigrateAsync();
     }
