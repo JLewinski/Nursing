@@ -1,3 +1,4 @@
+using System;
 using FastEndpoints;
 using FastEndpoints.ClientGen.Kiota;
 using FastEndpoints.Swagger;
@@ -76,6 +77,11 @@ app.UseAuthorization();
 app.UseFastEndpoints(options =>
 {
     options.Endpoints.ShortNames = true;
+    options.Endpoints.NameGenerator = (type) =>
+    {
+        var name = type.EndpointType.Name;
+        return name.EndsWith("Endpoint") ? name.Substring(0, name.Length - 8) : name;
+    };
 });
 
 if (app.Environment.IsDevelopment())

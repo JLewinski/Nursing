@@ -7,6 +7,40 @@
     "version": "1.0"
   },
   "paths": {
+    "/invite": {
+      "post": {
+        "tags": [
+          "Invite"
+        ],
+        "operationId": "Invite",
+        "requestBody": {
+          "x-name": "InviteRequest",
+          "description": "",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NursingAPIEndpointsInviteRequest"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 1
+        },
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        },
+        "security": [
+          {
+            "JWTBearerAuth": []
+          }
+        ]
+      }
+    },
     "/sync": {
       "post": {
         "tags": [
@@ -82,6 +116,15 @@
   },
   "components": {
     "schemas": {
+      "NursingAPIEndpointsInviteRequest": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "email": {
+            "type": "string"
+          }
+        }
+      },
       "NursingAPIEndpointsSyncResponse": {
         "type": "object",
         "additionalProperties": false,

@@ -9,6 +9,10 @@
  * ---------------------------------------------------------------
  */
 
+export interface NursingAPIEndpointsInviteRequest {
+  email?: string;
+}
+
 export interface NursingAPIEndpointsSyncResponse {
   feedings?: NursingAPIModelsFeeding[];
 }

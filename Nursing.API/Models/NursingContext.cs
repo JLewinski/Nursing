@@ -8,6 +8,7 @@ public interface INursingContext
     DbSet<Invite> Invites { get; set; }
 
     Task MigrateAsync();
+    Task<int> SaveChangesAsync(CancellationToken ct);
 }
 
 public class NursingContext : DbContext, INursingContext

@@ -16,16 +16,15 @@ public class SyncResponse
     public List<Feeding> Feedings { get; set; } = null!;
 }
 
-public class Sync : Endpoint<SyncRequest, Results<Ok<SyncResponse>, BadRequest>>
+public class SyncEndpoint : Endpoint<SyncRequest, Results<Ok<SyncResponse>, BadRequest>>
 {
     public INursingContext Context { get; set; } = null!;
     public override void Configure()
     {
         Post("/sync");
-
     }
 
-    public override async Task<Results<Ok<SyncResponse>, BadRequest>> ExecuteAsync(SyncRequest req, CancellationToken ct)
+    public override async Task HandleAsync(SyncRequest req, CancellationToken ct)
     {
         foreach (var feeding in req.Feedings)
         {
@@ -53,9 +52,10 @@ public class Sync : Endpoint<SyncRequest, Results<Ok<SyncResponse>, BadRequest>>
                 }
             }
         }
+
         var feedings = await Context.Feedings.Where(x => x.LastUpdated > req.LastSync).ToListAsync(ct);
 
-        return TypedResults.Ok(new SyncResponse
+        Response =  TypedResults.Ok(new SyncResponse
         {
             Feedings = feedings
         });
