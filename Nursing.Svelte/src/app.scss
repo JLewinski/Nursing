@@ -5,6 +5,31 @@ $info: #ffd59a;
 @import "bootstrap/scss/bootstrap";
 @import "bootstrap-icons/font/bootstrap-icons.css";
 
+// Prevent pinch-to-zoom in PWA
+html {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+body {
+    touch-action: manipulation;
+    overscroll-behavior: none;
+}
+
+// Prevent double-tap zoom on buttons and interactive elements
+button,
+input,
+select,
+textarea,
+a {
+    touch-action: manipulation;
+}
+
 dialog {
     border-width: $modal-content-border-width;
     border-color: $modal-content-border-color;
