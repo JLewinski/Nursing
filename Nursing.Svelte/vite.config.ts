@@ -10,12 +10,5 @@ export default defineConfig({
       strict: false,
     },
   },
-  css: {
-    preprocessorOptions: {
-      scss: {
-        quietDeps: true,
-      },
-    },
-  },
   // TODO: Add PWA plugin configuration
 });
