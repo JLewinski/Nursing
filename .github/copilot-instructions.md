@@ -1,6 +1,6 @@
 # Nursing Time Tracking Application
 
-A multi-platform nursing/feeding time tracking application built with .NET 8.0 and TypeScript. The application includes an ASP.NET Core Web API backend, Blazor WebAssembly frontend, Svelte frontend, and comprehensive test suite. It tracks feeding sessions with left/right breast timers for nursing mothers.
+A multi-platform nursing/feeding time tracking application built with .NET 8.0 and TypeScript. The application includes an ASP.NET Core Web API backend, Svelte frontend, and comprehensive test suite. It tracks feeding sessions with left/right breast timers for nursing mothers.
 
 Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.
 
@@ -9,8 +9,6 @@ Always reference these instructions first and fallback to search or bash command
 ### Prerequisites and Environment Setup
 - Ensure .NET 8.0 SDK is installed (current version: 8.0.119)
 - Ensure Node.js v20.19.4+ and npm 10.8.2+ are installed
-- Java 17 (OpenJDK Temurin-17.0.16+8) is available for Android development
-- Android SDK is available at `/usr/local/lib/android/sdk` with ANDROID_HOME set
 - Docker 28.0.4+ is available for containerization
 - PostgreSQL database is required for API runtime (not for building/testing)
 
@@ -21,7 +19,7 @@ Run these commands in sequence from the repository root:
 cd /home/runner/work/Nursing/Nursing
 dotnet workload restore    # Takes ~13 seconds
 dotnet restore            # Takes ~24 seconds - installs all NuGet packages
-dotnet build --no-restore # Takes ~12 seconds - builds all 4 projects
+dotnet build --no-restore # Takes ~12 seconds - builds all 3 active projects
 ```
 
 **NEVER CANCEL: Build commands complete in under 45 seconds total. Set timeout to 120+ seconds.**
@@ -35,13 +33,15 @@ dotnet test --no-build    # Takes ~4 seconds - runs 11 xUnit tests in Nursing.AP
 
 All tests pass and use in-memory Entity Framework for testing without requiring PostgreSQL.
 
-### Running the Blazor WebAssembly Frontend
+### Running the Blazor WebAssembly Frontend (DEPRECATED)
+**Note: The Blazor project is no longer being actively developed.**
+
 ```bash
 cd Nursing.Blazor
 dotnet run --no-build     # Starts on http://localhost:5006
 ```
 
-The Blazor frontend starts immediately and serves the WebAssembly application.
+The Blazor frontend is still present in the solution but is not being actively maintained or developed.
 
 ### Running the Svelte Frontend
 ```bash
@@ -74,8 +74,8 @@ docker build -f Nursing.API/Dockerfile -t nursing-api .
 ### Core Projects
 - **Nursing.Core** (.NET 8.0 class library) - Shared models and DTOs
 - **Nursing.API** (.NET 8.0 Web API) - REST API with PostgreSQL, Entity Framework, JWT authentication
-- **Nursing.Blazor** (.NET 8.0 WebAssembly) - Blazor frontend with Bootstrap, local storage, modal support
-- **Nursing.Svelte** (TypeScript/Svelte 5) - Alternative frontend with Vite, Bootstrap, Chart.js
+- **Nursing.Blazor** (.NET 8.0 WebAssembly) - **DEPRECATED** - Blazor frontend (no longer actively developed)
+- **Nursing.Svelte** (TypeScript/Svelte 5) - Primary frontend with Vite, Bootstrap, Chart.js
 - **Nursing.API.Tests** (.NET 8.0 xUnit) - Comprehensive test suite with in-memory database
 
 ### Key Features
@@ -93,15 +93,15 @@ After making changes, always test these core user workflows:
 
 1. **Timer Functionality**: Start left timer, switch to right timer, verify totals update correctly
 2. **Session Management**: Create new session, finish session, verify session data persists
-3. **Frontend Connectivity**: Verify both Blazor and Svelte frontends start and render correctly
+3. **Frontend Connectivity**: Verify Svelte frontend starts and renders correctly
 4. **API Tests**: Run full test suite to verify business logic integrity
 
 ### CI/CD Pipeline
 The GitHub Actions workflow (`.github/workflows/buildTest.yml`) requires:
 - .NET 9.0 preview SDK
-- Java 17 (Temurin distribution)  
-- Android SDK setup
 - Workload restoration before build
+
+**Note**: The CI pipeline still includes Java 17 and Android SDK setup for legacy compatibility with the deprecated Blazor project, but these are not required for active development.
 
 Always run these commands before committing:
 ```bash
@@ -127,14 +127,15 @@ dotnet test --no-build
 5. Run `dotnet build && dotnet test` to verify
 
 ### Frontend Development
-For Blazor changes:
-- Modify components in `Nursing.Blazor/Pages/` or `Nursing.Blazor/Components/`
-- Run `dotnet run` from `Nursing.Blazor/` to test
-
-For Svelte changes:
+**Primary Frontend (Svelte):**
 - Modify components in `Nursing.Svelte/src/`
 - Run `npm run dev` from `Nursing.Svelte/` to test
 - Use `npm run build` to create production build
+
+**Deprecated Frontend (Blazor):**
+- The Blazor project (`Nursing.Blazor/`) is no longer being actively developed
+- Components are in `Nursing.Blazor/Pages/` or `Nursing.Blazor/Components/`
+- Can still run with `dotnet run` from `Nursing.Blazor/` if needed for legacy purposes
 
 ### Database Changes
 - Entity Framework migrations are in `Nursing.API/Migrations/`
@@ -150,16 +151,16 @@ For Svelte changes:
 dotnet workload restore && dotnet restore && dotnet build --no-restore && dotnet test --no-build
 
 # Check project structure
-ls -la  # Shows: Nursing.sln, docker-compose.yml, privacy.md, 4 project folders
+ls -la  # Shows: Nursing.sln, docker-compose.yml, privacy.md, 4 project folders (3 active + 1 deprecated)
 
 # Solution info
-dotnet sln list  # Shows all 4 projects in solution
+dotnet sln list  # Shows all 4 projects in solution (Blazor is deprecated)
 ```
 
 ### Package Information
 ```bash
 # View main solution structure
-cat Nursing.sln  # 4 projects: Core, API, Blazor, API.Tests
+cat Nursing.sln  # 4 projects: Core, API, Blazor (deprecated), API.Tests
 
 # Check API dependencies  
 cat Nursing.API/Nursing.API.csproj  # Entity Framework, PostgreSQL, JWT, Swagger
