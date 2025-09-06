@@ -61,7 +61,10 @@
                 s.leftDuration,
                 s.rightDuration,
             ]),
-            sort: true,
+            sort: {
+                columnIndex: 0,
+                direction: 'desc'
+            },
             autoWidth: true,
         }).render(gridElement);
 
