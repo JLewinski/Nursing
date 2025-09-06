@@ -1,7 +1,6 @@
 @page "/history"
 @using BlazorDateRangePicker
 @using Nursing.Core.Models.DTO
-@using System.Linq
 @inject Nursing.Blazor.Services.LocalDatabase Database
 
 <h1>History</h1>
@@ -100,17 +99,13 @@
     protected override async Task OnParametersSetAsync()
     {
         await base.OnParametersSetAsync();
-        Feedings = (await Database.GetFeedings(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow))
-            .OrderByDescending(f => f.Started)
-            .ToList();
+        Feedings = await Database.GetFeedings(DateTime.UtcNow.AddDays(-7), DateTime.UtcNow);
     }
 
     private async Task OnDateRangeChanged(DateRange dateRange)
     {
         StartTime = dateRange.Start.DateTime;
         EndTime = dateRange.End.DateTime;
-        Feedings = (await Database.GetFeedings(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime))
-            .OrderByDescending(f => f.Started)
-            .ToList();
+        Feedings = await Database.GetFeedings(dateRange.Start.UtcDateTime, dateRange.End.UtcDateTime);
     }
 }
