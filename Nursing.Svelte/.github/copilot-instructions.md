@@ -96,6 +96,7 @@ Deleted sessions have a `deleted: ISO_timestamp` field instead of full removal:
 ```bash
 pnpm dev               # Local dev server (Vite)
 pnpm build             # Production build → build/
+pnpm check             # SvelteKit typecheck + lint
 pnpm preview           # Test production locally
 pnpm prod              # Run Node server
 ```
