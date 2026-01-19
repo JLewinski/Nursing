@@ -1,0 +1,39 @@
+{
+  "name": "nursing-svelte",
+  "version": "1.0.0",
+  "exports": "./src/index.ts",
+  "tasks": {
+    "dev": "deno run -A --watch=static/,src/ npm:vite dev",
+    "build": "deno run -A npm:vite build",
+    "preview": "deno run -A npm:vite preview",
+    "prod": "deno run --allow-net --allow-read --allow-env build/index.js",
+    "docker_build": "docker build --no-cache -t nursing-app .",
+    "docker_run": "docker run -p 6969:6969 nursing-app",
+    "check": "deno run -A npm:svelte-check"
+  },
+  "compilerOptions": {
+    "lib": ["deno.window", "dom", "dom.iterable"],
+    "allowJs": true,
+    "strict": true,
+    "jsx": "react-jsx",
+    "jsxImportSource": "npm:react"
+  },
+  "imports": {
+    "@sveltejs/adapter-node": "npm:@sveltejs/adapter-node@^5.5.1",
+    "@sveltejs/kit": "npm:@sveltejs/kit@^2.50.0",
+    "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^4.0.4",
+    "bootstrap": "npm:bootstrap@^5.3.8",
+    "bootstrap-icons": "npm:bootstrap-icons@^1.13.1",
+    "chart.js": "npm:chart.js@^4.5.1",
+    "gridjs": "npm:gridjs@^6.2.0",
+    "sass": "npm:sass@^1.97.2",
+    "svelte": "npm:svelte@^5.47.0",
+    "svelte-adapter-deno": "npm:svelte-adapter-deno@^0.9.1",
+    "svelte-check": "npm:svelte-check@^4.3.5",
+    "typescript": "npm:typescript@^5.9.3",
+    "uuid": "npm:uuid@^11.1.0",
+    "vite": "npm:vite@^5.4.21"
+  },
+  "nodeModulesDir": "auto",
+  "lock": false
+}
