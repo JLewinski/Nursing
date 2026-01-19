@@ -1,9 +1,8 @@
-$color-mode-type: media-query;
-
-$info: #ffd59a;
-
-@import "bootstrap/scss/bootstrap";
-@import "bootstrap-icons/font/bootstrap-icons.css";
+@use "bootstrap/scss/bootstrap" as * with (
+  $color-mode-type: media-query,
+  $info: #ffd59a
+);
+@use "bootstrap-icons/font/bootstrap-icons.css";
 
 // Prevent pinch-to-zoom in PWA
 html {
