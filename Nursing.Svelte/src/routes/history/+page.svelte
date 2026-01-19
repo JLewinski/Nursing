@@ -26,8 +26,7 @@
             columns: [
                 {
                     name: "Date",
-                    formatter: (cell) =>
-                        (cell as Date).toLocaleDateString(),
+                    formatter: (cell) => (cell as Date).toLocaleDateString(),
                 },
                 {
                     name: "Start Time",
@@ -52,15 +51,20 @@
                 {
                     name: "Right Duration",
                     formatter: (cell) => formatDuration(cell as number),
-                }
+                },
             ],
-            data: sessions.map((s) => [
-                new Date(s.startTime),
-                new Date(s.startTime),
-                new Date(s.endTime),
-                s.leftDuration,
-                s.rightDuration,
-            ]),
+            data: sessions
+                .map((s) => [
+                    new Date(s.startTime),
+                    new Date(s.startTime),
+                    new Date(s.endTime),
+                    s.leftDuration,
+                    s.rightDuration,
+                ])
+                .sort(
+                    (a, b) =>
+                        (b[0] as Date).getTime() - (a[0] as Date).getTime(),
+                ),
             sort: true,
             autoWidth: true,
         }).render(gridElement);
