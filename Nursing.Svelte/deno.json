@@ -19,6 +19,7 @@
     "jsxImportSource": "npm:react"
   },
   "imports": {
+    "@std/assert": "jsr:@std/assert@^1.0.0",
     "@sveltejs/kit": "npm:@sveltejs/kit@^2.50.0",
     "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^4.0.4",
     "bootstrap": "npm:bootstrap@^5.3.8",
