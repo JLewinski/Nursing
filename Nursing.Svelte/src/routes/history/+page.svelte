@@ -27,6 +27,9 @@
                 {
                     name: "Date",
                     formatter: (cell) => (cell as Date).toLocaleDateString(),
+                    sort: {
+                        compare: (a, b) => (a as Date).getTime() - (b as Date).getTime()
+                    }
                 },
                 {
                     name: "Start Time",
@@ -35,6 +38,9 @@
                             hour: "2-digit",
                             minute: "2-digit",
                         }),
+                    sort: {
+                        compare: (a, b) => (a as Date).getTime() - (b as Date).getTime()
+                    }
                 },
                 {
                     name: "End Time",
@@ -43,6 +49,9 @@
                             hour: "2-digit",
                             minute: "2-digit",
                         }),
+                    sort: {
+                        compare: (a, b) => (a as Date).getTime() - (b as Date).getTime()
+                    }
                 },
                 {
                     name: "Left Duration",
