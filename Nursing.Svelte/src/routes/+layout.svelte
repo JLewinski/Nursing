@@ -1,5 +1,5 @@
 <script lang="ts">
-    import "../app.scss";
+    import "../app.css";
     import "./nav.css";
     import Installation from "$lib/components/Installation.svelte";
     import { setTimerState } from "$lib/stores/timerStore.svelte";

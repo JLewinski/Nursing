@@ -14,8 +14,7 @@
   },
   "devDependencies": {
     "@sveltejs/adapter-auto": "^3.3.1",
-    "@sveltejs/adapter-node": "^5.5.1",
-    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/adapter-cloudflare": "^7.2.5",
     "@sveltejs/kit": "^2.50.0",
     "@sveltejs/vite-plugin-svelte": "^4.0.4",
     "@types/bootstrap": "^5.2.10",
@@ -25,7 +24,6 @@
     "gridjs": "^6.2.0",
     "sass": "^1.97.2",
     "svelte": "^5.47.0",
-    "svelte-adapter-deno": "^0.9.1",
     "svelte-check": "^4.3.5",
     "typescript": "^5.9.3",
     "uuid": "^11.1.0",

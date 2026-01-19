@@ -19,7 +19,6 @@
     "jsxImportSource": "npm:react"
   },
   "imports": {
-    "@sveltejs/adapter-node": "npm:@sveltejs/adapter-node@^5.5.1",
     "@sveltejs/kit": "npm:@sveltejs/kit@^2.50.0",
     "@sveltejs/vite-plugin-svelte": "npm:@sveltejs/vite-plugin-svelte@^4.0.4",
     "bootstrap": "npm:bootstrap@^5.3.8",
@@ -28,7 +27,6 @@
     "gridjs": "npm:gridjs@^6.2.0",
     "sass": "npm:sass@^1.97.2",
     "svelte": "npm:svelte@^5.47.0",
-    "svelte-adapter-deno": "npm:svelte-adapter-deno@^0.9.1",
     "svelte-check": "npm:svelte-check@^4.3.5",
     "typescript": "npm:typescript@^5.9.3",
     "uuid": "npm:uuid@^11.1.0",
