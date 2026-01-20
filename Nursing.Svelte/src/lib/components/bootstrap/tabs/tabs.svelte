@@ -7,7 +7,7 @@
     let tabTitles = $derived(tabs as string[]);
 
     // svelte-ignore state_referenced_locally
-        let selectedTab = $state(tabTitles[0]);
+    let selectedTab = $state(tabTitles[0]);
     let tabContent = Object.keys(children).map(key => children[key] as Snippet);
 </script>
 
