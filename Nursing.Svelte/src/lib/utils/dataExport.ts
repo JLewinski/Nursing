@@ -1,24 +1,24 @@
-import type { Session } from '$lib/types';
+import type { DBSession } from '$lib/db/mod';
 import { Database } from '$lib/db/mod';
 
 interface ExportData {
     version: string;
     timestamp: string;
-    sessions: Session[];
+    sessions: DBSession[];
     settings: Record<string, unknown>;
 }
 
 export class DataExport {
     static async exportData(): Promise<string> {
         const db = new Database();
+        await db.init();
         const sessions = await db.getAllSessions();
-        const settings = await db.getSettings();
 
         const exportData: ExportData = {
             version: '1.0',
             timestamp: new Date().toISOString(),
             sessions,
-            settings
+            settings: {}
         };
 
         return JSON.stringify(exportData, null, 2);
@@ -28,15 +28,20 @@ export class DataExport {
         try {
             const data: ExportData = JSON.parse(jsonData);
             const db = new Database();
+            await db.init();
 
             // Validate data version and structure
             if (!this.validateImportData(data)) {
                 throw new Error('Invalid import data format');
             }
 
-            await db.importData(data);
+            // Import sessions
+            for (const session of data.sessions) {
+                await db.saveSession(session);
+            }
         } catch (error) {
-            throw new Error(`Import failed: ${error.message}`);
+            const message = error instanceof Error ? error.message : String(error);
+            throw new Error(`Import failed: ${message}`);
         }
     }
 

@@ -8,10 +8,11 @@ export function validateSession(session: Partial<Session>): boolean {
     return session.timerEvents.every(validateTimerEvent);
 }
 
-export function validateTimerEvent(event: Partial<TimerEvent>): boolean {
+export function validateTimerEvent(event: TimerEvent): boolean {
     return (
-        !!event.id &&
         !!event.timestamp &&
+        !!event.type &&
+        !!event.timer &&
         ['start', 'stop'].includes(event.type) &&
         ['left', 'right'].includes(event.timer)
     );
