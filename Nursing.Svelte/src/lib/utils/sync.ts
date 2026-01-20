@@ -1,5 +1,5 @@
-import type { Session, SyncState } from '$lib/types/index.ts';
-import { Database } from '$lib/db/mod.ts';
+import type { Session, SyncState } from '$lib/types/index';
+import { Database } from '$lib/db/mod';
 
 export class SyncManager {
     private db: Database;

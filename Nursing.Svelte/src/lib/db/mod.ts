@@ -1,4 +1,4 @@
-import { applyMigrations } from './migrations.ts';
+import { applyMigrations } from './migrations';
 
 interface DBSchema {
     sessions: {

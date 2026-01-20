@@ -9,8 +9,8 @@
 - **Framework**: SvelteKit 2.0 with Svelte 5 (latest reactive features)
 - **Storage**: IndexedDB (`NursingDB`) for sessions and settings
 - **PWA**: Service Workers for offline support, Web App Manifest for installation
-- **Build**: Vite + SvelteKit with Deno adapter
-- **Runtime**: Deno (instead of Node.js)
+- **Build**: Vite + SvelteKit with Cloudflare adapter
+- **Runtime**: Node.js
 - **UI**: Bootstrap 5 + Bootstrap Icons, Chart.js for analytics
 
 ### Core Data Flow
@@ -94,12 +94,11 @@ Deleted sessions have a `deleted: ISO_timestamp` field instead of full removal:
 
 ### Build Commands
 ```bash
-deno task dev          # Local dev server (Vite)
-deno task build        # Production build → build/
-deno task preview      # Test production locally
-deno task prod         # Run Deno server
-deno task docker_build # Build Docker image
-deno task docker_run   # Run in Docker (port 6969)
+pnpm dev               # Local dev server (Vite)
+pnpm build             # Production build → build/
+pnpm check             # SvelteKit typecheck + lint
+pnpm preview           # Test production locally
+pnpm prod              # Run Node server
 ```
 
 ### Database Initialization
@@ -141,7 +140,7 @@ deno task docker_run   # Run in Docker (port 6969)
 
 ### PWA/Service Worker Changes
 - Edit [service-worker.ts](src/service-worker.ts)
-- Run `deno task build` to regenerate `$service-worker` manifest
+- Run `pnpm build` to regenerate `$service-worker` manifest
 - Test offline behavior: DevTools → Network → Offline, then reload
 
 ### Database Changes
