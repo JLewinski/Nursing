@@ -86,3 +86,38 @@ self.addEventListener('fetch', (event: Event) => {
 
     fetchEvent.respondWith(respond());
 });
+
+self.addEventListener('notificationclick', (event) => {
+    const notificationEvent = event as NotificationEvent;
+    const notification = notificationEvent.notification;
+
+    notification.close();
+
+    // Open the app and navigate to root
+    const waitUntilPromise = async () => {
+        const sw = self as unknown as ServiceWorkerGlobalScope;
+        const allClients = await sw.clients.matchAll({
+            includeUncontrolled: true,
+            type: 'window'
+        });
+
+        // If client is already open, focus it
+        if (allClients.length > 0) {
+            await allClients[0].focus();
+            return;
+        }
+
+        // Otherwise open new window
+        if (sw.clients.openWindow) {
+            await sw.clients.openWindow('/');
+        }
+    };
+
+    notificationEvent.waitUntil(waitUntilPromise());
+});
+
+self.addEventListener('push', (event) => {
+    // Stub for future Push API implementation
+    // const pushEvent = event as PushEvent;
+    // console.log('Push event received', pushEvent?.data?.text());
+});
