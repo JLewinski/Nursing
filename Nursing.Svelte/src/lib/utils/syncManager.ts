@@ -15,7 +15,7 @@ export class SyncManager {
             const registration = await navigator.serviceWorker.ready;
             if ("sync" in registration) {
                 try {
-                    await registration.sync.register("sync-sessions");
+                    await (registration.sync as any).register("sync-sessions");
                 } catch (error) {
                     console.error("Background sync registration failed:", error);
                 }
