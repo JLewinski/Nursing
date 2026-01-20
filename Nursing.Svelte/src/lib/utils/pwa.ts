@@ -1,4 +1,4 @@
-import { registerServiceWorker } from './serviceWorkerRegistration.ts';
+import { registerServiceWorker } from './serviceWorkerRegistration';
 
 export class PWAManager {
     private static instance: PWAManager;

@@ -1,4 +1,4 @@
-import { migrateOldData } from "./migration_old.ts";
+import { migrateOldData } from "./migration_old";
 
 export const migrations = [
     {

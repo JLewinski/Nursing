@@ -1,4 +1,4 @@
-import { Database } from "../db/mod.ts";
+import { Database } from "../db/mod";
 
 export class StorageManager {
     private static readonly STORAGE_THRESHOLD = 0.9; // 90% of available space

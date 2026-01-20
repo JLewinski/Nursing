@@ -1,5 +1,5 @@
-import { Database } from "$lib/db/mod.ts";
-import { syncStore } from "$lib/stores/syncStore.svelte.ts";
+import { Database } from "$lib/db/mod";
+import { syncStore } from "$lib/stores/syncStore.svelte";
 
 export class SyncManager {
     private db: Database;
