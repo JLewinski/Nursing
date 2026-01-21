@@ -46,12 +46,12 @@ The Blazor frontend is still present in the solution but is not being actively m
 ### Running the Svelte Frontend
 ```bash
 cd Nursing.Svelte
-npm install              # Takes ~7 seconds - installs dependencies (shows 7 vulnerabilities - expected)
-npm run build           # Takes ~12 seconds - builds production version
-npm run dev             # Starts development server on http://localhost:5173
+pnpm i               # Takes ~7 seconds - installs dependencies
+pnpm build           # Takes ~12 seconds - builds production version
+pnpm dev             # Starts development server on http://localhost:5173
 ```
 
-**NEVER CANCEL: npm install takes ~10 seconds, build takes ~15 seconds. Set timeout to 60+ seconds.**
+**NEVER CANCEL: pnpm install takes ~10 seconds, build takes ~15 seconds. Set timeout to 60+ seconds.**
 
 ### Running the API (Requires PostgreSQL)
 The API cannot run without PostgreSQL database connection. To run the API:
@@ -129,8 +129,8 @@ dotnet test --no-build
 ### Frontend Development
 **Primary Frontend (Svelte):**
 - Modify components in `Nursing.Svelte/src/`
-- Run `npm run dev` from `Nursing.Svelte/` to test
-- Use `npm run build` to create production build
+- Run `pnpm dev` from `Nursing.Svelte/` to test
+- Use `pnpm build` to create production build
 
 **Deprecated Frontend (Blazor):**
 - The Blazor project (`Nursing.Blazor/`) is no longer being actively developed
@@ -174,8 +174,8 @@ cat Nursing.Svelte/package.json  # Svelte 5, Vite, Bootstrap, Chart.js, TypeScri
 - **dotnet restore**: ~24 seconds  
 - **dotnet build**: ~12 seconds
 - **dotnet test**: ~4 seconds
-- **npm install** (Svelte): ~7 seconds
-- **npm run build** (Svelte): ~12 seconds
+- **pnpm install** (Svelte): ~7 seconds
+- **pnpm build** (Svelte): ~12 seconds
 - **Complete .NET build cycle**: ~45 seconds total
 - **Complete Svelte build cycle**: ~20 seconds total
 
